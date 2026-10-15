@@ -138,6 +138,42 @@ async function syncKalenderFromSheets(sheetId) {
   if (html.trim()) {
     calGrid.innerHTML = html;
   }
+
+  // Automatisch de periode (maanden) detecteren en bijwerken in de titel
+  const validDates = [];
+  rows.forEach(item => {
+    const datum = item['Datum'] || item['datum'] || item['col_0'] || '';
+    const titel = item['Titel'] || item['titel'] || item['col_1'] || '';
+    if (datum && titel && datum.toLowerCase() !== 'datum') {
+      validDates.push(datum);
+    }
+  });
+
+  if (validDates.length > 0) {
+    const parseMonth = (str) => {
+      const s = String(str).toLowerCase();
+      if (s.includes('jan') || s.includes('/ 01') || s.includes('/01') || s.includes('/ 1') || s.includes('/1')) return 'JAN';
+      if (s.includes('feb') || s.includes('/ 02') || s.includes('/02') || s.includes('/ 2') || s.includes('/2')) return 'FEB';
+      if (s.includes('mrt') || s.includes('maa') || s.includes('/ 03') || s.includes('/03') || s.includes('/ 3') || s.includes('/3')) return 'MRT';
+      if (s.includes('apr') || s.includes('/ 04') || s.includes('/04') || s.includes('/ 4') || s.includes('/4')) return 'APR';
+      if (s.includes('mei') || s.includes('/ 05') || s.includes('/05') || s.includes('/ 5') || s.includes('/5')) return 'MEI';
+      if (s.includes('jun') && !s.includes('jul') || s.includes('/ 06') || s.includes('/06') || s.includes('/ 6') || s.includes('/6')) return 'JUNI';
+      if (s.includes('jul') || s.includes('/ 07') || s.includes('/07') || s.includes('/ 7') || s.includes('/7')) return 'JULI';
+      if (s.includes('aug') || s.includes('/ 08') || s.includes('/08') || s.includes('/ 8') || s.includes('/8')) return 'AUG';
+      if (s.includes('sep') || s.includes('/ 09') || s.includes('/09') || s.includes('/ 9') || s.includes('/9')) return 'SEPT';
+      if (s.includes('okt') || s.includes('oct') || s.includes('/ 10') || s.includes('/10')) return 'OKT';
+      if (s.includes('nov') || s.includes('/ 11') || s.includes('/11')) return 'NOV';
+      if (s.includes('dec') || s.includes('/ 12') || s.includes('/12')) return 'DEC';
+      return null;
+    };
+
+    const firstMonth = parseMonth(validDates[0]);
+    const lastMonth = parseMonth(validDates[validDates.length - 1]);
+    const subEl = document.querySelector('.cal-poster-sub');
+    if (subEl && firstMonth && lastMonth) {
+      subEl.textContent = `${firstMonth} – ${lastMonth}`;
+    }
+  }
 }
 
 /**
