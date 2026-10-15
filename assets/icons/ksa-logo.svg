@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ksaBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0066cc" />
+      <stop offset="100%" stop-color="#003d80" />
+    </linearGradient>
+    <linearGradient id="ksaRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff3366" />
+      <stop offset="100%" stop-color="#d60036" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#003d80" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <!-- Background Badge -->
+  <rect x="15" y="15" width="170" height="170" rx="42" fill="url(#ksaBlue)" filter="url(#glow)"/>
+  
+  <!-- Dynamic Youth Movement Wave / Swirls -->
+  <path d="M 40 145 C 70 170, 130 170, 160 145 C 170 115, 150 70, 120 50 C 90 30, 45 60, 40 100 Z" fill="#ffffff" opacity="0.15" />
+  
+  <!-- KSA Cross / Torch in Red & Gold -->
+  <g transform="translate(100, 92)">
+    <!-- Central Shield / Ribbon -->
+    <path d="M -32 -48 L 32 -48 C 32 -20, 36 28, 0 52 C -36 28, -32 -20, -32 -48 Z" fill="url(#ksaRed)" />
+    <!-- White Nordic/KSA Cross -->
+    <path d="M -8 -45 L 8 -45 L 8 40 L -8 40 Z" fill="#ffffff" />
+    <path d="M -26 -22 L 26 -22 L 26 -8 L -26 -8 Z" fill="#ffffff" />
+    <!-- Yellow Spark / Star -->
+    <circle cx="0" cy="-15" r="5" fill="#ffdd00" />
+  </g>
+  
+  <!-- Ribbon Banner with Text "KSA" -->
+  <g transform="translate(100, 158)">
+    <rect x="-65" y="-14" width="130" height="26" rx="13" fill="#ffdd00" />
+    <text x="0" y="5" font-family="'Plus Jakarta Sans', 'Arial Black', sans-serif" font-weight="900" font-size="14" fill="#003366" text-anchor="middle" letter-spacing="1.5">ZONHOVEN</text>
+  </g>
+</svg>
