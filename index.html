@@ -17,6 +17,9 @@
 
   <!-- Stylesheet in KSA.BE Style -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Automatic Device & Screen Detection (Mobile vs Desktop) -->
+  <script src="js/device-detect.js"></script>
 </head>
 <body>
 
@@ -93,6 +96,9 @@
 
       <!-- Action Items -->
       <div class="nav-actions">
+        <a href="javascript:void(0)" onclick="switchKsaView('mobile')" class="btn btn-outline-blue btn-sm" style="display:inline-flex; align-items:center; gap:5px; padding: 6px 12px; font-size: 0.82rem;" title="Schakel over naar smartphone-app weergave">
+          <span>📱 Mobiele App</span>
+        </a>
         <!-- Mobile Hamburger Menu Button -->
         <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu openen">
           ☰
@@ -937,6 +943,9 @@
           &copy; 2026 KSA Zonhoven Meisjes &bull; VZW 't Heem &bull; Aangesloten bij KSA Nationaal
         </div>
         <div class="footer-support-tags">
+          <a href="javascript:void(0)" onclick="switchKsaView('mobile')" class="footer-admin-link" title="Open de mobiele versie van deze website">
+            <span>📱 Mobiele App Weergave</span>
+          </a>
           <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" class="footer-admin-link" title="Open Google Sheets om de kalender en website aan te passen">
             <span>📊 Website Beheer (Google Sheets) &rarr;</span>
           </a>

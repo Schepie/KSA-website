@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  
+  <title>KSA Zonhoven Meisjes | Mobiele App</title>
+  <meta name="description" content="KSA Zonhoven Meisjes - Mobiele versie met live agenda, groepen, leiding en praktische info voor smartphone.">
+  <meta name="theme-color" content="#003056">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KSA Zonhoven">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/ksa-logo-official.svg?v=blue">
+  <link rel="apple-touch-icon" href="assets/icons/ksa-logo.png">
+
+  <!-- Mobile App Stylesheet -->
+  <link rel="stylesheet" href="css/mobile.css">
+
+  <!-- Automatic Device & Screen Detection -->
+  <script src="js/device-detect.js"></script>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       APP TOP HEADER (FIXED)
+       ========================================================================== -->
+  <header class="mobile-app-header">
+    <div class="header-brand">
+      <img src="assets/icons/ksa-logo-official.svg?v=blue" alt="KSA Logo" class="header-logo">
+      <div class="header-title-box">
+        <span class="header-title">KSA ZONHOVEN</span>
+        <span class="header-badge">Meisjes &bull; 6-17j</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- HalloKien ticket shortcut -->
+      <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener" class="header-action-btn hot-action" title="Bestel HalloKien Tickets">
+        🎟️
+      </a>
+      <!-- Location shortcut -->
+      <a href="https://maps.google.com/?q=Dijkbeemdenweg+8+3520+Zonhoven" target="_blank" rel="noopener" class="header-action-btn" title="Open locatie in Maps">
+        📍
+      </a>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN APP VIEWS (TAB PANES)
+       ========================================================================== -->
+  <main class="app-container">
+
+    <!-- ------------------------------------------------------------------------
+         TAB 1: INTRO / HOME
+         ------------------------------------------------------------------------ -->
+    <div class="tab-pane active" id="tab-intro">
+
+      <!-- Live Sunday Status & Hero -->
+      <div class="hero-live-badge">
+        <div class="live-indicator-row">
+          <div class="pulse-pill">
+            <span class="pulse-dot"></span>
+            <span>ELKE ZONDAG</span>
+          </div>
+          <span class="live-tagline">Dijkbeemdenweg 8</span>
+        </div>
+
+        <h1 class="hero-live-title">
+          DÉ JEUGDBEWEGING VOOR <span>ALLE TOFFE MEISJES</span>!
+        </h1>
+
+        <p class="hero-live-desc">
+          Zondagnamiddag vol pleinspelen, bosspelen, vriendschap en een onvergetelijk zomerkamp.
+        </p>
+
+        <div class="hero-details-strip">
+          <div class="hero-detail-col">
+            <strong>⏰ 13u30 – 17u00</strong>
+            <span>Iedere zondagnamiddag</span>
+          </div>
+          <div class="hero-detail-col">
+            <strong>🏡 Ons Heem</strong>
+            <span>Dijkbeemdenweg 8, Zonhoven</span>
+          </div>
+        </div>
+
+        <div class="hero-quick-actions">
+          <a href="javascript:void(0)" class="hero-btn hero-btn-primary" data-switch-tab="agenda">
+            <span>📅 Bekijk Kalender</span>
+          </a>
+          <a href="javascript:void(0)" class="hero-btn hero-btn-secondary" data-switch-tab="groepen">
+            <span>🎒 Onze Groepen</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- HalloKien Event Spotlight Card -->
+      <div class="mobile-event-card">
+        <div class="event-card-head">
+          <span class="event-chip">🎃 Eerstvolgend Groot Feest</span>
+          <span style="font-size:0.75rem; color:#fde047;">Za 17 Okt 2026</span>
+        </div>
+        <h2 class="event-title">HALLOKIEN BINGO NIGHT</h2>
+        <div class="event-meta">
+          <div>📍 Evenementenhal Zonhoven (Polyvalente zaal)</div>
+          <div>⏰ Deuren 18u30 &bull; Start 19u30 &bull; Vol = Vol!</div>
+        </div>
+
+        <div class="event-countdown-row">
+          <div class="countdown-box">
+            <div class="countdown-num" id="mDays">--</div>
+            <div class="countdown-lbl">Dagen</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="mHours">--</div>
+            <div class="countdown-lbl">Uur</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="mMinutes">--</div>
+            <div class="countdown-lbl">Min</div>
+          </div>
+          <div class="countdown-box">
+            <div class="countdown-num" id="mSeconds">--</div>
+            <div class="countdown-lbl">Sec</div>
+          </div>
+        </div>
+
+        <div class="event-action-row">
+          <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener" class="btn-ticket">
+            🎟️ Bestel Tickets via Ravotshop &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- 2 Gratis Proefzondagen Callout -->
+      <div class="proef-banner">
+        <div class="proef-icon">✨</div>
+        <div class="proef-text">
+          <h4>2 Gratis Proefzondagen!</h4>
+          <p>
+            Nieuwe meisjes van 6 t.e.m. 17 jaar mogen <strong>2 keer gratis komen meedoen</strong> om te ontdekken hoe tof KSA is. Vooraf inschrijven hoeft niet!
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Shortcuts Grid -->
+      <div class="app-section-head">
+        <h3 class="app-section-title">⚡ Snelle Toegang</h3>
+      </div>
+
+      <div class="shortcuts-grid">
+        <div class="shortcut-tile" data-switch-tab="agenda">
+          <div class="shortcut-icon-bubble" style="background:#eaf1fa; color:#003056;">
+            📅
+          </div>
+          <span class="shortcut-title">Officiële Kalender</span>
+          <span class="shortcut-desc">Wanneer is het KSA?</span>
+        </div>
+
+        <div class="shortcut-tile" data-switch-tab="groepen">
+          <div class="shortcut-icon-bubble" style="background:#fef7e6; color:#d97706;">
+            🎒
+          </div>
+          <span class="shortcut-title">5 Groepen</span>
+          <span class="shortcut-desc">Van 6 tot 17+ jaar</span>
+        </div>
+
+        <div class="shortcut-tile" data-switch-tab="leiding">
+          <div class="shortcut-icon-bubble" style="background:#fde8e9; color:#e3001b;">
+            👑
+          </div>
+          <span class="shortcut-title">De Leidingploeg</span>
+          <span class="shortcut-desc">Wie is wie? Paspoortjes</span>
+        </div>
+
+        <div class="shortcut-tile" data-switch-tab="info">
+          <div class="shortcut-icon-bubble" style="background:#ecfdf5; color:#059669;">
+            📝
+          </div>
+          <span class="shortcut-title">Inschrijven &amp; Info</span>
+          <span class="shortcut-desc">Uniform &amp; Ravot gids</span>
+        </div>
+      </div>
+
+      <!-- Sfeerfoto Preview Card -->
+      <div style="background:#ffffff; border-radius:var(--radius-lg); overflow:hidden; border:1px solid var(--border-subtle); box-shadow:var(--shadow-sm); margin-bottom:16px;">
+        <img src="images/ksakinderen.jpg" alt="KSA Zonhoven Kinderen" style="width:100%; height:180px; object-fit:cover;">
+        <div style="padding:12px 14px;">
+          <h4 style="font-size:0.95rem; font-weight:800; color:var(--ksa-blue);">💙❤️ Samen herinneringen maken</h4>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">
+            Al decennia de warmste meidengroep van Zonhoven. Kom gerust zondag een kijkje nemen!
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         TAB 2: AGENDA / KALENDER
+         ------------------------------------------------------------------------ -->
+    <div class="tab-pane" id="tab-agenda">
+      
+      <div class="app-section-head">
+        <div>
+          <h2 class="app-section-title">📅 Kalender 2026</h2>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Zondagactiviteiten &amp; Evenementen</span>
+        </div>
+        <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" style="font-size:0.72rem; color:var(--ksa-blue); font-weight:700;">
+          📊 Live Sync
+        </a>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="calendar-filter-bar">
+        <button type="button" class="cal-filter-chip active" data-filter="all">Alles</button>
+        <button type="button" class="cal-filter-chip" data-filter="upcoming">Binnenkort</button>
+        <button type="button" class="cal-filter-chip" data-filter="ksa">KSA Zondagen</button>
+        <button type="button" class="cal-filter-chip" data-filter="special">Speciaal &amp; Feest</button>
+      </div>
+
+      <!-- Agenda Items List -->
+      <div class="cal-list">
+
+        <!-- 20/09 (Voorbij) -->
+        <div class="cal-card-item is-past" data-category="special">
+          <div class="cal-date-block">
+            <span class="cal-day-num">20</span>
+            <span class="cal-month-str">SEP</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">STARTDAG &amp; LEIDINGZOEKTOCHT</span>
+            </div>
+            <div class="cal-event-subtext">Feestelijke opening nieuw werkjaar &bull; Afgelopen</div>
+          </div>
+        </div>
+
+        <!-- 27/09 (Voorbij) -->
+        <div class="cal-card-item is-past" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">27</span>
+            <span class="cal-month-str">SEP</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+            </div>
+            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
+          </div>
+        </div>
+
+        <!-- 04/10 (Voorbij) -->
+        <div class="cal-card-item is-past" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">04</span>
+            <span class="cal-month-str">OKT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+            </div>
+            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
+          </div>
+        </div>
+
+        <!-- 11/10 (Voorbij) -->
+        <div class="cal-card-item is-past" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">11</span>
+            <span class="cal-month-str">OKT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+            </div>
+            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
+          </div>
+        </div>
+
+        <!-- 17/10 HALLOKIEN (CURRENT HIGHLIGHT) -->
+        <div class="cal-card-item is-current" data-category="special">
+          <div class="cal-date-block">
+            <span class="cal-day-num">17</span>
+            <span class="cal-month-str">OKT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">HALLOKIEN BINGO 🎃</span>
+              <span class="cal-event-badge badge-highlight">Binnenkort!</span>
+            </div>
+            <div class="cal-event-subtext">Evenementenhal Zonhoven &bull; Deuren 18u30</div>
+          </div>
+        </div>
+
+        <!-- 18/10 GEEN KSA -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:#f1f5f9; color:#64748b;">
+            <span class="cal-day-num">18</span>
+            <span class="cal-month-str">OKT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">GEEN KSA</span>
+              <span class="cal-event-badge badge-none">Rustdag</span>
+            </div>
+            <div class="cal-event-subtext">Geen activiteit na de HalloKien kienavond</div>
+          </div>
+        </div>
+
+        <!-- 25/10 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">25</span>
+            <span class="cal-month-str">OKT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 01/11 GEEN KSA -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:#f1f5f9; color:#64748b;">
+            <span class="cal-day-num">01</span>
+            <span class="cal-month-str">NOV</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">GEEN KSA</span>
+              <span class="cal-event-badge badge-none">Allerheiligen</span>
+            </div>
+            <div class="cal-event-subtext">Herfstvakantie &bull; Geen activiteit</div>
+          </div>
+        </div>
+
+        <!-- 08/11 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">08</span>
+            <span class="cal-month-str">NOV</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Pleinspelen &amp; bosspelen</div>
+          </div>
+        </div>
+
+        <!-- 15/11 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">15</span>
+            <span class="cal-month-str">NOV</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal</div>
+          </div>
+        </div>
+
+        <!-- 22/11 CHRISTOFFELFEEST -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:var(--ksa-yellow-soft); color:#b45309;">
+            <span class="cal-day-num">22</span>
+            <span class="cal-month-str">NOV</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">CHRISTOFFELFEEST ⛪</span>
+              <span class="cal-event-badge badge-highlight">Speciaal</span>
+            </div>
+            <div class="cal-event-subtext">Viering met alle leden &amp; sympathisanten</div>
+          </div>
+        </div>
+
+        <!-- 29/11 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">29</span>
+            <span class="cal-month-str">NOV</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal</div>
+          </div>
+        </div>
+
+        <!-- 06/12 KSA SINT -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:var(--ksa-red-soft); color:var(--ksa-red);">
+            <span class="cal-day-num">06</span>
+            <span class="cal-month-str">DEC</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">SINTERKLAAS BIJ KSA 👑</span>
+              <span class="cal-event-badge badge-highlight">Sint op bezoek!</span>
+            </div>
+            <div class="cal-event-subtext">Hoog bezoek aan ons lokaal!</div>
+          </div>
+        </div>
+
+        <!-- 13/12 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">13</span>
+            <span class="cal-month-str">DEC</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal</div>
+          </div>
+        </div>
+
+        <!-- 18/12 KERSTFEESTJE -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:var(--ksa-red-soft); color:var(--ksa-red);">
+            <span class="cal-day-num">18</span>
+            <span class="cal-month-str">DEC</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KERSTFEESTJE 🎅</span>
+              <span class="cal-event-badge badge-highlight">Kerstavond</span>
+            </div>
+            <div class="cal-event-subtext">Gezellig samen het jaar afsluiten</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Action / Download -->
+      <div class="cal-actions-bar">
+        <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" class="hero-btn hero-btn-secondary" style="background:#ffffff; color:var(--ksa-blue); border:1px solid var(--border-subtle);">
+          <span>📊 Open Google Sheet</span>
+        </a>
+        <a href="index.html#agenda" class="hero-btn hero-btn-primary">
+          <span>📥 Download Poster</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         TAB 3: GROEPEN (AGE GROUPS)
+         ------------------------------------------------------------------------ -->
+    <div class="tab-pane" id="tab-groepen">
+
+      <div class="app-section-head">
+        <div>
+          <h2 class="app-section-title">🎒 Leeftijdsgroepen</h2>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Kies een groep om te ontdekken</span>
+        </div>
+      </div>
+
+      <!-- Group Pill Selector -->
+      <div class="group-pill-selector">
+        <button type="button" class="group-select-btn active" data-group="kabouters">
+          ✨ Kabouters (6-8j)
+        </button>
+        <button type="button" class="group-select-btn" data-group="sloebers">
+          🎈 Sloebers (8-10j)
+        </button>
+        <button type="button" class="group-select-btn" data-group="roodkapjes">
+          🏕️ Roodkapjes (10-12j)
+        </button>
+        <button type="button" class="group-select-btn" data-group="jim">
+          🧭 Jim (12-14j)
+        </button>
+        <button type="button" class="group-select-btn" data-group="sim">
+          ⚡ Sim (14-16j)
+        </button>
+        <button type="button" class="group-select-btn" data-group="kim">
+          🔥 Kim (+16)
+        </button>
+      </div>
+
+      <!-- Interactive Single Group Detail Card -->
+      <div class="group-detail-view">
+        <div class="group-image-wrap">
+          <img id="mGroupImg" src="images/kabouters.jpg" alt="Groepsfoto">
+          <div class="group-age-tag" id="mGroupAge">6 - 8 jaar (1ste &amp; 2de leerjaar)</div>
+        </div>
+
+        <div class="group-content-box">
+          <div class="group-name-row">
+            <h3 class="group-name" id="mGroupName">KABOUTERS</h3>
+          </div>
+          <div class="group-tagline" id="mGroupTagline">
+            Spelen, ontdekken &amp; oneindig veel fantasie!
+          </div>
+          <p class="group-description" id="mGroupDesc">
+            Bij de kabouters stappen de allerjongste meisjes binnen in een magische wereld vol plezier. Van tikkertje in het gras en verkleedpartijtjes tot het bouwen van reusachtige zandkastelen.
+          </p>
+
+          <div class="group-tags" id="mGroupTags">
+            <span class="group-tag">✨ Pleinspelen</span>
+            <span class="group-tag">🎨 Knutselen</span>
+            <span class="group-tag">🏰 Korte namiddagkampjes</span>
+          </div>
+
+          <!-- Group Leaders Callout -->
+          <div class="group-leaders-callout">
+            <div class="leaders-preview-text">
+              <span class="leaders-preview-lbl">Leidsters van deze groep:</span>
+              <span class="leaders-preview-names" id="mGroupLeaders">Cara &amp; Nore</span>
+            </div>
+            <button type="button" class="btn-view-leaders" id="mViewLeadersBtn">
+              Bekijk Leiding &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Proefzondagen CTA -->
+      <div style="background:#ffffff; border-radius:var(--radius-md); padding:14px; border:1px solid var(--border-subtle); text-align:center;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:var(--ksa-blue);">Kom gerust 2x gratis proberen!</h4>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin:4px 0 10px;">
+          Iedere zondag van 13u30 tot 17u00 aan ons lokaal. Geen inschrijving nodig vooraf.
+        </p>
+        <a href="https://ravot.ksa.be" target="_blank" rel="noopener" class="hero-btn hero-btn-primary" style="margin:0 auto; max-width:240px;">
+          <span>🚀 Inschrijven via Ravot</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         TAB 4: LEIDING (LEADERS PER GROUP)
+         ------------------------------------------------------------------------ -->
+    <div class="tab-pane" id="tab-leiding">
+
+      <div class="app-section-head">
+        <div>
+          <h2 class="app-section-title">👑 De Leidingploeg</h2>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Tik op een paspoort voor weetjes!</span>
+        </div>
+      </div>
+
+      <!-- Hoofdleiding Card (Fien Aerts) -->
+      <div class="hoofdleiding-banner">
+        <div class="hoofdleiding-photo">
+          <img src="assets/images/real_leiding_hoofd.jpg" alt="Hoofdleiding Fien Aerts">
+        </div>
+        <div class="hoofdleiding-info">
+          <span class="hoofd-role">Hoofdleiding</span>
+          <h3 class="hoofd-name">FIEN AERTS</h3>
+          <p class="hoofd-desc">
+            Centraal aanspreekpunt voor ouders, leiding en KSA Nationaal.
+          </p>
+          <div class="hoofd-actions">
+            <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" class="hoofd-btn">
+              ✉️ Stuur Mail
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hint banner -->
+      <div style="background:var(--ksa-blue-soft); color:var(--ksa-blue); padding:8px 12px; border-radius:var(--radius-sm); font-size:0.76rem; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:6px;">
+        <span>💡</span>
+        <span>Tik op een foto om het originele <strong>leidingspaspoortje</strong> groot te bekijken!</span>
+      </div>
+
+      <!-- 1. Kabouters (Cara & Nore) -->
+      <div class="leader-group-block" id="leader-sec-kabouters">
+        <h4 class="leader-group-title">
+          <span>✨</span> Kabouters Leiding (6-8j)
+        </h4>
+        <div class="leader-cards-grid">
+          <!-- Cara -->
+          <div class="leader-card-single" data-paspoort="images/cara.jpg" data-name="Cara (Kabouters Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/cara.jpg" alt="Cara" style="object-position: 50% 20%;">
+            </div>
+            <span class="leader-card-name">Cara</span>
+            <span class="leader-card-role">Kabouters</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+
+          <!-- Nore -->
+          <div class="leader-card-single" data-paspoort="images/nore.jpg" data-name="Nore (Kabouters Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/nore.jpg" alt="Nore" style="object-position: 50% 20%;">
+            </div>
+            <span class="leader-card-name">Nore</span>
+            <span class="leader-card-role">Kabouters</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Sloebers (Lien & Lies) -->
+      <div class="leader-group-block" id="leader-sec-sloebers">
+        <h4 class="leader-group-title">
+          <span>🎈</span> Sloebers Leiding (8-10j)
+        </h4>
+        <div class="leader-cards-grid">
+          <!-- Lien -->
+          <div class="leader-card-single" data-paspoort="images/lien.jpg" data-name="Lien (Sloebers Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/lien.jpg" alt="Lien" style="object-position: 50% 20%;">
+            </div>
+            <span class="leader-card-name">Lien</span>
+            <span class="leader-card-role">Sloebers</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+
+          <!-- Lies -->
+          <div class="leader-card-single" data-paspoort="images/lies.jpg" data-name="Lies (Sloebers Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/lies.jpg" alt="Lies" style="object-position: 50% 20%;">
+            </div>
+            <span class="leader-card-name">Lies</span>
+            <span class="leader-card-role">Sloebers</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Jim (Lotte, Lina B. & Lina S.) -->
+      <div class="leader-group-block" id="leader-sec-jim">
+        <h4 class="leader-group-title">
+          <span>🧭</span> Jim Leiding (12-14j)
+        </h4>
+        <div class="leader-cards-grid">
+          <!-- Lotte -->
+          <div class="leader-card-single" data-paspoort="images/lotte.jpg" data-name="Lotte (Jim Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/lotte.jpg" alt="Lotte" style="object-position: 50% 20%;">
+            </div>
+            <span class="leader-card-name">Lotte</span>
+            <span class="leader-card-role">Jim</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+
+          <!-- Lina's -->
+          <div class="leader-card-single" data-paspoort="images/jim.jpg" data-name="Lina B. & Lina S. (Jim Leiding)">
+            <div class="leader-avatar-circle">
+              <img src="images/jim.jpg" alt="Lina's">
+            </div>
+            <span class="leader-card-name">Lina B. &amp; Lina S.</span>
+            <span class="leader-card-role">Jim</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Sim (Kato & Fien) -->
+      <div class="leader-group-block" id="leader-sec-sim">
+        <h4 class="leader-group-title">
+          <span>⚡</span> Sim Leiding (14-16j)
+        </h4>
+        <div class="leader-cards-grid" style="grid-template-columns: 1fr;">
+          <div class="leader-card-single" data-paspoort="images/sim.jpg" data-name="Kato & Fien (Sim Leiding)">
+            <div class="leader-avatar-circle" style="width:78px; height:78px;">
+              <img src="images/sim.jpg" alt="Kato en Fien">
+            </div>
+            <span class="leader-card-name">Kato &amp; Fien</span>
+            <span class="leader-card-role">Sim Leiding</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Kim (Oonah) -->
+      <div class="leader-group-block" id="leader-sec-kim">
+        <h4 class="leader-group-title">
+          <span>🔥</span> Kim (+16) Begeleiding
+        </h4>
+        <div class="leader-cards-grid" style="grid-template-columns: 1fr;">
+          <div class="leader-card-single" data-paspoort="images/Oonah.jpg" data-name="Oonah (Kim +16 Begeleiding)">
+            <div class="leader-avatar-circle" style="width:78px; height:78px;">
+              <img src="images/Oonah.jpg" alt="Oonah" style="object-position: 50% 15%;">
+            </div>
+            <span class="leader-card-name">Oonah</span>
+            <span class="leader-card-role">Kim (+16)</span>
+            <span class="leader-card-pill">🔍 Bekijk Paspoort</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ------------------------------------------------------------------------
+         TAB 5: INFO & INSCHRIJVEN (PRAKTISCH)
+         ------------------------------------------------------------------------ -->
+    <div class="tab-pane" id="tab-info">
+
+      <div class="app-section-head">
+        <div>
+          <h2 class="app-section-title">ℹ️ Info &amp; Inschrijven</h2>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Praktisch &bull; Uniform &bull; Ravot</span>
+        </div>
+      </div>
+
+      <!-- Zondagen Info -->
+      <div class="info-card-box">
+        <h3>⏰ Zondagnamiddagen</h3>
+        <p style="font-size:0.86rem; color:var(--text-muted); margin-bottom:8px;">
+          Iedere zondag van <strong>13u30 tot 17u00</strong> aan ons lokaal (Dijkbeemdenweg 8, Zonhoven). We ravotten, spelen in het groen en maken veel plezier.
+        </p>
+        <a href="https://maps.google.com/?q=Dijkbeemdenweg+8+3520+Zonhoven" target="_blank" rel="noopener" class="hero-btn hero-btn-secondary" style="background:var(--ksa-blue-soft); color:var(--ksa-blue); border:none; padding:8px 12px; font-size:0.82rem;">
+          📍 Open Route in Google Maps
+        </a>
+      </div>
+
+      <!-- Uniform Info -->
+      <div class="info-card-box">
+        <h3>👕 Ons KSA Uniform</h3>
+        <p style="font-size:0.86rem; color:var(--text-muted);">
+          Elke zondag dragen we onze donkerblauwe KSA-trui of -hemd, samen met onze KSA-das en lintjes. Dit toont dat we één hechte meidengroep zijn!
+        </p>
+      </div>
+
+      <!-- Ravot Inschrijfgids -->
+      <div class="info-card-box">
+        <h3>📝 Inschrijven via Ravot (ksa.be)</h3>
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:12px;">
+          Inschrijven voor het werkjaar gebeurt via het officiële KSA platform:
+        </p>
+
+        <div class="info-list-step">
+          <div class="step-num-bubble">1</div>
+          <div>
+            <div class="step-text-title">Surf naar ravot.ksa.be</div>
+            <div class="step-text-sub">Open het ledenportaal op je smartphone</div>
+          </div>
+        </div>
+
+        <div class="info-list-step">
+          <div class="step-num-bubble">2</div>
+          <div>
+            <div class="step-text-title">Inloggen of Account</div>
+            <div class="step-text-sub">Bestaand account gebruiken of eenvoudig aanmaken</div>
+          </div>
+        </div>
+
+        <div class="info-list-step">
+          <div class="step-num-bubble">3</div>
+          <div>
+            <div class="step-text-title">Kies 'KSA Zonhoven Meisjes'</div>
+            <div class="step-text-sub">Selecteer onze groep en de juiste leeftijd</div>
+          </div>
+        </div>
+
+        <div class="info-list-step">
+          <div class="step-num-bubble">4</div>
+          <div>
+            <div class="step-text-title">Bevestig inschrijving</div>
+            <div class="step-text-sub">UiTPAS / kansentarief discreet mogelijk</div>
+          </div>
+        </div>
+
+        <a href="https://ravot.ksa.be" target="_blank" rel="noopener" class="hero-btn hero-btn-primary" style="margin-top:10px;">
+          <span>🚀 Naar ravot.ksa.be &rarr;</span>
+        </a>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="info-card-box">
+        <h3>📬 Contact &amp; Vragen</h3>
+        <div style="font-size:0.85rem; color:var(--text-main); display:flex; flex-direction:column; gap:6px;">
+          <div>✉️ <strong>E-mail:</strong> <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline;">hoofdleiding.ksazonhoven@gmail.com</a></div>
+          <div>🏠 <strong>Lokaal:</strong> Dijkbeemdenweg 8, 3520 Zonhoven</div>
+          <div>🏕️ <strong>Verhuring 't Heem:</strong> <a href="mailto:heem.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline;">heem.ksazonhoven@gmail.com</a></div>
+        </div>
+      </div>
+
+      <!-- Desktop Switcher Option -->
+      <div class="desktop-switch-box">
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:10px;">
+          Liever de uitgebreide website met alle fotogalerijen en zaalverhuur bekijken?
+        </p>
+        <button type="button" class="btn-switch-desktop" onclick="switchKsaView('desktop')">
+          <span>💻 Schakel over naar Volledige Desktopversie</span>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ==========================================================================
+       PASPOORT LIGHTBOX MODAL
+       ========================================================================== -->
+  <div class="paspoort-modal" id="paspoortModal">
+    <div class="paspoort-modal-content">
+      <button type="button" class="paspoort-modal-close" id="modalCloseBtn" aria-label="Sluiten">✕</button>
+      <img src="" alt="Leidingspaspoort" class="paspoort-modal-img" id="modalPaspoortImg">
+      <div class="paspoort-modal-footer">
+        <span class="paspoort-modal-title" id="modalPaspoortTitle">Leidingspaspoort</span>
+        <span style="font-size:0.75rem; color:var(--ksa-red); font-weight:700;">❤️💙 KSA Zonhoven</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       BOTTOM FIXED NAVIGATION DOCK
+       ========================================================================== -->
+  <nav class="mobile-bottom-nav">
+    <a href="javascript:void(0)" class="nav-item active" data-tab="intro">
+      <div class="nav-item-icon-wrap">
+        <img src="assets/icons/menu/nav_nieuws.png" alt="Home">
+      </div>
+      <span class="nav-item-label">Home</span>
+    </a>
+
+    <a href="javascript:void(0)" class="nav-item" data-tab="agenda">
+      <div class="nav-item-icon-wrap">
+        <img src="assets/icons/menu/nav_kalender.png" alt="Kalender">
+      </div>
+      <span class="nav-item-label">Kalender</span>
+    </a>
+
+    <a href="javascript:void(0)" class="nav-item" data-tab="groepen">
+      <div class="nav-item-icon-wrap">
+        <img src="assets/icons/menu/nav_groepen.png" alt="Groepen">
+      </div>
+      <span class="nav-item-label">Groepen</span>
+    </a>
+
+    <a href="javascript:void(0)" class="nav-item" data-tab="leiding">
+      <div class="nav-item-icon-wrap">
+        <img src="assets/icons/menu/nav_leiding.png" alt="Leiding">
+      </div>
+      <span class="nav-item-label">Leiding</span>
+    </a>
+
+    <a href="javascript:void(0)" class="nav-item" data-tab="info">
+      <div class="nav-item-icon-wrap">
+        <img src="assets/icons/menu/nav_info.png" alt="Info">
+      </div>
+      <span class="nav-item-label">Info</span>
+    </a>
+  </nav>
+
+  <!-- Mobile App Controller Script -->
+  <script src="js/mobile.js"></script>
+</body>
+</html>
