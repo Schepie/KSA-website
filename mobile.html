@@ -7,7 +7,7 @@
   
   <title>KSA Zonhoven Meisjes | Mobiele App</title>
   <meta name="description" content="KSA Zonhoven Meisjes - Mobiele versie met live agenda, groepen, leiding en praktische info voor smartphone.">
-  <meta name="theme-color" content="#003056">
+  <meta name="theme-color" content="#0067b1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="KSA Zonhoven">
@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="assets/icons/ksa-logo.png">
 
   <!-- Mobile App Stylesheet -->
-  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/mobile.css?v=crisp">
 
   <!-- Automatic Device & Screen Detection -->
   <script src="js/device-detect.js"></script>
@@ -97,54 +97,46 @@
         </div>
       </div>
 
-      <!-- HalloKien Event Spotlight Card -->
+      <!-- HalloKien Event Spotlight Card with Event Photo -->
       <div class="mobile-event-card">
-        <div class="event-card-head">
-          <span class="event-chip">🎃 Eerstvolgend Groot Feest</span>
-          <span style="font-size:0.75rem; color:#fde047;">Za 17 Okt 2026</span>
+        <div class="event-card-media">
+          <img src="assets/images/real_hallokien.jpg" alt="HalloKien KSA Zonhoven Meisjes" class="event-media-img">
+          <div class="event-media-badge">📅 Za 17 Okt 2026</div>
         </div>
-        <h2 class="event-title">HALLOKIEN BINGO NIGHT</h2>
-        <div class="event-meta">
-          <div>📍 Evenementenhal Zonhoven (Polyvalente zaal)</div>
-          <div>⏰ Deuren 18u30 &bull; Start 19u30 &bull; Vol = Vol!</div>
-        </div>
+        <div class="event-card-body">
+          <h2 class="event-title">HALLOKIEN BINGO NIGHT 🎃</h2>
+          <div class="event-meta">
+            <div>📍 Evenementenhal Zonhoven (Polyvalente zaal)</div>
+            <div>⏰ Deuren 18u30 &bull; Start 19u30 &bull; Vol = Vol!</div>
+          </div>
 
-        <div class="event-countdown-row">
-          <div class="countdown-box">
-            <div class="countdown-num" id="mDays">--</div>
-            <div class="countdown-lbl">Dagen</div>
+          <div class="event-countdown-row">
+            <div class="countdown-box">
+              <div class="countdown-num" id="mDays">--</div>
+              <div class="countdown-lbl">Dagen</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="mHours">--</div>
+              <div class="countdown-lbl">Uur</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="mMinutes">--</div>
+              <div class="countdown-lbl">Min</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="mSeconds">--</div>
+              <div class="countdown-lbl">Sec</div>
+            </div>
           </div>
-          <div class="countdown-box">
-            <div class="countdown-num" id="mHours">--</div>
-            <div class="countdown-lbl">Uur</div>
-          </div>
-          <div class="countdown-box">
-            <div class="countdown-num" id="mMinutes">--</div>
-            <div class="countdown-lbl">Min</div>
-          </div>
-          <div class="countdown-box">
-            <div class="countdown-num" id="mSeconds">--</div>
-            <div class="countdown-lbl">Sec</div>
-          </div>
-        </div>
 
-        <div class="event-action-row">
-          <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener" class="btn-ticket">
-            🎟️ Bestel Tickets via Ravotshop &rarr;
-          </a>
+          <div class="event-action-row">
+            <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener" class="btn-ticket">
+              🎟️ Bestel Tickets via Ravotshop &rarr;
+            </a>
+          </div>
         </div>
       </div>
 
-      <!-- 2 Gratis Proefzondagen Callout -->
-      <div class="proef-banner">
-        <div class="proef-icon">✨</div>
-        <div class="proef-text">
-          <h4>2 Gratis Proefzondagen!</h4>
-          <p>
-            Nieuwe meisjes van 6 t.e.m. 17 jaar mogen <strong>2 keer gratis komen meedoen</strong> om te ontdekken hoe tof KSA is. Vooraf inschrijven hoeft niet!
-          </p>
-        </div>
-      </div>
 
       <!-- Quick Nav Shortcuts Grid -->
       <div class="app-section-head">
@@ -153,7 +145,7 @@
 
       <div class="shortcuts-grid">
         <div class="shortcut-tile" data-switch-tab="agenda">
-          <div class="shortcut-icon-bubble" style="background:#eaf1fa; color:#003056;">
+          <div class="shortcut-icon-bubble" style="background:var(--ksa-blue-soft); color:var(--ksa-blue);">
             📅
           </div>
           <span class="shortcut-title">Officiële Kalender</span>
@@ -208,77 +200,20 @@
           <h2 class="app-section-title">📅 Kalender 2026</h2>
           <span style="font-size:0.75rem; color:var(--text-muted);">Zondagactiviteiten &amp; Evenementen</span>
         </div>
-        <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" style="font-size:0.72rem; color:var(--ksa-blue); font-weight:700;">
-          📊 Live Sync
+        <a href="assets/images/real_agenda.jpg" download="KSA_Zonhoven_Kalender.jpg" target="_blank" rel="noopener" class="cal-download-btn-compact" title="Download kalender poster">
+          <span>📥 Download</span>
         </a>
       </div>
 
       <!-- Filter Chips -->
       <div class="calendar-filter-bar">
         <button type="button" class="cal-filter-chip active" data-filter="all">Alles</button>
-        <button type="button" class="cal-filter-chip" data-filter="upcoming">Binnenkort</button>
         <button type="button" class="cal-filter-chip" data-filter="ksa">KSA Zondagen</button>
         <button type="button" class="cal-filter-chip" data-filter="special">Speciaal &amp; Feest</button>
       </div>
 
-      <!-- Agenda Items List -->
+      <!-- Agenda Items List (Vanaf heden / Binnenkort) -->
       <div class="cal-list">
-
-        <!-- 20/09 (Voorbij) -->
-        <div class="cal-card-item is-past" data-category="special">
-          <div class="cal-date-block">
-            <span class="cal-day-num">20</span>
-            <span class="cal-month-str">SEP</span>
-          </div>
-          <div class="cal-info-block">
-            <div class="cal-event-title-row">
-              <span class="cal-event-name">STARTDAG &amp; LEIDINGZOEKTOCHT</span>
-            </div>
-            <div class="cal-event-subtext">Feestelijke opening nieuw werkjaar &bull; Afgelopen</div>
-          </div>
-        </div>
-
-        <!-- 27/09 (Voorbij) -->
-        <div class="cal-card-item is-past" data-category="ksa">
-          <div class="cal-date-block">
-            <span class="cal-day-num">27</span>
-            <span class="cal-month-str">SEP</span>
-          </div>
-          <div class="cal-info-block">
-            <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
-            </div>
-            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
-          </div>
-        </div>
-
-        <!-- 04/10 (Voorbij) -->
-        <div class="cal-card-item is-past" data-category="ksa">
-          <div class="cal-date-block">
-            <span class="cal-day-num">04</span>
-            <span class="cal-month-str">OKT</span>
-          </div>
-          <div class="cal-info-block">
-            <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
-            </div>
-            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
-          </div>
-        </div>
-
-        <!-- 11/10 (Voorbij) -->
-        <div class="cal-card-item is-past" data-category="ksa">
-          <div class="cal-date-block">
-            <span class="cal-day-num">11</span>
-            <span class="cal-month-str">OKT</span>
-          </div>
-          <div class="cal-info-block">
-            <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
-            </div>
-            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Afgelopen</div>
-          </div>
-        </div>
 
         <!-- 17/10 HALLOKIEN (CURRENT HIGHLIGHT) -->
         <div class="cal-card-item is-current" data-category="special">
@@ -288,7 +223,7 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">HALLOKIEN BINGO 🎃</span>
+              <span class="cal-event-name">HALLOKIEN 🎃</span>
               <span class="cal-event-badge badge-highlight">Binnenkort!</span>
             </div>
             <div class="cal-event-subtext">Evenementenhal Zonhoven &bull; Deuren 18u30</div>
@@ -304,9 +239,9 @@
           <div class="cal-info-block">
             <div class="cal-event-title-row">
               <span class="cal-event-name">GEEN KSA</span>
-              <span class="cal-event-badge badge-none">Rustdag</span>
+              <span class="cal-event-badge badge-none">Geen KSA</span>
             </div>
-            <div class="cal-event-subtext">Geen activiteit na de HalloKien kienavond</div>
+            <div class="cal-event-subtext">Rustdag na de HalloKien kienavond</div>
           </div>
         </div>
 
@@ -318,7 +253,7 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-name">KSA</span>
               <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
             <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
@@ -334,9 +269,9 @@
           <div class="cal-info-block">
             <div class="cal-event-title-row">
               <span class="cal-event-name">GEEN KSA</span>
-              <span class="cal-event-badge badge-none">Allerheiligen</span>
+              <span class="cal-event-badge badge-none">Geen KSA</span>
             </div>
-            <div class="cal-event-subtext">Herfstvakantie &bull; Geen activiteit</div>
+            <div class="cal-event-subtext">Geen KSA activiteit deze zondag</div>
           </div>
         </div>
 
@@ -348,10 +283,10 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-name">KSA</span>
               <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Pleinspelen &amp; bosspelen</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
@@ -363,25 +298,25 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-name">KSA</span>
               <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Aan ons lokaal</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
-        <!-- 22/11 CHRISTOFFELFEEST -->
-        <div class="cal-card-item" data-category="special">
-          <div class="cal-date-block" style="background:var(--ksa-yellow-soft); color:#b45309;">
+        <!-- 22/11 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
             <span class="cal-day-num">22</span>
             <span class="cal-month-str">NOV</span>
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">CHRISTOFFELFEEST ⛪</span>
-              <span class="cal-event-badge badge-highlight">Speciaal</span>
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Viering met alle leden &amp; sympathisanten</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
@@ -393,14 +328,14 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-name">KSA</span>
               <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Aan ons lokaal</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
-        <!-- 06/12 KSA SINT -->
+        <!-- 06/12 KSA & SINTERKLAAS -->
         <div class="cal-card-item" data-category="special">
           <div class="cal-date-block" style="background:var(--ksa-red-soft); color:var(--ksa-red);">
             <span class="cal-day-num">06</span>
@@ -408,10 +343,10 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">SINTERKLAAS BIJ KSA 👑</span>
-              <span class="cal-event-badge badge-highlight">Sint op bezoek!</span>
+              <span class="cal-event-name">KSA &amp; SINTERKLAAS 🎁</span>
+              <span class="cal-event-badge badge-active">Sint op bezoek!</span>
             </div>
-            <div class="cal-event-subtext">Hoog bezoek aan ons lokaal!</div>
+            <div class="cal-event-subtext">13u30 tot 17u00 &bull; Hoog bezoek aan ons lokaal!</div>
           </div>
         </div>
 
@@ -423,38 +358,178 @@
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KSA ACTIVITEIT</span>
+              <span class="cal-event-name">KSA</span>
               <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Aan ons lokaal</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
-        <!-- 18/12 KERSTFEESTJE -->
-        <div class="cal-card-item" data-category="special">
-          <div class="cal-date-block" style="background:var(--ksa-red-soft); color:var(--ksa-red);">
-            <span class="cal-day-num">18</span>
+        <!-- 20/12 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">20</span>
             <span class="cal-month-str">DEC</span>
           </div>
           <div class="cal-info-block">
             <div class="cal-event-title-row">
-              <span class="cal-event-name">KERSTFEESTJE 🎅</span>
-              <span class="cal-event-badge badge-highlight">Kerstavond</span>
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
             </div>
-            <div class="cal-event-subtext">Gezellig samen het jaar afsluiten</div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
           </div>
         </div>
 
-      </div>
+        <!-- 27/12 GEEN KSA (KERSTVAKANTIE) -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:#f1f5f9; color:#64748b;">
+            <span class="cal-day-num">27</span>
+            <span class="cal-month-str">DEC</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">GEEN KSA (KERSTVAKANTIE)</span>
+              <span class="cal-event-badge badge-none">Geen KSA</span>
+            </div>
+            <div class="cal-event-subtext">Kerstvakantie &bull; Geen activiteit</div>
+          </div>
+        </div>
 
-      <!-- Quick Action / Download -->
-      <div class="cal-actions-bar">
-        <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" class="hero-btn hero-btn-secondary" style="background:#ffffff; color:var(--ksa-blue); border:1px solid var(--border-subtle);">
-          <span>📊 Open Google Sheet</span>
-        </a>
-        <a href="index.html#agenda" class="hero-btn hero-btn-primary">
-          <span>📥 Download Poster</span>
-        </a>
+        <!-- 03/01 GEEN KSA (KERSTVAKANTIE) -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:#f1f5f9; color:#64748b;">
+            <span class="cal-day-num">03</span>
+            <span class="cal-month-str">JAN</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">GEEN KSA (KERSTVAKANTIE)</span>
+              <span class="cal-event-badge badge-none">Geen KSA</span>
+            </div>
+            <div class="cal-event-subtext">Kerstvakantie &bull; Geen activiteit</div>
+          </div>
+        </div>
+
+        <!-- 10/01 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">10</span>
+            <span class="cal-month-str">JAN</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 17/01 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">17</span>
+            <span class="cal-month-str">JAN</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 24/01 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">24</span>
+            <span class="cal-month-str">JAN</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 31/01 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">31</span>
+            <span class="cal-month-str">JAN</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 07/02 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">07</span>
+            <span class="cal-month-str">FEB</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 14/02 KSA -->
+        <div class="cal-card-item" data-category="ksa">
+          <div class="cal-date-block">
+            <span class="cal-day-num">14</span>
+            <span class="cal-month-str">FEB</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">KSA</span>
+              <span class="cal-event-badge badge-active">13u30 - 17u00</span>
+            </div>
+            <div class="cal-event-subtext">Aan ons lokaal &bull; Dijkbeemdenweg 8</div>
+          </div>
+        </div>
+
+        <!-- 08/03 SPAGHETTIDAG -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:var(--ksa-yellow-soft); color:#b45309;">
+            <span class="cal-day-num">08</span>
+            <span class="cal-month-str">MRT</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">SPAGHETTIDAG 🍝</span>
+              <span class="cal-event-badge badge-highlight">Spaghettidag</span>
+            </div>
+            <div class="cal-event-subtext">Lekker eten &amp; gezelligheid aan ons lokaal</div>
+          </div>
+        </div>
+
+        <!-- 11-20/07 ZOMERKAMP -->
+        <div class="cal-card-item" data-category="special">
+          <div class="cal-date-block" style="background:var(--ksa-blue-soft); color:var(--ksa-blue);">
+            <span class="cal-day-num">11-20</span>
+            <span class="cal-month-str">JULI</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">HET GROTE ZOMERKAMP ⛺</span>
+              <span class="cal-event-badge badge-highlight">Zomerkamp!</span>
+            </div>
+            <div class="cal-event-subtext">Het absolute hoogtepunt van ons KSA-jaar!</div>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -469,40 +544,43 @@
           <h2 class="app-section-title">🎒 Leeftijdsgroepen</h2>
           <span style="font-size:0.75rem; color:var(--text-muted);">Kies een groep om te ontdekken</span>
         </div>
+        <span class="scroll-hint-pill">👉 Veeg naar rechts</span>
       </div>
 
-      <!-- Group Pill Selector -->
-      <div class="group-pill-selector">
-        <button type="button" class="group-select-btn active" data-group="kabouters">
-          ✨ Kabouters (6-8j)
-        </button>
-        <button type="button" class="group-select-btn" data-group="sloebers">
-          🎈 Sloebers (8-10j)
-        </button>
-        <button type="button" class="group-select-btn" data-group="roodkapjes">
-          🏕️ Roodkapjes (10-12j)
-        </button>
-        <button type="button" class="group-select-btn" data-group="jim">
-          🧭 Jim (12-14j)
-        </button>
-        <button type="button" class="group-select-btn" data-group="sim">
-          ⚡ Sim (14-16j)
-        </button>
-        <button type="button" class="group-select-btn" data-group="kim">
-          🔥 Kim (+16)
-        </button>
+      <!-- Group Pill Selector with visible scrollbar & scroll hint -->
+      <div class="scrollable-bar-wrap">
+        <div class="group-pill-selector">
+          <button type="button" class="group-select-btn active" data-group="kabouters">
+            ✨ Kabouters (6-8j)
+          </button>
+          <button type="button" class="group-select-btn" data-group="sloebers">
+            🎈 Sloebers (8-10j)
+          </button>
+          <button type="button" class="group-select-btn" data-group="roodkapjes">
+            🏕️ Roodkapjes (10-12j)
+          </button>
+          <button type="button" class="group-select-btn" data-group="jim">
+            🧭 Jim (12-14j)
+          </button>
+          <button type="button" class="group-select-btn" data-group="sim">
+            ⚡ Sim (14-16j)
+          </button>
+          <button type="button" class="group-select-btn" data-group="kim">
+            🔥 Kim (+16)
+          </button>
+        </div>
       </div>
 
       <!-- Interactive Single Group Detail Card -->
       <div class="group-detail-view">
         <div class="group-image-wrap">
           <img id="mGroupImg" src="images/kabouters.jpg" alt="Groepsfoto">
-          <div class="group-age-tag" id="mGroupAge">6 - 8 jaar (1ste &amp; 2de leerjaar)</div>
         </div>
 
         <div class="group-content-box">
-          <div class="group-name-row">
-            <h3 class="group-name" id="mGroupName">KABOUTERS</h3>
+          <h3 class="group-name" id="mGroupName">KABOUTERS</h3>
+          <div>
+            <span class="group-age-tag" id="mGroupAge">6 - 8 jaar (1ste &amp; 2de leerjaar)</span>
           </div>
           <div class="group-tagline" id="mGroupTagline">
             Spelen, ontdekken &amp; oneindig veel fantasie!
@@ -726,8 +804,8 @@
       <!-- Uniform Info -->
       <div class="info-card-box">
         <h3>👕 Ons KSA Uniform</h3>
-        <p style="font-size:0.86rem; color:var(--text-muted);">
-          Elke zondag dragen we onze donkerblauwe KSA-trui of -hemd, samen met onze KSA-das en lintjes. Dit toont dat we één hechte meidengroep zijn!
+        <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.45;">
+          Elke zondag dragen we hetzelfde! Een donkerblauwe trui of hemd en ons KSA sjaaltje. We dragen het met trots overal naartoe en op de Dag van de Jeugdbeweging kleuren we alle straten blauw!
         </p>
       </div>
 
@@ -775,13 +853,31 @@
         </a>
       </div>
 
+      <!-- Zaalverhuur 't Heem -->
+      <div class="info-card-box">
+        <h3>🏡 Zaalverhuur VZW 't Heem</h3>
+        <div style="border-radius:var(--radius-md); overflow:hidden; margin-bottom:12px; border:1px solid var(--border-subtle); box-shadow:var(--shadow-sm);">
+          <img src="images/theem.jpg" alt="Zaalverhuur 't Heem Zonhoven" style="width:100%; height:190px; object-fit:cover; display:block;">
+        </div>
+        <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.45; margin-bottom:12px;">
+          Onze lokalen en polyvalente feestzalen zijn te huur voor jeugdverenigingen, weekends, kampen en familie- of verjaardagsfeestjes. Voorzien van een professionele keuken, sanitair en een grote buitenspeelweide.
+        </p>
+        <div style="font-size:0.85rem; color:var(--text-main); display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+          <div>✉️ <strong>E-mail:</strong> <a href="mailto:heem.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline; font-weight:600;">heem.ksazonhoven@gmail.com</a></div>
+          <div>🌐 <strong>Website:</strong> <a href="https://www.theem.be" target="_blank" rel="noopener" style="color:var(--ksa-blue); text-decoration:underline; font-weight:600;">www.theem.be</a></div>
+          <div>📍 <strong>Adres:</strong> <a href="https://maps.google.com/?q=Dijkbeemdenweg+8+3520+Zonhoven" target="_blank" rel="noopener" style="color:var(--ksa-blue); text-decoration:underline;">Dijkbeemdenweg 8, 3520 Zonhoven</a></div>
+        </div>
+        <a href="https://www.theem.be" target="_blank" rel="noopener" class="hero-btn hero-btn-primary" style="display:flex; align-items:center; justify-content:center; gap:8px; width:100%;">
+          <span>🌐 Bezoek www.theem.be &rarr;</span>
+        </a>
+      </div>
+
       <!-- Contact Info -->
       <div class="info-card-box">
         <h3>📬 Contact &amp; Vragen</h3>
         <div style="font-size:0.85rem; color:var(--text-main); display:flex; flex-direction:column; gap:6px;">
-          <div>✉️ <strong>E-mail:</strong> <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline;">hoofdleiding.ksazonhoven@gmail.com</a></div>
-          <div>🏠 <strong>Lokaal:</strong> Dijkbeemdenweg 8, 3520 Zonhoven</div>
-          <div>🏕️ <strong>Verhuring 't Heem:</strong> <a href="mailto:heem.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline;">heem.ksazonhoven@gmail.com</a></div>
+          <div>✉️ <strong>E-mail hoofdleiding:</strong> <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline;">hoofdleiding.ksazonhoven@gmail.com</a></div>
+          <div>🏠 <strong>Lokaal:</strong> <a href="https://maps.google.com/?q=Dijkbeemdenweg+8+3520+Zonhoven" target="_blank" rel="noopener" style="color:var(--ksa-blue); text-decoration:underline;">Dijkbeemdenweg 8, 3520 Zonhoven</a></div>
         </div>
       </div>
 
@@ -855,5 +951,7 @@
 
   <!-- Mobile App Controller Script -->
   <script src="js/mobile.js"></script>
+  <!-- Google Sheets Live Sync CMS -->
+  <script src="js/sheets-sync.js?v=mobile1"></script>
 </body>
 </html>

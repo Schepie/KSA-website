@@ -92,51 +92,159 @@ async function syncKalenderFromSheets(sheetId) {
   if (!rows || rows.length === 0) return;
 
   const calGrid = document.querySelector('.cal-grid');
-  if (!calGrid) return;
+  const calList = document.querySelector('.cal-list');
+  if (!calGrid && !calList) return;
 
-  let html = '';
-  rows.forEach(item => {
-    // Veldnamen flexibel matchen
-    const datum = item['Datum'] || item['datum'] || item['col_0'] || '';
-    const titel = item['Titel'] || item['titel'] || item['Activiteit'] || item['col_1'] || '';
-    const status = String(item['Status'] || item['status'] || item['col_2'] || '').toLowerCase();
-    const emoji = item['Emoji'] || item['emoji'] || item['Sticker'] || item['col_3'] || '';
-    const onderlijnd = String(item['Onderlijnd'] || item['onderlijnd'] || item['col_4'] || '').toLowerCase();
+  // 1. Desktop kalender (.cal-grid) bijwerken
+  if (calGrid) {
+    let desktopHtml = '';
+    rows.forEach(item => {
+      const datum = item['Datum'] || item['datum'] || item['col_0'] || '';
+      const titel = item['Titel'] || item['titel'] || item['Activiteit'] || item['col_1'] || '';
+      const status = String(item['Status'] || item['status'] || item['col_2'] || '').toLowerCase();
+      const emoji = item['Emoji'] || item['emoji'] || item['Sticker'] || item['col_3'] || '';
+      const onderlijnd = String(item['Onderlijnd'] || item['onderlijnd'] || item['col_4'] || '').toLowerCase();
 
-    if (!datum && !titel) return;
-    if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return; // Header skip
+      if (!datum && !titel) return;
+      if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return; // Header skip
 
-    const isPast = status.includes('voorbij') || status.includes('past');
-    const isCurrent = status.includes('nu') || status.includes('binnenkort') || status.includes('actief') || status.includes('highlight');
-    const isUnderline = onderlijnd === 'ja' || onderlijnd === 'yes' || titel.toUpperCase().includes('GEEN KSA');
+      const isPast = status.includes('voorbij') || status.includes('past');
+      const isCurrent = status.includes('nu') || status.includes('binnenkort') || status.includes('actief') || status.includes('highlight');
+      const isUnderline = onderlijnd === 'ja' || onderlijnd === 'yes' || titel.toUpperCase().includes('GEEN KSA');
 
-    let itemClasses = ['cal-item'];
-    if (isPast) itemClasses.push('is-past');
-    if (isCurrent) itemClasses.push('is-current');
+      let itemClasses = ['cal-item'];
+      if (isPast) itemClasses.push('is-past');
+      if (isCurrent) itemClasses.push('is-current');
 
-    let textClasses = ['cal-event-text'];
-    if (isUnderline) textClasses.push('cal-text-underline');
-    if (titel.toUpperCase().includes('HALLOKIEN')) textClasses.push('cal-text-hallokien');
-    if (titel.toUpperCase().includes('SPAGHETTI')) textClasses.push('cal-text-spaghetti');
-    if (titel.length >= 13) textClasses.push('cal-text-long');
+      let textClasses = ['cal-event-text'];
+      if (isUnderline) textClasses.push('cal-text-underline');
+      if (titel.toUpperCase().includes('HALLOKIEN')) textClasses.push('cal-text-hallokien');
+      if (titel.toUpperCase().includes('SPAGHETTI')) textClasses.push('cal-text-spaghetti');
+      if (titel.length >= 13) textClasses.push('cal-text-long');
 
-    html += `
-      <div class="${itemClasses.join(' ')}">
-        <div class="cal-date">
-          ${isCurrent ? '<span class="cal-excl">!</span> ' : ''}${datum}
+      desktopHtml += `
+        <div class="${itemClasses.join(' ')}">
+          <div class="cal-date">
+            ${isCurrent ? '<span class="cal-excl">!</span> ' : ''}${datum}
+          </div>
+          <div class="cal-card">
+            ${emoji ? `<span class="cal-sticker">${emoji}</span>` : ''}
+            <span class="${textClasses.join(' ')}">${titel}</span>
+            ${isCurrent ? `<span class="cal-pill-now">Binnenkort!</span>` : ''}
+            ${isPast ? `<span style="font-size:0.75rem; color:#888; margin-top:2px;">(Voorbij)</span>` : ''}
+          </div>
         </div>
-        <div class="cal-card">
-          ${emoji ? `<span class="cal-sticker">${emoji}</span>` : ''}
-          <span class="${textClasses.join(' ')}">${titel}</span>
-          ${isCurrent ? `<span class="cal-pill-now">Binnenkort!</span>` : ''}
-          ${isPast ? `<span style="font-size:0.75rem; color:#888; margin-top:2px;">(Voorbij)</span>` : ''}
-        </div>
-      </div>
-    `;
-  });
+      `;
+    });
 
-  if (html.trim()) {
-    calGrid.innerHTML = html;
+    if (desktopHtml.trim()) {
+      calGrid.innerHTML = desktopHtml;
+    }
+  }
+
+  // 2. Mobiele kalender (.cal-list) bijwerken
+  if (calList) {
+    let mobileHtml = '';
+    rows.forEach(item => {
+      const datum = item['Datum'] || item['datum'] || item['col_0'] || '';
+      const titel = item['Titel'] || item['titel'] || item['Activiteit'] || item['col_1'] || '';
+      const status = String(item['Status'] || item['status'] || item['col_2'] || '').toLowerCase();
+      const emoji = item['Emoji'] || item['emoji'] || item['Sticker'] || item['col_3'] || '';
+
+      if (!datum && !titel) return;
+      if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return; // Header skip
+
+      const isPast = status.includes('voorbij') || status.includes('past');
+      // Op mobiel tonen we standaard alleen de actuele en komende evenementen
+      if (isPast) return;
+
+      const isCurrent = status.includes('nu') || status.includes('binnenkort') || status.includes('actief') || status.includes('highlight');
+
+      // Datum parseren (bv. "17 / 10", "18/10", "11 - 20 Juli")
+      let day = '';
+      let month = 'KSA';
+      if (datum.includes('/')) {
+        const parts = datum.split('/');
+        day = parts[0].trim().padStart(2, '0');
+        const mIdx = parseInt(parts[1].trim());
+        const months = ['JAN', 'FEB', 'MRT', 'APR', 'MEI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEC'];
+        if (!isNaN(mIdx) && mIdx >= 1 && mIdx <= 12) {
+          month = months[mIdx - 1];
+        } else {
+          month = parts[1].trim().toUpperCase();
+        }
+      } else if (datum.toLowerCase().includes('juli')) {
+        day = datum.replace(/[^0-9\-]/g, '') || '11-20';
+        month = 'JULI';
+      } else {
+        day = datum;
+      }
+
+      // Categorie en subtekst bepalen
+      const titelUpper = titel.toUpperCase();
+      let category = 'ksa';
+      let badgeHtml = '';
+      let subtext = 'Aan ons lokaal &bull; Dijkbeemdenweg 8';
+      let dateBlockStyle = '';
+
+      if (titelUpper.includes('GEEN KSA')) {
+        category = 'special';
+        badgeHtml = '<span class="cal-event-badge badge-none">Geen KSA</span>';
+        if (titelUpper.includes('KERST')) {
+          subtext = 'Kerstvakantie &bull; Geen activiteit';
+        } else if (datum.includes('18')) {
+          subtext = 'Rustdag na de HalloKien kienavond';
+        } else {
+          subtext = 'Geen KSA activiteit deze zondag';
+        }
+        dateBlockStyle = 'style="background:#f1f5f9; color:#64748b;"';
+      } else if (titelUpper.includes('HALLOKIEN')) {
+        category = 'special';
+        badgeHtml = '<span class="cal-event-badge badge-highlight">Binnenkort!</span>';
+        subtext = 'Evenementenhal Zonhoven &bull; Deuren 18u30';
+      } else if (titelUpper.includes('SPAGHETTI')) {
+        category = 'special';
+        badgeHtml = '<span class="cal-event-badge badge-highlight">Spaghettidag</span>';
+        subtext = 'Lekker eten & gezelligheid aan ons lokaal';
+      } else if (titelUpper.includes('ZOMERKAMP') || titelUpper.includes('KAMP')) {
+        category = 'special';
+        badgeHtml = '<span class="cal-event-badge badge-highlight">Zomerkamp!</span>';
+        subtext = 'Het absolute hoogtepunt van ons KSA-jaar!';
+      } else if (titelUpper.includes('SINTERKLAAS')) {
+        category = 'special';
+        badgeHtml = '<span class="cal-event-badge badge-active">Sint op bezoek!</span>';
+        subtext = '13u30 tot 17u00 &bull; Hoog bezoek aan ons lokaal!';
+      } else {
+        category = 'ksa';
+        badgeHtml = '<span class="cal-event-badge badge-active">13u30 - 17u00</span>';
+        subtext = 'Aan ons lokaal &bull; Dijkbeemdenweg 8';
+      }
+
+      mobileHtml += `
+        <div class="cal-card-item ${isCurrent ? 'is-current' : ''}" data-category="${category}">
+          <div class="cal-date-block" ${dateBlockStyle}>
+            <span class="cal-day-num">${day}</span>
+            <span class="cal-month-str">${month}</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">${titel} ${emoji || ''}</span>
+              ${badgeHtml}
+            </div>
+            <div class="cal-event-subtext">${subtext}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    if (mobileHtml.trim()) {
+      calList.innerHTML = mobileHtml;
+      if (typeof window.filterMobileCalendar === 'function') {
+        const activeChip = document.querySelector('.cal-filter-chip.active');
+        const currentFilter = activeChip ? activeChip.getAttribute('data-filter') : 'all';
+        window.filterMobileCalendar(currentFilter);
+      }
+    }
   }
 
   // Automatisch de periode (maanden) detecteren en bijwerken in de titel

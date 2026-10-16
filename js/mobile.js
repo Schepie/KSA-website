@@ -81,11 +81,20 @@ function initMobileNavigation() {
     });
   });
 
-  // Check URL hash on initial load
-  const initialHash = window.location.hash;
-  if (initialHash) {
-    activateTab(initialHash);
+  // Check URL parameter (?tab=) or hash (#...) on initial load
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || window.location.hash || '';
+  if (initialTab) {
+    activateTab(initialTab);
   }
+
+  // Listen to browser back/forward or hash change
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash;
+    if (hash) {
+      activateTab(hash);
+    }
+  });
 
   // Expose global helper
   window.switchMobileTab = activateTab;
@@ -263,29 +272,33 @@ function initMobileCountdown() {
    ========================================================================== */
 function initCalendarFilters() {
   const chips = document.querySelectorAll('.cal-filter-chip');
-  const items = document.querySelectorAll('.cal-card-item');
+
+  function applyFilter(filter) {
+    const items = document.querySelectorAll('.cal-card-item');
+    items.forEach(item => {
+      const cat = (item.getAttribute('data-category') || '').toLowerCase();
+      const isPast = item.classList.contains('is-past');
+
+      if (filter === 'all') {
+        item.style.display = 'flex';
+      } else if (filter === 'upcoming') {
+        item.style.display = !isPast ? 'flex' : 'none';
+      } else if (filter === 'ksa') {
+        item.style.display = cat.includes('ksa') ? 'flex' : 'none';
+      } else if (filter === 'special') {
+        item.style.display = cat.includes('special') ? 'flex' : 'none';
+      }
+    });
+  }
+
+  window.filterMobileCalendar = applyFilter;
 
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
       chips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-
-      const filter = chip.getAttribute('data-filter');
-
-      items.forEach(item => {
-        const cat = item.getAttribute('data-category') || '';
-        const isPast = item.classList.contains('is-past');
-
-        if (filter === 'all') {
-          item.style.display = 'flex';
-        } else if (filter === 'upcoming') {
-          item.style.display = !isPast ? 'flex' : 'none';
-        } else if (filter === 'ksa') {
-          item.style.display = cat.includes('ksa') ? 'flex' : 'none';
-        } else if (filter === 'special') {
-          item.style.display = cat.includes('special') ? 'flex' : 'none';
-        }
-      });
+      const filter = chip.getAttribute('data-filter') || 'all';
+      applyFilter(filter);
     });
   });
 }

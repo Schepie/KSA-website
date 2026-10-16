@@ -15,7 +15,7 @@
   // Check explicit overrides from URL
   if (viewParam === 'desktop' || noMobileParam === '1' || noMobileParam === 'true') {
     try { sessionStorage.setItem(STORAGE_KEY, 'desktop'); } catch (e) {}
-  } else if (viewParam === 'mobile') {
+  } else if (viewParam === 'mobile' || urlParams.has('tab')) {
     try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
   }
 
@@ -25,22 +25,29 @@
     preferredView = sessionStorage.getItem(STORAGE_KEY);
   } catch (e) {}
 
-  const isMobileScreen = window.innerWidth <= MOBILE_BREAKPOINT || 
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isSmallScreen = window.innerWidth <= MOBILE_BREAKPOINT || 
     (window.matchMedia && window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches);
 
   const pathname = window.location.pathname.toLowerCase();
   const isMobilePage = pathname.endsWith('mobile.html') || pathname.includes('/mobile');
 
+  // If already on mobile page, remember mobile preference
+  if (isMobilePage && preferredView !== 'desktop') {
+    try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
+  }
+
   // Route: If on desktop page and is mobile screen
   if (!isMobilePage) {
-    if (preferredView !== 'desktop' && isMobileScreen) {
+    if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA)) {
       const targetHash = window.location.hash || '';
       window.location.replace('mobile.html' + targetHash);
     }
   } 
-  // Route: If on mobile page and is desktop screen
+  // Route: If on mobile page, only send to desktop if explicitly requested or on large non-touch screen without mobile preference
   else {
-    if (preferredView !== 'mobile' && !isMobileScreen && window.innerWidth > 820) {
+    if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
       const targetHash = window.location.hash || '';
       window.location.replace('index.html' + targetHash);
     }
