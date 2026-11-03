@@ -1595,14 +1595,19 @@ img {
   text-decoration: none;
 }
 
-.leiding-avatar-thumb {
-  width: 76px;
-  height: 76px;
+.leiding-avatar-thumb,
+.leiding-card > div:first-child:not(.leiding-avatars-duo) {
+  width: 76px !important;
+  height: 76px !important;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid var(--ksa-blue);
   box-shadow: var(--shadow-sm);
   transition: transform var(--transition-bounce), border-color var(--transition-fast);
+}
+
+.leiding-card-hoofd > div:first-child:not(.leiding-avatars-duo) {
+  border-color: var(--ksa-red);
 }
 
 .leiding-avatar-thumb img,

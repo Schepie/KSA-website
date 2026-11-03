@@ -677,6 +677,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         outline: 2.5px solid #e3001b;
       }
 
+      .leiding-avatar-thumb,
+      .leiding-card > div:first-child:not(.leiding-avatars-duo) {
+        width: 76px !important;
+        height: 76px !important;
+      }
       .leiding-avatar-thumb img,
       .leiding-card > div:first-child > img {
         object-fit: cover !important;
