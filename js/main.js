@@ -312,87 +312,104 @@ function initMobileMenu() {
 }
 
 /* --------------------------------------------------------------------------
-   6. Gallery Lightbox Modal
+   6. Gallery & Paspoort Lightbox Modal (Opens large in dedicated pop-up window)
    -------------------------------------------------------------------------- */
 function initLightbox() {
-  const items = document.querySelectorAll('.gallery-card, .gallery-item');
+  document.addEventListener('click', (e) => {
+    // In edit-mode we allow editing instead of opening the preview window
+    if (document.body.classList.contains('ksa-edit-mode-active')) return;
 
-  items.forEach(item => {
-    item.addEventListener('click', () => {
-      const img = item.querySelector('img');
-      const caption = item.querySelector('.gallery-overlay-badge, .gallery-caption');
-      if (!img) return;
+    const item = e.target.closest('.paspoort-card, .gallery-item, .gallery-card');
+    if (!item) return;
 
-      // Create modal overlay dynamically on demand
-      const modal = document.createElement('div');
-      modal.className = 'lightbox-modal active';
-      modal.style.position = 'fixed';
-      modal.style.inset = '0';
-      modal.style.backgroundColor = 'rgba(13, 9, 48, 0.95)';
-      modal.style.zIndex = '99999';
-      modal.style.display = 'flex';
-      modal.style.alignItems = 'center';
-      modal.style.justifyContent = 'center';
-      modal.style.padding = '24px';
+    // Avoid triggering when clicking edit tools if any
+    if (e.target.closest('.ksa-card-edit-tools')) return;
 
-      const content = document.createElement('div');
-      content.style.maxWidth = '900px';
-      content.style.maxHeight = '90vh';
-      content.style.position = 'relative';
-      content.style.textAlign = 'center';
+    const img = item.querySelector('img');
+    if (!img || !img.src) return;
 
-      const closeBtn = document.createElement('button');
-      closeBtn.innerHTML = '&times;';
-      closeBtn.style.position = 'absolute';
-      closeBtn.style.top = '-45px';
-      closeBtn.style.right = '0';
-      closeBtn.style.background = 'none';
-      closeBtn.style.border = 'none';
-      closeBtn.style.color = '#ffffff';
-      closeBtn.style.fontSize = '2.5rem';
-      closeBtn.style.cursor = 'pointer';
+    e.preventDefault();
+    e.stopPropagation();
 
-      const modalImg = document.createElement('img');
-      modalImg.src = img.src;
-      modalImg.alt = img.alt || 'KSA Foto';
-      modalImg.style.maxWidth = '100%';
-      modalImg.style.maxHeight = '80vh';
-      modalImg.style.borderRadius = '16px';
-      modalImg.style.border = '4px solid #ffffff';
-      modalImg.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.8)';
-      modalImg.style.margin = '0 auto';
+    const caption = item.querySelector('.paspoort-card-badge, .gallery-overlay-badge, .gallery-caption');
+    const titleText = caption ? caption.innerText.replace(/🔍\s*/, '').trim() : (item.getAttribute('title') || img.alt || 'KSA Paspoort');
 
-      const captionEl = document.createElement('div');
-      captionEl.innerText = caption ? caption.innerText : '';
-      captionEl.style.color = '#ffffff';
-      captionEl.style.textAlign = 'center';
-      captionEl.style.marginTop = '14px';
-      captionEl.style.fontWeight = '700';
-      captionEl.style.fontFamily = 'var(--font-heading, "Bebas Neue", sans-serif)';
-      captionEl.style.fontSize = '1.4rem';
-
-      content.appendChild(closeBtn);
-      content.appendChild(modalImg);
-      if (caption) content.appendChild(captionEl);
-      modal.appendChild(content);
-      document.body.appendChild(modal);
-
-      function closeModal() {
-        modal.remove();
-        document.removeEventListener('keydown', handleKey);
-      }
-
-      closeBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
-
-      function handleKey(e) {
-        if (e.key === 'Escape') closeModal();
-      }
-      document.addEventListener('keydown', handleKey);
-    });
+    openPaspoortLightbox(img.src, titleText, img.alt);
   });
+}
+
+function openPaspoortLightbox(imgSrc, titleText, altText) {
+  // Remove any existing modal first
+  document.querySelectorAll('.lightbox-modal').forEach(m => m.remove());
+
+  const modal = document.createElement('div');
+  modal.className = 'lightbox-modal active';
+  modal.style.cssText = 'position:fixed; inset:0; background:rgba(10, 15, 30, 0.88); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:999999; display:flex; align-items:center; justify-content:center; padding:20px;';
+
+  const content = document.createElement('div');
+  content.style.cssText = 'max-width:820px; width:100%; max-height:92vh; position:relative; text-align:center; display:flex; flex-direction:column; align-items:center;';
+
+  const headerBar = document.createElement('div');
+  headerBar.style.cssText = 'display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:12px; color:#ffffff;';
+
+  const titleEl = document.createElement('h3');
+  titleEl.style.cssText = 'margin:0; font-family:var(--font-heading, "Bebas Neue", sans-serif); font-size:1.6rem; letter-spacing:0.8px; color:#ffffff; text-shadow:0 2px 8px rgba(0,0,0,0.5);';
+  titleEl.textContent = titleText || '🌟 Leidingspaspoort';
+
+  const actionsWrap = document.createElement('div');
+  actionsWrap.style.cssText = 'display:flex; align-items:center; gap:10px;';
+
+  const openNewTabBtn = document.createElement('a');
+  openNewTabBtn.href = imgSrc;
+  openNewTabBtn.target = '_blank';
+  openNewTabBtn.rel = 'noopener noreferrer';
+  openNewTabBtn.title = 'Open paspoort in apart venster / nieuw tabblad';
+  openNewTabBtn.style.cssText = 'color:#f8fafc; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:6px 12px; font-size:0.82rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px;';
+  openNewTabBtn.innerHTML = '<span>↗️ Apart Venster</span>';
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.title = 'Sluiten (Esc)';
+  closeBtn.style.cssText = 'background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); color:#ffffff; font-size:1.8rem; line-height:1; width:38px; height:38px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;';
+
+  actionsWrap.appendChild(openNewTabBtn);
+  actionsWrap.appendChild(closeBtn);
+  headerBar.appendChild(titleEl);
+  headerBar.appendChild(actionsWrap);
+
+  const imgWrap = document.createElement('div');
+  imgWrap.style.cssText = 'background:#ffffff; border-radius:18px; padding:8px; box-shadow:0 20px 50px rgba(0,0,0,0.5); border:3px solid #ffffff; max-height:80vh; display:flex; align-items:center; justify-content:center; overflow:hidden;';
+
+  const modalImg = document.createElement('img');
+  modalImg.src = imgSrc;
+  modalImg.alt = altText || titleText || 'KSA Paspoort';
+  modalImg.style.cssText = 'max-width:100%; max-height:76vh; object-fit:contain; border-radius:12px; display:block;';
+
+  imgWrap.appendChild(modalImg);
+  content.appendChild(headerBar);
+  content.appendChild(imgWrap);
+  modal.appendChild(content);
+
+  document.body.appendChild(modal);
+  const origOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+
+  function closeModal() {
+    modal.remove();
+    document.body.style.overflow = origOverflow;
+    document.removeEventListener('keydown', handleKey);
+  }
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  function handleKey(e) {
+    if (e.key === 'Escape') closeModal();
+  }
+  document.addEventListener('keydown', handleKey);
 }
 
 /* --------------------------------------------------------------------------

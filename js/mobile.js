@@ -325,12 +325,16 @@ function initPaspoortModal() {
     document.body.style.overflow = '';
   }
 
-  document.querySelectorAll('[data-paspoort]').forEach(trigger => {
-    trigger.addEventListener('click', () => {
-      const src = trigger.getAttribute('data-paspoort');
-      const name = trigger.getAttribute('data-name');
-      openModal(src, name);
-    });
+  document.addEventListener('click', (e) => {
+    if (document.body.classList.contains('ksa-edit-mode-active')) return;
+    const trigger = e.target.closest('[data-paspoort], .paspoort-card, .gallery-item');
+    if (!trigger) return;
+    if (e.target.closest('.ksa-card-edit-tools')) return;
+
+    const src = trigger.getAttribute('data-paspoort') || trigger.querySelector('img')?.src;
+    if (!src) return;
+    const name = trigger.getAttribute('data-name') || trigger.querySelector('.paspoort-card-badge')?.textContent || trigger.getAttribute('title') || 'Leidingspaspoort';
+    openModal(src, name);
   });
 
   if (closeBtn) {
