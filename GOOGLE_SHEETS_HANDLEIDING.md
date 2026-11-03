@@ -25,6 +25,27 @@ In de hoofdmap van het project staat het bestand **`KSA_Zonhoven_Website_Beheer.
 
 ---
 
+## 📸 Nieuw: Foto's toevoegen met de ingebouwde `"📸 KSA Foto's"`-knop (Zonder URL!)
+
+De leiding hoeft **geen URL's of bestandspaden** meer te typen om een foto te wijzigen of toe te voegen! Via het bestand **`ksa_foto_uploader_script.gs`** voeg je een eigen upload-knop toe aan jullie Google Sheet.
+
+### Eenmalige installatie in Google Sheets (duurt 30 seconden):
+1. Open jullie [KSA Google Sheet](https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit).
+2. Klik in het bovenste menu op **Uitbreidingen** *(Extensions)* &rarr; **Apps Script**.
+3. Verwijder de korte standaardcode die daar staat en plak de volledige inhoud van het bestand **`ksa_foto_uploader_script.gs`**.
+4. Klik bovenaan op het diskette-icoontje **Project opslaan** (`Ctrl+S`) en ververs de Google Sheet (`F5`).
+5. Er verschijnt nu bovenaan in de menubalk van Google Sheets automatisch een knop: **`📸 KSA Foto's`**!
+
+### Hoe gebruikt de leiding de knop?
+1. **Klik op de cel** in de Google Sheet waar een foto moet komen (bv. kolom `Afbeelding` in `Nieuws`, kolom `Foto` in `Leiding` of `HeroFoto` in `Home`).
+2. Klik bovenaan op **`📸 KSA Foto's`** &rarr; **`📤 Foto uploaden naar geselecteerde cel...`** (of open het zijpaneel voor meerdere foto's tegelijk).
+3. Kies een foto vanaf je **computer of smartphone** (of klik op een eerder geüploade foto in het overzicht onderaan).
+4. Het script verkleint grote camerafoto's automatisch voor snelle laadtijd, slaat de foto op in de Google Drive-map `KSA_Zonhoven_Website_Fotos` en **vult de cel 100% automatisch in**!
+
+*(Tip: Daarnaast kun je in een fotocel ook gewoon een kort woord typen zoals `spaghetti`, `hallokien`, `startdag`, `kamp`, `kabouters`, `lotte`, `cara` of een gewone Google Drive deel-link plakken — de website zet alles automatisch om!)*
+
+---
+
 ## 📑 Overzicht van de 9 Tabbladen
 
 Hieronder vind je per onderdeel de exacte kolommen en uitleg:
