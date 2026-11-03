@@ -230,14 +230,9 @@ function initGroupTabs() {
    3. HALLOKIEN COUNTDOWN TIMER (17 OKTOBER 2026)
    ========================================================================== */
 function initMobileCountdown() {
-  const targetDate = new Date();
-  targetDate.setMonth(9); // Oktober (0-indexed)
-  targetDate.setDate(17);
-  targetDate.setHours(19, 30, 0, 0);
-
-  if (targetDate.getTime() < Date.now()) {
-    targetDate.setFullYear(targetDate.getFullYear() + 1);
-  }
+  const now = new Date();
+  const workYearStart = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  const targetDate = new Date(workYearStart, 9, 17, 19, 30, 0, 0);
 
   const dEl = document.getElementById('mDays');
   const hEl = document.getElementById('mHours');

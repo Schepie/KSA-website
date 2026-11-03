@@ -7,8 +7,8 @@
  * 
  * Gesynchroniseerde onderdelen:
  * 0. Home / Startscherm & Aftelklok Event Banner(s) (Hero + Countdown)
- * 1. Kalender (#agenda)
- * 2. Nieuws (#nieuws) & Mobiele Spotlight
+ * 1. Kalender (#agenda) - inclusief automatische 'Voorbij'-detectie op datum!
+ * 2. Nieuws (#nieuws) - inclusief automatische 'Voorbij'-detectie op datum!
  * 3. Groepen (#groepen)
  * 4. Leiding & Paspoortjes (#leiding)
  * 5. Info & Ravot Inschrijfgids (#info)
@@ -72,6 +72,11 @@ async function fetchGoogleSheetData(sheetId, tabNames, validatorFn) {
         // Eerste rij bevat de kolomnamen
         headers = dataRows[0].c.map(cell => (cell && cell.v !== null && cell.v !== undefined) ? String(cell.v).trim() : '');
         dataRows = dataRows.slice(1);
+      }
+
+      // Negeer het Help / Handleiding tabblad als Google hierop terugvalt
+      if (headers.some(h => h.toLowerCase().includes('handleiding') || h.toLowerCase().includes('uitleg voor leiding'))) {
+        continue;
       }
       
       // Rijen converteren naar objecten
@@ -140,13 +145,159 @@ function isRowVisible(tonenVal) {
 }
 
 /**
+ * Slimme foto-resolver die:
+ * 1. Foto's geüpload met de "📸 KSA Foto's" knop in Google Sheets direct herkent.
+ * 2. Elke gewone Google Drive deel-link (bv. drive.google.com/file/d/.../view) automatisch
+ *    omzet naar een snelle rechtstreekse afbeelding (https://lh3.googleusercontent.com/d/<ID>=w1200).
+ * 3. Eenvoudige trefwoorden en voornamen (bv. 'spaghetti', 'hallokien', 'startdag', 'kamp',
+ *    'kabouters', 'lotte', 'cara') automatisch koppelt aan de juiste foto.
+ */
+function resolveKsaImage(rawInput, fallback = 'images/ksakinderen.jpg') {
+  const str = String(rawInput || '').trim();
+  if (!str) return fallback;
+
+  // 1. Check of het een Google Drive deel-link of ID is
+  const driveIdMatch =
+    str.match(/\/file\/d\/([a-zA-Z0-9_-]{15,})/) ||
+    str.match(/[?&]id=([a-zA-Z0-9_-]{15,})/) ||
+    str.match(/googleusercontent\.com\/d\/([a-zA-Z0-9_-]{15,})/);
+  if (driveIdMatch && driveIdMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${driveIdMatch[1]}=w1200`;
+  }
+
+  // 2. Als het al een volledige URL of lokaal pad met slash is
+  if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('data:') || str.includes('/')) {
+    return str;
+  }
+
+  // 3. Korte trefwoorden of bestandsnamen zonder map
+  const lower = str.toLowerCase().replace(/\.(jpg|jpeg|png|webp)$/i, '');
+  const keywordMap = {
+    hallokien: 'assets/images/real_hallokien.jpg',
+    spaghetti: 'assets/images/real_spaghettidag.jpg',
+    spaghettidag: 'assets/images/real_spaghettidag.jpg',
+    startdag: 'assets/images/real_startdag.jpg',
+    kamp: 'assets/images/real_kamp_group1.png',
+    zomerkamp: 'assets/images/real_kamp_group1.png',
+    hero: 'images/ksakinderen.jpg',
+    ksakinderen: 'images/ksakinderen.jpg',
+    groepsfoto: 'images/ksakinderen.jpg',
+    kabouters: 'images/kabouters.jpg',
+    sloebers: 'images/sloebers.jpg',
+    roodkapjes: 'assets/images/real_leiding_roodkappen.jpg',
+    jim: 'images/jim.jpg',
+    sim: 'images/sim.jpg',
+    kim: 'images/kim.jpg',
+    hoofdleiding: 'assets/images/real_leiding_hoofd.jpg',
+    theem: 'images/theem.jpg',
+    heem: 'images/theem.jpg',
+    hemd: 'images/Hemd.jpg',
+    uniform: 'images/Hemd.jpg',
+    cara: 'images/cara.jpg',
+    nore: 'images/nore.jpg',
+    lien: 'images/lien.jpg',
+    lies: 'images/lies.jpg',
+    lotte: 'images/lotte.jpg',
+    oonah: 'images/Oonah.jpg'
+  };
+
+  if (keywordMap[lower]) {
+    return keywordMap[lower];
+  }
+
+  // Als iemand enkel "mijnfoto.jpg" typt, zoek standaard in images/
+  if (/\.(jpg|jpeg|png|webp|gif)$/i.test(str)) {
+    return `images/${str}`;
+  }
+
+  return str;
+}
+
+/**
+ * Bepaal op basis van een KSA-datumtekst (bv. "17 / 10", "11 - 20 Juli", "Za 17 Okt 2026")
+ * de exacte einddatum (23:59:59 op die dag) binnen het huidige KSA-werkjaar (sept t/m aug).
+ * Hiermee worden gepasseerde activiteiten en evenementen automatisch op 'Voorbij' gezet!
+ */
+function parseKsaActivityEndDate(datumStr) {
+  if (!datumStr) return null;
+  const raw = String(datumStr).trim();
+  if (!raw) return null;
+
+  const now = new Date();
+  // KSA-werkjaar loopt van september (maand 9, index 8) t/m augustus (maand 8, index 7)
+  const workYearStart = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+
+  // 1. Google GViz Date(yyyy, m, d)
+  if (raw.startsWith('Date(')) {
+    const parts = raw.match(/\d+/g);
+    if (parts && parts.length >= 3) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10); // 0-indexed bij Google Date()
+      const d = parseInt(parts[2], 10);
+      return new Date(y, m, d, 23, 59, 59, 999);
+    }
+  }
+
+  let day = null;
+  let month = null; // 1-12
+  let explicitYear = null;
+
+  // Check of er een expliciet 4-cijferig jaartal in staat (bv. 2026 of 2027)
+  const yearMatch = raw.match(/\b(20\d{2})\b/);
+  if (yearMatch) {
+    explicitYear = parseInt(yearMatch[1], 10);
+  }
+
+  // 2. Formaat met schuine streep: "17 / 10", "1/11", "17/10/2026", "11-20 / 07"
+  if (raw.includes('/')) {
+    const slashParts = raw.split('/');
+    const dayPart = slashParts[0].trim();
+    const monthPart = slashParts[1].trim();
+
+    // Bij een bereik zoals "11 - 20" nemen we de laatste dag (20)
+    const dayNums = dayPart.match(/\d+/g);
+    if (dayNums && dayNums.length > 0) {
+      day = parseInt(dayNums[dayNums.length - 1], 10);
+    }
+    const monthNums = monthPart.match(/\d+/g);
+    if (monthNums && monthNums.length > 0) {
+      month = parseInt(monthNums[0], 10);
+    }
+  } else {
+    // 3. Nederlandse maandnamen: bv. "11 - 20 Juli", "Za 17 Okt 2026", "Zo 20 September", "Zondag 8 Maart"
+    const nlMonths = {
+      jan: 1, feb: 2, mrt: 3, maa: 3, apr: 4, mei: 5, jun: 6,
+      jul: 7, aug: 8, sep: 9, okt: 10, oct: 10, nov: 11, dec: 12
+    };
+    const lower = raw.toLowerCase();
+    for (const [mKey, mVal] of Object.entries(nlMonths)) {
+      if (lower.includes(mKey)) {
+        month = mVal;
+        break;
+      }
+    }
+
+    // Haal alle getallen op die géén jaartal (20xx) of tijdstip (18u30) zijn
+    const cleanedForDay = raw
+      .replace(/\b20\d{2}\b/g, '')
+      .replace(/\d{1,2}\s*[uU:]\s*\d{2}/g, '');
+    const dayNums = cleanedForDay.match(/\d+/g);
+    if (dayNums && dayNums.length > 0) {
+      day = parseInt(dayNums[dayNums.length - 1], 10);
+    }
+  }
+
+  if (!day || !month || isNaN(day) || isNaN(month) || month < 1 || month > 12) {
+    return null;
+  }
+
+  const year = explicitYear || (month >= 9 ? workYearStart : workYearStart + 1);
+  return new Date(year, month - 1, day, 23, 59, 59, 999);
+}
+
+/**
  * Flexibele datum- en tijdparser voor de Countdown Banner.
- * Ondersteunt o.a.:
- * - "17/10/2026 19:30" of "17-10-2026 19u30"
- * - "17/10/2026" of "17/10 19:30"
- * - "2026-10-17 19:30"
- * - "17 oktober 2026 19:30"
- * - Google Sheets Date(2026,9,17,19,30,0)
+ * Geeft { date, isPast } terug zodat gepasseerde banners automatisch als 'Voorbij' herkend worden!
  */
 function parseFlexibleCountdownDate(str) {
   if (!str) return null;
@@ -154,12 +305,12 @@ function parseFlexibleCountdownDate(str) {
   if (!raw || raw.toLowerCase() === 'geen') return null;
 
   const now = new Date();
-  let year = now.getFullYear();
+  const workYearStart = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  let year = null;
   let month = null; // 0-indexed (0 = Jan, 9 = Okt)
   let day = null;
   let hours = 19;
   let minutes = 30;
-  let yearExplicit = false;
 
   // 1. Google GViz Date(yyyy, m, d, h, min, s)
   if (raw.startsWith('Date(')) {
@@ -170,7 +321,6 @@ function parseFlexibleCountdownDate(str) {
       day = parseInt(nums[2], 10);
       hours = nums[3] !== undefined ? parseInt(nums[3], 10) : 19;
       minutes = nums[4] !== undefined ? parseInt(nums[4], 10) : 30;
-      yearExplicit = true;
     }
   } else {
     // Tijdstip extraheren indien aanwezig (bv. "19:30" of "19u30" of "19.30")
@@ -179,11 +329,10 @@ function parseFlexibleCountdownDate(str) {
       hours = parseInt(timeMatch[1], 10);
       minutes = parseInt(timeMatch[2], 10);
     } else {
-      hours = 13;
-      minutes = 30;
+      hours = 23;
+      minutes = 59;
     }
 
-    // Datum zonder het tijd-gedeelte
     const datePart = raw.replace(/(\d{1,2})\s*[:uU\.]\s*(\d{2})(:\d{2})?/, '').trim();
 
     // 2. ISO formaat: yyyy-mm-dd
@@ -195,14 +344,12 @@ function parseFlexibleCountdownDate(str) {
       year = parseInt(isoMatch[1], 10);
       month = parseInt(isoMatch[2], 10) - 1;
       day = parseInt(isoMatch[3], 10);
-      yearExplicit = true;
     } else if (euMatch) {
       day = parseInt(euMatch[1], 10);
       month = parseInt(euMatch[2], 10) - 1;
       if (euMatch[3]) {
         year = parseInt(euMatch[3], 10);
         if (year < 100) year += 2000;
-        yearExplicit = true;
       }
     } else {
       // 4. Nederlandse maandnamen (bv. "17 oktober 2026")
@@ -222,7 +369,6 @@ function parseFlexibleCountdownDate(str) {
         day = parseInt(nums[0], 10);
         if (nums.length >= 2 && parseInt(nums[1], 10) > 31) {
           year = parseInt(nums[1], 10);
-          yearExplicit = true;
         }
       }
     }
@@ -232,14 +378,137 @@ function parseFlexibleCountdownDate(str) {
     return null;
   }
 
-  const target = new Date(year, month, day, hours, minutes, 0, 0);
-
-  // Als de datum al gepasseerd is, schuif door naar het eerstvolgende jaar
-  while (target.getTime() < Date.now()) {
-    target.setFullYear(target.getFullYear() + 1);
+  if (!year) {
+    year = (month + 1) >= 9 ? workYearStart : workYearStart + 1;
   }
 
-  return target;
+  const target = new Date(year, month, day, hours, minutes, 0, 0);
+  const endOfThatDay = new Date(year, month, day, 23, 59, 59, 999);
+  const isPast = Date.now() > endOfThatDay.getTime();
+
+  return { date: target, isPast };
+}
+
+/**
+ * Automatische datumcontrole op de standaard (statische) HTML bij het laden van de pagina,
+ * zodat gepasseerde kalenderdata en evenementen direct op 'Voorbij' staan.
+ */
+function autoUpdateStaticDomDates() {
+  const nowMs = Date.now();
+
+  // 1. Desktop Kalender (.cal-grid .cal-item)
+  const calItems = document.querySelectorAll('.cal-grid .cal-item');
+  let foundCurrent = false;
+  calItems.forEach(item => {
+    const dateEl = item.querySelector('.cal-date');
+    const cardEl = item.querySelector('.cal-card');
+    if (!dateEl || !cardEl) return;
+
+    const rawDate = dateEl.textContent.replace('!', '').trim();
+    const endDate = parseKsaActivityEndDate(rawDate);
+    if (!endDate) return;
+
+    if (nowMs > endDate.getTime()) {
+      item.classList.add('is-past');
+      item.classList.remove('is-current');
+      const excl = dateEl.querySelector('.cal-excl');
+      if (excl) excl.remove();
+      const pill = cardEl.querySelector('.cal-pill-now');
+      if (pill) pill.remove();
+      if (!cardEl.textContent.includes('(Voorbij)')) {
+        const pastSpan = document.createElement('span');
+        pastSpan.style.cssText = 'font-size:0.75rem; color:#888; margin-top:2px;';
+        pastSpan.textContent = '(Voorbij)';
+        cardEl.appendChild(pastSpan);
+      }
+    } else if (!foundCurrent) {
+      foundCurrent = true;
+      item.classList.add('is-current');
+      if (!dateEl.querySelector('.cal-excl')) {
+        dateEl.innerHTML = `<span class="cal-excl">!</span> ${rawDate}`;
+      }
+      if (!cardEl.querySelector('.cal-pill-now')) {
+        const pill = document.createElement('span');
+        pill.className = 'cal-pill-now';
+        pill.textContent = 'Binnenkort!';
+        cardEl.appendChild(pill);
+      }
+    }
+  });
+
+  // 2. Desktop Nieuws / Evenementen (.news-grid .news-card)
+  const newsCards = document.querySelectorAll('.news-grid .news-card');
+  newsCards.forEach(card => {
+    const dateEl = card.querySelector('.news-date');
+    if (!dateEl) return;
+    const rawDate = dateEl.textContent.replace(/\(.*\)/, '').trim();
+    const endDate = parseKsaActivityEndDate(rawDate);
+    if (endDate && nowMs > endDate.getTime() && !card.classList.contains('is-past')) {
+      card.classList.add('is-past');
+      const badgeEl = card.querySelector('.news-badge');
+      if (badgeEl) {
+        badgeEl.className = 'news-badge';
+        badgeEl.style.cssText = 'background-color:#555e68; color:#fff;';
+        badgeEl.textContent = '🏁 Reeds voorbij';
+      }
+      dateEl.style.backgroundColor = 'rgba(40,40,40,0.85)';
+      if (!dateEl.textContent.includes('Voorbij')) {
+        dateEl.textContent = `${rawDate} (Voorbij)`;
+      }
+      const titleEl = card.querySelector('.news-card-title');
+      if (titleEl) titleEl.style.color = '#4a5568';
+      const ticketBtn = card.querySelector('.news-actions .btn-primary');
+      if (ticketBtn) ticketBtn.remove();
+    }
+  });
+
+  // 3. Mobiele Kalender (.cal-list .cal-card-item)
+  const mobCalItems = document.querySelectorAll('.cal-list .cal-card-item');
+  let foundMobCurrent = false;
+  mobCalItems.forEach(item => {
+    const dayEl = item.querySelector('.cal-day-num');
+    const monthEl = item.querySelector('.cal-month-str');
+    if (!dayEl || !monthEl) return;
+    const rawDate = `${dayEl.textContent.trim()} ${monthEl.textContent.trim()}`;
+    const endDate = parseKsaActivityEndDate(rawDate);
+    if (!endDate) return;
+
+    if (nowMs > endDate.getTime()) {
+      item.remove();
+    } else if (!foundMobCurrent) {
+      foundMobCurrent = true;
+      item.classList.add('is-current');
+    } else {
+      item.classList.remove('is-current');
+    }
+  });
+
+  // 4. Statische Desktop & Mobiele Countdown Banner (bv. HalloKien 17 oktober)
+  const staticBanner = document.querySelector('.countdown-banner-wrap .ksa-event-banner');
+  if (staticBanner) {
+    const descEl = staticBanner.querySelector('.event-banner-desc');
+    const tagEl = staticBanner.querySelector('.event-banner-tag');
+    const endDate = descEl ? parseKsaActivityEndDate(descEl.textContent) : null;
+    if (endDate && nowMs > endDate.getTime()) {
+      if (tagEl) tagEl.textContent = '🏁 EVENEMENT VOORBIJ';
+      if (descEl && !descEl.textContent.includes('(Voorbij)')) {
+        descEl.textContent = `${descEl.textContent} (Voorbij)`;
+      }
+      const btnWrap = staticBanner.querySelector('.btn-primary');
+      if (btnWrap) btnWrap.style.display = 'none';
+    }
+  }
+
+  const staticMobCard = document.querySelector('.mobile-event-card');
+  if (staticMobCard) {
+    const badgeEl = staticMobCard.querySelector('.event-media-badge');
+    const endDate = badgeEl ? parseKsaActivityEndDate(badgeEl.textContent) : null;
+    if (endDate && nowMs > endDate.getTime()) {
+      badgeEl.textContent = `${badgeEl.textContent} (Voorbij)`;
+      const actionRow = staticMobCard.querySelector('.event-action-row');
+      if (actionRow) actionRow.style.display = 'none';
+    }
+  }
 }
 
 /* ==========================================================================
@@ -396,7 +665,7 @@ async function syncHomeFromSheets(sheetId) {
     const cornerSub = document.querySelector('.hero-corner-sub');
 
     if (heroImg && hf.linkOfFoto) {
-      heroImg.src = hf.linkOfFoto;
+      heroImg.src = resolveKsaImage(hf.linkOfFoto, 'images/ksakinderen.jpg');
     }
     if (cornerBadge) {
       if (!isRowVisible(hf.tonen)) {
@@ -431,9 +700,15 @@ async function syncHomeFromSheets(sheetId) {
   });
 
   // -------------------------------------------------------------------------
-  // F. COUNTDOWN EVENT BANNER(S) (Toevoegen, aanpassen of verwijderen!)
+  // F. COUNTDOWN EVENT BANNER(S) (Automatisch op 'Voorbij' als datum gepasseerd is!)
   // -------------------------------------------------------------------------
-  const activeBanners = bannerRows.filter(b => isRowVisible(b.tonen) && b.titel);
+  const activeBanners = bannerRows.filter(b => {
+    if (!isRowVisible(b.tonen) || !b.titel) return false;
+    const parsed = parseFlexibleCountdownDate(b.datumUur);
+    // Als er een datum ingevuld staat en deze ligt in het verleden -> automatisch voorbij!
+    if (parsed && parsed.isPast) return false;
+    return true;
+  });
 
   // Stop standaard countdown-timers uit main.js / mobile.js zodat onze dynamische timer het overneemt
   if (window.ksaDesktopCountdownInterval) {
@@ -450,14 +725,14 @@ async function syncHomeFromSheets(sheetId) {
   const desktopBannerWrap = document.querySelector('.countdown-banner-wrap');
   if (desktopBannerWrap) {
     if (activeBanners.length === 0) {
-      // Volledig verbergen als alle banners op 'Nee' staan of verwijderd zijn
+      // Volledig verbergen als alle banners op 'Nee'/'Voorbij' staan of verwijderd zijn
       desktopBannerWrap.style.display = 'none';
       desktopBannerWrap.innerHTML = '';
     } else {
       desktopBannerWrap.style.display = '';
       desktopBannerWrap.innerHTML = activeBanners.map((b, idx) => {
-        const targetDate = parseFlexibleCountdownDate(b.datumUur);
-        const targetMs = targetDate ? targetDate.getTime() : 0;
+        const parsed = parseFlexibleCountdownDate(b.datumUur);
+        const targetMs = parsed && parsed.date ? parsed.date.getTime() : 0;
         const badgeText = b.extra || '🔥 GROOT KSA ZONHOVEN EVENEMENT';
         const btnLink = b.linkOfFoto || '#nieuws';
         const btnText = b.knopTekst || '';
@@ -514,8 +789,8 @@ async function syncHomeFromSheets(sheetId) {
     } else {
       mobileCard.style.display = '';
       const firstBanner = activeBanners[0];
-      const targetDate = parseFlexibleCountdownDate(firstBanner.datumUur);
-      const targetMs = targetDate ? targetDate.getTime() : 0;
+      const parsed = parseFlexibleCountdownDate(firstBanner.datumUur);
+      const targetMs = parsed && parsed.date ? parsed.date.getTime() : 0;
 
       if (targetMs) {
         mobileCard.setAttribute('data-countdown-target', String(targetMs));
@@ -605,7 +880,7 @@ async function syncHomeFromSheets(sheetId) {
 }
 
 /* ==========================================================================
-   1. KALENDER SYNC (#agenda)
+   1. KALENDER SYNC (#agenda) - MET AUTOMATISCHE DATUMCONTROLE
    ========================================================================== */
 async function syncKalenderFromSheets(sheetId) {
   const isKalenderValid = (rows, headers) => {
@@ -620,21 +895,57 @@ async function syncKalenderFromSheets(sheetId) {
   const calList = document.querySelector('.cal-list');
   if (!calGrid && !calList) return;
 
+  const nowMs = Date.now();
+
+  // Verwerk alle rijen en bepaal automatisch op basis van de huidige datum of ze 'Voorbij' zijn
+  const processedRows = [];
+  rows.forEach(item => {
+    const datum = getVal(item, 'Datum', 'col_0');
+    const titel = getVal(item, 'Titel', 'Activiteit', 'col_1');
+    const rawStatus = getVal(item, 'Status', 'col_2').toLowerCase();
+    const emoji = getVal(item, 'Emoji', 'Sticker', 'col_3');
+    const onderlijnd = getVal(item, 'Onderlijnd', 'col_4').toLowerCase();
+
+    if (!datum && !titel) return;
+    if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return;
+
+    const endDate = parseKsaActivityEndDate(datum);
+    const autoIsPast = endDate ? (nowMs > endDate.getTime()) : false;
+    // Als de datum in het verleden ligt, is het ALTIJD 'Voorbij'
+    const isPast = autoIsPast || rawStatus.includes('voorbij') || rawStatus.includes('past');
+    // Een activiteit kan alleen 'Nu' / 'Binnenkort' zijn als deze NIET in het verleden ligt
+    const isCurrentManual = !isPast && (
+      rawStatus.includes('nu') ||
+      rawStatus.includes('binnenkort') ||
+      rawStatus.includes('actief') ||
+      rawStatus.includes('highlight')
+    );
+
+    processedRows.push({
+      datum,
+      titel,
+      emoji,
+      onderlijnd,
+      endDate,
+      isPast,
+      isCurrent: isCurrentManual
+    });
+  });
+
+  // Als er geen toekomstige activiteit handmatig op 'Nu' staat, markeer automatisch de eerstvolgende!
+  const hasAnyCurrent = processedRows.some(r => r.isCurrent);
+  if (!hasAnyCurrent) {
+    const firstUpcoming = processedRows.find(r => !r.isPast);
+    if (firstUpcoming) {
+      firstUpcoming.isCurrent = true;
+    }
+  }
+
   // 1. Desktop kalender (.cal-grid) bijwerken
   if (calGrid) {
     let desktopHtml = '';
-    rows.forEach(item => {
-      const datum = getVal(item, 'Datum', 'col_0');
-      const titel = getVal(item, 'Titel', 'Activiteit', 'col_1');
-      const status = getVal(item, 'Status', 'col_2').toLowerCase();
-      const emoji = getVal(item, 'Emoji', 'Sticker', 'col_3');
-      const onderlijnd = getVal(item, 'Onderlijnd', 'col_4').toLowerCase();
-
-      if (!datum && !titel) return;
-      if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return;
-
-      const isPast = status.includes('voorbij') || status.includes('past');
-      const isCurrent = status.includes('nu') || status.includes('binnenkort') || status.includes('actief') || status.includes('highlight');
+    processedRows.forEach(item => {
+      const { datum, titel, emoji, onderlijnd, isPast, isCurrent } = item;
       const isUnderline = onderlijnd === 'ja' || onderlijnd === 'yes' || titel.toUpperCase().includes('GEEN KSA');
 
       let itemClasses = ['cal-item'];
@@ -670,26 +981,16 @@ async function syncKalenderFromSheets(sheetId) {
   // 2. Mobiele kalender (.cal-list) bijwerken
   if (calList) {
     let mobileHtml = '';
-    rows.forEach(item => {
-      const datum = getVal(item, 'Datum', 'col_0');
-      const titel = getVal(item, 'Titel', 'Activiteit', 'col_1');
-      const status = getVal(item, 'Status', 'col_2').toLowerCase();
-      const emoji = getVal(item, 'Emoji', 'Sticker', 'col_3');
-
-      if (!datum && !titel) return;
-      if (datum.toLowerCase() === 'datum' && titel.toLowerCase() === 'titel') return;
-
-      const isPast = status.includes('voorbij') || status.includes('past');
+    processedRows.forEach(item => {
+      const { datum, titel, emoji, isPast, isCurrent } = item;
       if (isPast) return; // Op mobiel tonen we enkel komende evenementen
-
-      const isCurrent = status.includes('nu') || status.includes('binnenkort') || status.includes('actief') || status.includes('highlight');
 
       let day = '';
       let month = 'KSA';
       if (datum.includes('/')) {
         const parts = datum.split('/');
         day = parts[0].trim().padStart(2, '0');
-        const mIdx = parseInt(parts[1].trim());
+        const mIdx = parseInt(parts[1].trim(), 10);
         const months = ['JAN', 'FEB', 'MRT', 'APR', 'MEI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DEC'];
         if (!isNaN(mIdx) && mIdx >= 1 && mIdx <= 12) {
           month = months[mIdx - 1];
@@ -760,7 +1061,7 @@ async function syncKalenderFromSheets(sheetId) {
   }
 
   // Periode updaten
-  const validDates = rows.map(r => getVal(r, 'Datum', 'col_0')).filter(d => d && d.toLowerCase() !== 'datum');
+  const validDates = processedRows.map(r => r.datum).filter(Boolean);
   if (validDates.length > 0) {
     const parseMonth = (str) => {
       const s = String(str).toLowerCase();
@@ -788,7 +1089,7 @@ async function syncKalenderFromSheets(sheetId) {
 }
 
 /* ==========================================================================
-   2. NIEUWS SYNC (#nieuws)
+   2. NIEUWS SYNC (#nieuws) - MET AUTOMATISCHE DATUMCONTROLE
    ========================================================================== */
 async function syncNieuwsFromSheets(sheetId) {
   const isNieuwsValid = (rows, headers) => {
@@ -801,7 +1102,9 @@ async function syncNieuwsFromSheets(sheetId) {
 
   const newsGrid = document.querySelector('.news-grid');
   if (newsGrid) {
+    const nowMs = Date.now();
     let html = '';
+
     rows.forEach(item => {
       const titel = getVal(item, 'Titel', 'col_0');
       let datum = getVal(item, 'Datum', 'col_1');
@@ -809,21 +1112,26 @@ async function syncNieuwsFromSheets(sheetId) {
       const omschrijving = getVal(item, 'Omschrijving', 'Tekst', 'col_3');
       const waar = getVal(item, 'Waar', 'Locatie', 'col_4');
       const uur = getVal(item, 'Uur', 'Tijd', 'col_5');
-      const afbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_6') || 'assets/images/groepsfoto.jpg';
+      const rawAfbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_6');
+      const afbeelding = resolveKsaImage(rawAfbeelding, 'assets/images/real_startdag.jpg');
       const link = getVal(item, 'Link', 'col_7') || '#contact';
       const linkTekst = getVal(item, 'LinkTekst', 'Knop', 'col_8') || 'Meer info &rarr;';
       const status = getVal(item, 'Status', 'col_9').toLowerCase();
 
       if (!titel || titel.toLowerCase() === 'titel') return;
 
+      // Bepaal einddatum vóór eventuele tekst-herformattering
+      const endDate = parseKsaActivityEndDate(datum);
+      const autoIsPast = endDate ? (nowMs > endDate.getTime()) : false;
+
       if (typeof datum === 'string' && datum.startsWith('Date(')) {
         const parts = datum.match(/\d+/g);
         if (parts && parts.length >= 3) {
-          datum = `${parts[2]}/${parseInt(parts[1]) + 1}/${parts[0]}`;
+          datum = `${parts[2]}/${parseInt(parts[1], 10) + 1}/${parts[0]}`;
         }
       }
 
-      const isPast = status.includes('voorbij') || status.includes('past');
+      const isPast = autoIsPast || status.includes('voorbij') || status.includes('past');
 
       html += `
         <article class="news-card ${isPast ? 'is-past' : ''}">
@@ -900,7 +1208,8 @@ async function syncGroepenFromSheets(sheetId) {
     const omschrijving = getVal(item, 'Omschrijving', 'Tekst', 'Beschrijving', 'col_3');
     const actStr = getVal(item, 'Activiteiten', 'Voordelen', 'Tags', 'Perks', 'col_4');
     const leidsters = getVal(item, 'Leidsters', 'Leiding', 'col_5');
-    const afbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_6');
+    const rawAfbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_6');
+    const afbeelding = rawAfbeelding ? resolveKsaImage(rawAfbeelding, '') : '';
     const kleur = getVal(item, 'Kleur', 'Kleurcode', 'col_7');
 
     const perksArray = actStr ? actStr.split(/[,;]/).map(s => s.trim()).filter(Boolean) : null;
@@ -975,7 +1284,8 @@ async function syncLeidingFromSheets(sheetId) {
     const naam = getVal(hoofdRow, 'Naam', 'col_0');
     const rol = getVal(hoofdRow, 'Functie', 'col_2') || 'Hoofdleiding KSA Zonhoven';
     const desc = getVal(hoofdRow, 'Omschrijving', 'Tekst', 'col_3');
-    const foto = getVal(hoofdRow, 'Foto', 'Afbeelding', 'col_5');
+    const rawFoto = getVal(hoofdRow, 'Foto', 'Afbeelding', 'col_4', 'col_5');
+    const foto = rawFoto ? resolveKsaImage(rawFoto, 'assets/images/real_leiding_hoofd.jpg') : '';
     const email = getVal(hoofdRow, 'Email', 'E-mail', 'col_6') || 'hoofdleiding.ksazonhoven@gmail.com';
 
     // Desktop
@@ -1020,7 +1330,8 @@ async function syncLeidingFromSheets(sheetId) {
     rows.forEach(item => {
       const naam = getVal(item, 'Naam', 'col_0');
       const groep = getVal(item, 'Groep', 'col_1');
-      const foto = getVal(item, 'Foto', 'Afbeelding', 'col_5');
+      const rawFoto = getVal(item, 'Paspoort', 'Foto', 'Afbeelding', 'col_5', 'col_4');
+      const foto = rawFoto ? resolveKsaImage(rawFoto, '') : '';
       if (!naam || !foto || naam.toLowerCase() === 'naam') return;
       if (groep.toLowerCase().includes('hoofdleiding')) return;
 
@@ -1056,7 +1367,8 @@ async function syncLeidingFromSheets(sheetId) {
     rows.forEach(item => {
       const naam = getVal(item, 'Naam', 'col_0');
       const rawGroep = getVal(item, 'Groep', 'col_1').toLowerCase();
-      const foto = getVal(item, 'Foto', 'Afbeelding', 'col_5');
+      const rawFoto = getVal(item, 'Paspoort', 'Foto', 'Afbeelding', 'col_5', 'col_4');
+      const foto = rawFoto ? resolveKsaImage(rawFoto, '') : '';
       const rol = getVal(item, 'Functie', 'col_2') || 'Leiding';
 
       if (!naam || !foto || naam.toLowerCase() === 'naam') return;
@@ -1194,7 +1506,8 @@ async function syncHeemFromSheets(sheetId) {
   const adres = getVal(item, 'Adres', 'col_2') || 'Dijkbeemdenweg 8, 3520 Zonhoven';
   const email = getVal(item, 'Email', 'E-mail', 'col_3') || 'heem.ksazonhoven@gmail.com';
   const website = getVal(item, 'Website', 'Link', 'col_4') || 'https://www.theem.be';
-  const afbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_5');
+  const rawAfbeelding = getVal(item, 'Afbeelding', 'Foto', 'col_5');
+  const afbeelding = rawAfbeelding ? resolveKsaImage(rawAfbeelding, 'images/theem.jpg') : '';
   const faciliteitenStr = getVal(item, 'Faciliteiten', 'col_6');
 
   // Desktop #verhuring
@@ -1355,6 +1668,9 @@ async function syncContactFromSheets(sheetId) {
    INITIALISATIE VAN DE COMPLETE CMS SYNC
    ========================================================================== */
 async function initKsaSheetsCMS() {
+  // Werk eerst meteen de statische HTML bij op basis van de datum van vandaag
+  autoUpdateStaticDomDates();
+
   if (!KSA_SHEETS_CONFIG.enabled || !KSA_SHEETS_CONFIG.sheetId) {
     return;
   }

@@ -14,18 +14,18 @@ De website is **al gekoppeld** aan deze sheet. Zodra jullie in een tabblad iets 
 
 ## 🚀 Snelle Start: Alles in één klik importeren
 
-In de hoofdmap van het project staat het bestand **`KSA_Zonhoven_Website_Beheer.xlsx`**. Hierin zijn **alle 8 tabbladen** (`Home`, `Kalender`, `Nieuws`, `Groepen`, `Leiding`, `Info`, `HetHeem`, `Contact`) al volledig voor jullie klaargezet met de huidige inhoud van de website als voorbeeld!
+In de hoofdmap van het project staat het bestand **`KSA_Zonhoven_Website_Beheer.xlsx`**. Hierin zijn **alle 9 tabbladen** (`Home`, `Kalender`, `Nieuws`, `Groepen`, `Leiding`, `Info`, `HetHeem`, `Contact` én het ingebouwde **`Help`**-tabblad met uitleg) al volledig voor jullie klaargezet met de huidige inhoud van de website als voorbeeld!
 
 ### Hoe importeer je dit in jullie Google Sheet?
 1. Open de [KSA Google Sheet](https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit).
 2. Klik linksboven in het menu op **Bestand** *(File)* &rarr; **Importeren** *(Import)*.
 3. Klik op het tabblad **Uploaden** en kies het bestand `KSA_Zonhoven_Website_Beheer.xlsx`.
 4. Kies bij Importlocatie: **"Spreadsheet vervangen"** *(Replace spreadsheet)* of **"Nieuwe bladen invoegen"** *(Insert new sheets)*.
-5. Klik op **Gegevens importeren**. Klaar! Alle 8 tabbladen staan direct klaar.
+5. Klik op **Gegevens importeren**. Klaar! Alle 9 tabbladen (inclusief het **`Help`**-overzicht voor de leiding) staan direct klaar.
 
 ---
 
-## 📑 Overzicht van de 8 Tabbladen
+## 📑 Overzicht van de 9 Tabbladen
 
 Hieronder vind je per onderdeel de exacte kolommen en uitleg:
 
@@ -50,46 +50,47 @@ Beheert alles wat bezoekers als eerste zien op het startscherm: de **Event Banne
 | **`Stat4`** | `13U30` | `Elke Zondag` | | | | | `Ja` |
 
 #### ⏱️ Hoe werkt de Event Banner met Aftelklok (`Banner`)?
-* **Banner verbergen / verwijderen**: Zet in de kolom **`Tonen`** de waarde op **`Nee`** (of wis de `Banner` rij). De volledige donkerblauwe banner met aftelklok verdwijnt dan meteen van zowel de computer- als smartphone-versie!
-* **Banner aanpassen naar een nieuw evenement**: Pas de `Titel`, `Tekst`, `Extra_Info` (het rode labeltje), `Knop_Tekst` en `Link_of_Foto` aan, en vul bij **`Datum_Uur`** de nieuwe datum en tijd in (bv. `08/03/2027 11:30` voor Spaghettidag of `11/07/2027 09:00` voor Zomerkamp). De klok telt automatisch tot op de seconde af naar dit moment!
-* **Extra banner toevoegen**: Wil je een nieuw evenement alvast klaarzetten of twee aftelbanners tegelijk tonen? Voeg gewoon een extra rij toe met `Onderdeel = Banner`. Elke rij met `Tonen = Ja` krijgt zijn eigen live aftelklok!
+* **Automatisch op `'Voorbij'` als de datum gepasseerd is**: In het Excel/Google Sheet-bestand bevat de kolom **`Tonen`** bij `Banner` een slimme datumformule die `Datum_Uur` vergelijkt met de datum van vandaag (`VANDAAG()` / `TODAY()`). Zodra het evenement voorbij is, springt het veld **`Tonen`** automatisch op **`Voorbij`** en verbergt de website de verlopen banner! Ook de website zelf controleert bij het laden automatisch de huidige datum.
+* **Banner handmatig verbergen / verwijderen**: Zet in de kolom **`Tonen`** de waarde op **`Nee`** of **`Voorbij`** (of wis de `Banner` rij). De volledige donkerblauwe banner met aftelklok verdwijnt dan meteen van zowel de computer- als smartphone-versie!
+* **Banner aanpassen naar een nieuw evenement**: Pas de `Titel`, `Tekst`, `Extra_Info` (het rode labeltje), `Knop_Tekst` en `Link_of_Foto` aan, en vul bij **`Datum_Uur`** de nieuwe datum en tijd in (bv. `08/03/2027 12:00` voor Spaghettidag of `11/07/2027 09:00` voor Zomerkamp). De klok telt automatisch tot op de seconde af naar dit moment!
+* **Extra banner toevoegen**: Wil je een nieuw evenement alvast klaarzetten of twee aftelbanners tegelijk tonen? Voeg gewoon een extra rij toe met `Onderdeel = Banner`. Elke rij met `Tonen = Ja` (en een datum in de toekomst) krijgt zijn eigen live aftelklok!
 * **Extra knop in de Hero (`HeroKnop2`) of `Topbalk` verbergen**: Is HalloKien voorbij? Zet bij `HeroKnop2` en `Topbalk` de kolom `Tonen` op `Nee` (of pas ze aan naar het volgende evenement).
 
 ---
 
-### 📅 Tabblad 2: `Kalender` (Menu: Kalender)
+### 📅 Tabblad 2: `Kalender` (Menu: Kalender) — *Automatisch op 'Voorbij'!*
 Beheert het werkjaaroverzicht op de desktop-kalender en de mobiele agendalijst.
 
 | Datum | Titel | Status | Emoji | Onderlijnd |
 | :--- | :--- | :--- | :--- | :--- |
-| `17 / 10` | `HALLOKIEN` | `Nu` | `🎃` | `Nee` |
-| `18 / 10` | `GEEN KSA` | | | `Ja` |
-| `25 / 10` | `KSA` | | | `Nee` |
-| `1 / 11` | `GEEN KSA` | | | `Ja` |
-| `20 / 09` | `STARTDAG` | `Voorbij` | | `Nee` |
-| `11 - 20 Juli` | `HET GROTE ZOMERKAMP` | | `⛺` | `Nee` |
+| `20 / 09` | `STARTDAG` | `Voorbij` *(automatisch)* | `🎉` | `Nee` |
+| `17 / 10` | `HALLOKIEN` | `Voorbij` *(automatisch)* | `🎃` | `Nee` |
+| `8 / 11` | `KSA` | `Nu` *(automatisch)* | | `Nee` |
+| `15 / 11` | `KSA` | | | `Nee` |
+| `8 / 03` | `SPAGHETTIDAG` | | `🍝` | `Nee` |
+| `11 - 20 Juli` | `ZOMERKAMP` | | `⛺` | `Nee` |
 
 * **Datum**: bv. `17 / 10`, `8 / 11`, `11 - 20 Juli`
 * **Titel**: Naam van de activiteit
-* **Status**:
-  * `Nu` of `Binnenkort`: Krijgt een opvallend uitroepteken en label "Binnenkort!"
-  * `Voorbij`: Wordt grijs en transparant (op mobiel verdwijnt het automatisch naar het archief)
-  * *Laat leeg voor een normale activiteit*
+* **Status (Automatisch berekend op basis van huidige datum!)**:
+  * In `KSA_Zonhoven_Website_Beheer.xlsx` staat in kolom C (`Status`) een automatische datumformule op basis van `VANDAAG()` (`TODAY()`).
+  * Ligt de datum in het verleden? Dan springt `Status` in de sheet én op de website **automatisch op `Voorbij`** (wordt grijs op desktop en verdwijnt automatisch uit de komende lijst op mobiel).
+  * De eerstvolgende toekomstige activiteit krijgt **automatisch `Nu` (`Binnenkort!`)** met het rode uitroepteken!
 * **Emoji**: bv. `🎃`, `🎟️`, `🍝`, `⛺`, `🎁`
 * **Onderlijnd**: `Ja` als het onderlijnd moet zijn (zoals bij `GEEN KSA`)
 
 ---
 
-### 📰 Tabblad 3: `Nieuws` (Menu: Nieuws)
+### 📰 Tabblad 3: `Nieuws` (Menu: Nieuws) — *Automatisch op 'Voorbij'!*
 Beheert alle nieuwskaarten en evenementen in de sectie Nieuws.
 
 | Titel | Datum | Categorie | Omschrijving | Waar | Uur | Afbeelding | Link | LinkTekst | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `HALLOKIEN BINGO NIGHT` | `Za 17 Okt 2026` | `Kienavond` | `Klaar voor een avond vol spanning...` | `Evenementenhal Zonhoven` | `18u30` | `assets/images/real_hallokien.jpg` | `https://ravotshop.ksa.be/hallokien` | `Koop tickets op Ravotshop →` | |
-| `SPAGHETTIDAG` | `Zo 8 Maart` | `Eetdag` | `Heerlijke verse spaghetti...` | `'t Heem` | `11u30` | `assets/images/real_spaghettidag.jpg` | `#` | `Voorbij` | `Voorbij` |
+| `HalloKien Bingo Night 2026 🎃` | `Za 17 Okt 2026` | `🔥 Groot Evenement` | `Op zaterdag 17 oktober...` | `Evenementenhal Zonhoven` | `Deuren: 18u30` | `assets/images/real_hallokien.jpg` | `https://ravotshop.ksa.be/hallokien` | `Bestel Tickets →` | `Voorbij` *(automatisch)* |
+| `Grote KSA Spaghettidag 🍝` | `Zondag 8 Maart` | `🍝 Eetdag` | `Schuif gezellig de benen onder tafel...` | `Zonhoven` | `Middag & Avond` | `assets/images/real_spaghettidag.jpg` | `#agenda` | `Zet in je agenda →` | `Nu` *(automatisch)* |
 
 * **Afbeelding**: Een weblink naar een foto (bv. Google Drive / Imgur / Facebook afbeeldingslink) of een lokaal bestand (bv. `assets/images/real_hallokien.jpg`).
-* **Status**: Typ `Voorbij` zodra het evenement afgelopen is, dan krijgt het kaartje automatisch de stijl "Reeds voorbij".
+* **Status (Automatisch berekend op basis van huidige datum!)**: Zowel via de datumformule in kolom J (`Status`) als via de website-code springt een gepasseerd evenement **automatisch op `Voorbij`**. Het kaartje krijgt dan automatisch het grijze label `"🏁 Reeds voorbij"`, de datum krijgt `(Voorbij)` en de bestelknop voor tickets wordt netjes verborgen.
 
 ---
 
