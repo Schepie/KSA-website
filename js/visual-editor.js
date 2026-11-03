@@ -677,6 +677,26 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         outline: 2.5px solid #e3001b;
       }
 
+      body.ksa-edit-mode-active .paspoort-card {
+        transform: none !important;
+      }
+      body.ksa-edit-mode-active .paspoort-card:hover {
+        transform: none !important;
+      }
+      body.ksa-edit-mode-active .paspoort-card-badge {
+        cursor: pointer !important;
+        outline: 2px dashed #0055a5 !important;
+        outline-offset: 2px;
+        background-color: #0055a5 !important;
+        transition: transform 0.15s, background-color 0.15s;
+        z-index: 25 !important;
+      }
+      body.ksa-edit-mode-active .paspoort-card-badge:hover {
+        outline: 2px solid #e3001b !important;
+        background-color: #e3001b !important;
+        transform: scale(1.06);
+      }
+
       .leiding-avatar-thumb,
       .leiding-card > div:first-child:not(.leiding-avatars-duo) {
         width: 76px !important;
@@ -1532,6 +1552,52 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
   }
 
+  function openPassportBadgeModal(pCard) {
+    if (!pCard) return;
+    const badge = pCard.querySelector('.paspoort-card-badge');
+    const curVal = badge ? badge.textContent.trim() : '';
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    modal.innerHTML = `
+      <h3>✏️ Paspoort Tekst / Naam aanpassen</h3>
+      <p>Typ hier de naam en groep voor dit paspoortje (bv. <strong>🔍 Kato &amp; Fien • Sim</strong> of <strong>🔍 Lotte &amp; Lina's • Jim</strong>):</p>
+      <label for="ksaBadgeInput">Tekst op paspoort:</label>
+      <input type="text" id="ksaBadgeInput" value="${curVal.replace(/"/g, '&quot;')}" placeholder="Bv. 🔍 Kato &amp; Fien • Sim">
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBadgeCancel">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaBadgeSave">✔️ Toepassen</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    const input = document.getElementById('ksaBadgeInput');
+    const applyBadge = () => {
+      const val = input.value.trim();
+      if (val) {
+        if (!badge) {
+          const newBadge = document.createElement('div');
+          newBadge.className = 'paspoort-card-badge';
+          pCard.appendChild(newBadge);
+        }
+        const targetBadge = pCard.querySelector('.paspoort-card-badge');
+        if (targetBadge) {
+          targetBadge.textContent = val.startsWith('🔍') ? val : `🔍 ${val}`;
+          pCard.title = `Bekijk paspoort van ${val.replace(/^[🔍\s]+/, '')}`;
+        }
+      }
+      backdrop.style.display = 'none';
+    };
+
+    document.getElementById('ksaBadgeSave').onclick = applyBadge;
+    document.getElementById('ksaBadgeCancel').onclick = () => { backdrop.style.display = 'none'; };
+    input.onkeydown = (e) => { if (e.key === 'Enter') applyBadge(); };
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
+  }
+
   function injectCardEditTools() {
     document.querySelectorAll('.cal-grid .cal-item').forEach(item => {
       ensureCalStickerSlot(item);
@@ -1595,13 +1661,39 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     document.querySelectorAll('.paspoort-grid .paspoort-card').forEach(pCard => {
+      const badge = pCard.querySelector('.paspoort-card-badge');
+      if (badge && !badge.dataset.ksaBadgeClickBound) {
+        badge.dataset.ksaBadgeClickBound = '1';
+        badge.title = '✏️ Klik om de tekst/naam van dit paspoort aan te passen';
+        badge.addEventListener('click', (e) => {
+          if (!isEditMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openPassportBadgeModal(pCard);
+        });
+      }
+
       if (pCard.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
       tools.className = 'ksa-card-edit-tools';
       tools.innerHTML = `
-        <button type="button" class="ksa-mini-btn" data-act="add">➕ Paspoort</button>
-        <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" data-act="del">🗑️</button>
+        <button type="button" class="ksa-mini-btn" data-act="badge" title="Pas de naam / groep van dit paspoort aan">✏️ Tekst</button>
+        <button type="button" class="ksa-mini-btn" data-act="view" title="Bekijk dit paspoort groot">🔍 Bekijk</button>
+        <button type="button" class="ksa-mini-btn" data-act="add" title="Voeg nieuw paspoort toe">➕ Paspoort</button>
+        <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" data-act="del" title="Verwijder dit paspoort">🗑️</button>
       `;
+      tools.querySelector('[data-act="badge"]').onclick = (e) => {
+        e.stopPropagation();
+        openPassportBadgeModal(pCard);
+      };
+      tools.querySelector('[data-act="view"]').onclick = (e) => {
+        e.stopPropagation();
+        const img = pCard.querySelector('img');
+        const badgeEl = pCard.querySelector('.paspoort-card-badge');
+        if (img && typeof window.openPaspoortLightbox === 'function') {
+          window.openPaspoortLightbox(img.src, badgeEl ? badgeEl.textContent.trim() : '', img.alt);
+        }
+      };
       tools.querySelector('[data-act="add"]').onclick = (e) => {
         e.stopPropagation();
         const clone = pCard.cloneNode(true);
@@ -1616,9 +1708,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           cloneImg.id = 'paspoort_img_' + Date.now();
           cloneImg.title = '📸 Klik om de foto van dit nieuwe paspoort te kiezen';
         }
-        const badge = clone.querySelector('.paspoort-card-badge');
-        if (badge) {
-          badge.textContent = '🔍 Nieuw Paspoort';
+        const cloneBadge = clone.querySelector('.paspoort-card-badge');
+        if (cloneBadge) {
+          delete cloneBadge.dataset.ksaBadgeClickBound;
+          cloneBadge.textContent = '🔍 Nieuw Paspoort';
         }
         clone.title = 'Bekijk paspoort';
 

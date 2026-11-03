@@ -338,6 +338,7 @@ function initLightbox() {
   });
 }
 
+window.openPaspoortLightbox = openPaspoortLightbox;
 function openPaspoortLightbox(imgSrc, titleText, altText) {
   // Remove any existing modal first
   document.querySelectorAll('.lightbox-modal').forEach(m => m.remove());
