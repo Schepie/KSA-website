@@ -274,6 +274,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const repo = localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName;
     const branch = localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch;
 
+    if (src.startsWith('images/uploads/') || src.startsWith('data:')) {
+      // Verwijder de paspoort-zoom crop (scale 2.8x rechtsboven) zodra een eigen foto is gekozen!
+      img.classList.remove('paspoort-avatar-crop', 'paspoort-face-focus');
+    }
+
     if (src.startsWith('images/uploads/')) {
       img.onerror = function() {
         this.onerror = null;
@@ -987,7 +992,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
         // 1. Vervang op het aangeklikte element
-        currentImageTarget.src = dataUrl;
+        setSmartImageSrc(currentImageTarget, dataUrl);
 
         // 2. Vervang direct ook alle andere afbeeldingen op de pagina die dezelfde originele bron hadden
         //    (bv. als je de cirkel van Cara wijzigt, wijzigt haar grote paspoort onderaan automatisch mee!)
@@ -996,7 +1001,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             if (otherImg.id === 'groupResultImg' || otherImg.id === 'mGroupImg') return;
             const otherOrig = otherImg.getAttribute('data-orig-src') || otherImg.getAttribute('src') || '';
             if (otherOrig === origSrc) {
-              otherImg.src = dataUrl;
+              setSmartImageSrc(otherImg, dataUrl);
             }
           });
         }
