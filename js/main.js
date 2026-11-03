@@ -19,20 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
    1. Live Countdown (HalloKien & Major Events)
    -------------------------------------------------------------------------- */
 function initCountdown() {
-  // HalloKien date (17 October)
-  const targetDate = new Date();
-  targetDate.setMonth(9); // October
-  targetDate.setDate(17);
-  targetDate.setHours(19, 30, 0, 0);
-
-  // If already past for this year, set to next year
-  if (targetDate.getTime() < Date.now()) {
-    targetDate.setFullYear(targetDate.getFullYear() + 1);
-  }
+  const now = new Date();
+  const workYearStart = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  const targetDate = new Date(workYearStart, 9, 17, 19, 30, 0, 0);
 
   function update() {
+    const activeTarget = window.ksaCountdownTargetDate || targetDate;
     const now = Date.now();
-    const diff = targetDate.getTime() - now;
+    const diff = activeTarget.getTime() - now;
 
     if (diff <= 0) {
       document.getElementById('days').innerText = '00';
@@ -159,6 +153,8 @@ const groupData = {
 groupData.springers = groupData.sloebers;
 groupData.roodkappen = groupData.roodkapjes;
 groupData.plus = groupData.kim;
+window.groupData = groupData;
+window.initLightbox = initLightbox;
 
 function applyGroupColors(groupKey) {
   const data = groupData[groupKey];
