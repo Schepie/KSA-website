@@ -453,7 +453,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       Object.entries(pageData.texts).forEach(([selector, html]) => {
         if (isGroupManagedSelector(selector)) return;
         const el = querySmartSelector(selector);
-        if (el && html !== undefined) el.innerHTML = html;
+        if (!el || html === undefined) return;
+        if (el.classList && el.classList.contains('cal-sticker')) return;
+        el.innerHTML = html;
       });
     }
 
@@ -589,18 +591,41 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         filter: brightness(0.85);
         outline: 3px solid #e3001b;
       }
+      body:not(.ksa-edit-mode-active) .cal-sticker.ksa-sticker-empty,
+      body:not(.ksa-edit-mode-active) .cal-sticker:empty {
+        display: none !important;
+      }
       body.ksa-edit-mode-active .cal-sticker {
         pointer-events: auto !important;
         cursor: pointer !important;
         outline: 2px dashed #e3001b;
         outline-offset: 2px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         padding: 2px;
+        min-width: 26px;
+        min-height: 26px;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+      body.ksa-edit-mode-active .cal-sticker.ksa-sticker-empty::before,
+      body.ksa-edit-mode-active .cal-sticker:empty::before {
+        content: "➕";
+        font-size: 0.75rem;
+        line-height: 1;
+        opacity: 0.75;
+      }
+      body.ksa-edit-mode-active .cal-sticker.ksa-sticker-empty,
+      body.ksa-edit-mode-active .cal-sticker:empty {
+        outline: 2px dashed #0055a5;
+        background: rgba(255, 255, 255, 0.92);
       }
       body.ksa-edit-mode-active .cal-sticker:hover {
         transform: scale(1.25) !important;
         outline: 2px solid #0055a5;
+        opacity: 1 !important;
       }
       .ksa-sticker-grid {
         display: grid;
@@ -987,7 +1012,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.cal-poster-sub',
       '.cal-date',
       '.cal-event-text',
-      '.cal-sticker',
       '.cal-pill-now',
       '#groupResultName',
       '#groupResultAge',
@@ -1104,6 +1128,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   function disableEditMode() {
     isEditMode = false;
     document.body.classList.remove('ksa-edit-mode-active');
+    document.querySelectorAll('.cal-sticker').forEach(el => {
+      if (!el.textContent.trim()) el.remove();
+      else el.classList.remove('ksa-sticker-empty');
+    });
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
       el.removeAttribute('contenteditable');
     });
@@ -1446,7 +1474,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const span = document.createElement('span');
         span.className = 'cal-sticker';
         span.textContent = clean;
-        span.title = 'Klik om icoon te wijzigen of te verwijderen';
+        span.title = '🎨 Klik om dit icoon te wijzigen of te verwijderen';
         span.onclick = (e) => {
           if (!isEditMode) return;
           e.preventDefault();
@@ -1454,6 +1482,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           openCalendarStickerModal(calItem);
         };
         card.insertBefore(span, card.firstChild);
+      } else if (isEditMode) {
+        ensureCalStickerSlot(calItem);
       }
       backdrop.style.display = 'none';
     };
@@ -1468,17 +1498,33 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
   }
 
+  function ensureCalStickerSlot(item) {
+    if (!item) return;
+    const card = item.querySelector('.cal-card');
+    if (!card) return;
+    let sticker = card.querySelector('.cal-sticker');
+    if (!sticker) {
+      sticker = document.createElement('span');
+      sticker.className = 'cal-sticker ksa-sticker-empty';
+      card.insertBefore(sticker, card.firstChild);
+    }
+    const hasIcon = sticker.textContent.trim().length > 0;
+    sticker.classList.toggle('ksa-sticker-empty', !hasIcon);
+    sticker.removeAttribute('contenteditable');
+    sticker.title = hasIcon
+      ? '🎨 Klik om dit icoon te wijzigen of te verwijderen'
+      : '🎨 Klik om een icoon (bv. 🎅, 👑, 🎃) toe te voegen aan deze datum';
+    sticker.onclick = (e) => {
+      if (!isEditMode) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openCalendarStickerModal(item);
+    };
+  }
+
   function injectCardEditTools() {
     document.querySelectorAll('.cal-grid .cal-item').forEach(item => {
-      item.querySelectorAll('.cal-sticker').forEach(sticker => {
-        sticker.title = '🎨 Klik om dit icoon te wijzigen of te verwijderen';
-        sticker.onclick = (e) => {
-          if (!isEditMode) return;
-          e.preventDefault();
-          e.stopPropagation();
-          openCalendarStickerModal(item);
-        };
-      });
+      ensureCalStickerSlot(item);
 
       if (item.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
@@ -1613,6 +1659,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     saveBtn.innerHTML = '⏳ Bezig met opslaan...';
 
     document.querySelectorAll('.ksa-card-edit-tools').forEach(el => el.remove());
+    document.querySelectorAll('.cal-sticker').forEach(el => {
+      if (!el.textContent.trim()) el.remove();
+      else el.classList.remove('ksa-sticker-empty');
+    });
 
     const isMobilePage = window.location.pathname.includes('mobile.html');
     const pageKey = isMobilePage ? 'mobile' : 'desktop';
