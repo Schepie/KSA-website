@@ -296,8 +296,8 @@
     }
   },
   "banner": {
-    "hidden": false,
+    "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T20:51:01.953Z"
+  "updatedAt": "2026-11-03T20:55:52.936Z"
 }
