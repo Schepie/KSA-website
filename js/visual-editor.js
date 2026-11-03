@@ -448,8 +448,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       });
     }
 
-    tagOriginalImageSources();
-
     // 3. Tekst-elementen
     if (pageData.texts) {
       Object.entries(pageData.texts).forEach(([selector, html]) => {
@@ -459,7 +457,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       });
     }
 
-    // 4. Foto's per selector
+    // 4. Foto's per selector (elke foto is 100% onafhankelijk!)
     if (pageData.images) {
       Object.entries(pageData.images).forEach(([selector, src]) => {
         if (isGroupManagedSelector(selector)) return;
@@ -470,35 +468,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       });
     }
 
-    // 5. Globale Foto-vervangingen (imageMap: bv. "images/cara.jpg" -> "images/uploads/...")
-    //    Hiermee worden paspoortjes onderaan én de mobiele site automatisch mee bijgewerkt!
-    const DEFAULT_IMAGE_MAP = {
-      'assets/images/real_leiding_hoofd.jpg': 'images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg',
-      'images/cara.jpg': 'images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg',
-      'images/nore.jpg': 'images/uploads/1793738363773_WhatsApp_Image_2026-11-03_at_17.46.17.jpg',
-      'images/lien.jpg': 'images/uploads/1793738376204_WhatsApp_Image_2026-11-03_at_17.46.15.jpg',
-      'images/lies.jpg': 'images/uploads/1793738387412_WhatsApp_Image_2026-11-03_at_17.46.16__5_.jpg',
-      'images/lotte.jpg': 'images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg',
-      'images/jim.jpg': 'images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg',
-      'images/Oonah.jpg': 'images/uploads/1793739666907_WhatsApp_Image_2026-11-03_at_17.46.16.jpg'
-    };
-    const mergedImageMap = Object.assign({}, DEFAULT_IMAGE_MAP, state.imageMap || {});
-    document.querySelectorAll('img').forEach(img => {
-      if (img.id === 'groupResultImg' || img.id === 'mGroupImg') return;
-      const orig = img.getAttribute('data-orig-src') || img.getAttribute('src') || '';
-      if (orig && mergedImageMap[orig]) {
-        setSmartImageSrc(img, mergedImageMap[orig]);
-      }
-    });
-    // Ook op mobiele data-paspoort attributen toepassen
-    document.querySelectorAll('[data-paspoort]').forEach(card => {
-      const origP = card.getAttribute('data-paspoort') || '';
-      if (origP && mergedImageMap[origP]) {
-        card.setAttribute('data-paspoort', mergedImageMap[origP]);
-      }
-    });
-
-    // 6. Knoppen & Links
+    // 5. Knoppen & Links
     if (pageData.links) {
       Object.entries(pageData.links).forEach(([selector, info]) => {
         const a = querySmartSelector(selector);
@@ -683,8 +653,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
 
       .leiding-avatar-thumb img,
-      .leiding-card > div:first-child > img,
-      .paspoort-card img {
+      .leiding-card > div:first-child > img {
         object-fit: cover !important;
         object-position: 50% 34% !important;
         transform-origin: 50% 36% !important;
@@ -693,9 +662,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       .leiding-avatar-item:hover .leiding-avatar-thumb img,
       .leiding-card > div:first-child:hover > img {
         transform: scale(1.85) !important;
-      }
-      .paspoort-card:hover img {
-        transform: scale(1.65) !important;
       }
 
       .ksa-card-edit-tools {
@@ -1193,20 +1159,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         canvas.getContext('2d').drawImage(imgObj, 0, 0, w, h);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-        // 1. Vervang op het aangeklikte element
+        // Vervang enkel het aangeklikte element (elk element zoals leidingsploeg en leidingspaspoortje heeft zijn eigen aparte foto)
         setSmartImageSrc(currentImageTarget, dataUrl);
-
-        // 2. Vervang direct ook alle andere afbeeldingen op de pagina die dezelfde originele bron hadden
-        //    (bv. als je de cirkel van Cara wijzigt, wijzigt haar grote paspoort onderaan automatisch mee!)
-        if (origSrc && !origSrc.startsWith('data:')) {
-          document.querySelectorAll('img').forEach(otherImg => {
-            if (otherImg.id === 'groupResultImg' || otherImg.id === 'mGroupImg') return;
-            const otherOrig = otherImg.getAttribute('data-orig-src') || otherImg.getAttribute('src') || '';
-            if (otherOrig === origSrc) {
-              setSmartImageSrc(otherImg, dataUrl);
-            }
-          });
-        }
 
         const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '') + '.jpg';
         const selector = getUniqueSelector(currentImageTarget);
@@ -1664,7 +1618,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const pageKey = isMobilePage ? 'mobile' : 'desktop';
 
     let fullState = (await fetchLatestGithubState()) || {};
-    fullState.imageMap = fullState.imageMap || {};
+    delete fullState.imageMap;
 
     const ghToken = (localStorage.getItem('ksa_github_token') || '').trim();
     const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
@@ -1687,15 +1641,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           );
           if (imgItem.groupKey && window.groupData && window.groupData[imgItem.groupKey]) {
             window.groupData[imgItem.groupKey].image = repoImgPath;
-          }
-          if (imgItem.origSrc && !imgItem.origSrc.startsWith('data:')) {
-            fullState.imageMap[imgItem.origSrc] = repoImgPath;
-            document.querySelectorAll('img').forEach(otherImg => {
-              const otherOrig = otherImg.getAttribute('data-orig-src') || '';
-              if (otherOrig === imgItem.origSrc) {
-                setSmartImageSrc(otherImg, repoImgPath);
-              }
-            });
           }
           if (imgItem.selector) {
             const domImg = document.querySelector(imgItem.selector);
@@ -1737,13 +1682,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       const sel = getUniqueSelector(img);
       if (isGroupManagedSelector(sel)) return;
       const srcVal = img.getAttribute('src') || '';
-      const origVal = img.getAttribute('data-orig-src') || '';
       // Als er een raw.githubusercontent fallback actief was, bewaar het schone repo-pad
       const cleanSrc = srcVal.replace(/^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+\//, '');
       if (sel) pageData.images[sel] = cleanSrc;
-      if (origVal && cleanSrc && origVal !== cleanSrc && !cleanSrc.startsWith('data:')) {
-        fullState.imageMap[origVal] = cleanSrc;
-      }
     });
 
     document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
