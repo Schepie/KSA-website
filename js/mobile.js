@@ -166,6 +166,9 @@ const mobileGroupData = {
   }
 };
 
+// Expose mobileGroupData globally for sheets CMS sync
+window.mobileGroupData = mobileGroupData;
+
 function initGroupTabs() {
   const buttons = document.querySelectorAll('.group-select-btn');
   const imgEl = document.getElementById('mGroupImg');
@@ -220,6 +223,7 @@ function initGroupTabs() {
 
   // Initialize with first group
   renderGroup('kabouters');
+  window.renderMobileGroup = renderGroup;
 }
 
 /* ==========================================================================
@@ -241,8 +245,9 @@ function initMobileCountdown() {
   const sEl = document.getElementById('mSeconds');
 
   function update() {
+    const activeTarget = window.ksaCountdownTargetDate || targetDate;
     const now = Date.now();
-    const diff = targetDate.getTime() - now;
+    const diff = activeTarget.getTime() - now;
 
     if (diff <= 0) {
       if (dEl) dEl.innerText = '00';
@@ -264,7 +269,8 @@ function initMobileCountdown() {
   }
 
   update();
-  setInterval(update, 1000);
+  if (window.ksaMobileCountdownInterval) clearInterval(window.ksaMobileCountdownInterval);
+  window.ksaMobileCountdownInterval = setInterval(update, 1000);
 }
 
 /* ==========================================================================
@@ -350,3 +356,4 @@ function initPaspoortModal() {
     }
   });
 }
+window.initPaspoortModal = initPaspoortModal;
