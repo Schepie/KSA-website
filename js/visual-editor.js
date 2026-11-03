@@ -23,7 +23,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   repoName: 'KSA-website',
   defaultBranch: 'main',
   contentFilePath: 'data/site-content.json',
-  storageKey: 'ksa_website_github_edits_v2'
+  storageKey: 'ksa_website_github_edits_v3'
 };
 
 (function initKsaVisualEditor() {
@@ -1077,7 +1077,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (img.closest('.ksa-editor-dock') || img.closest('.nav-item-icon-wrap')) return;
       img.classList.add('ksa-editable-img');
       img.title = '📸 Klik om deze foto te vervangen vanaf je PC of GSM';
-      img.addEventListener('click', onEditableImageClick, true);
+      if (!img.dataset.ksaBound) {
+        img.dataset.ksaBound = '1';
+        img.addEventListener('click', onEditableImageClick, true);
+      }
     });
 
     document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
@@ -1142,6 +1145,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
     document.querySelectorAll('img.ksa-editable-img').forEach(img => {
       img.classList.remove('ksa-editable-img');
+      delete img.dataset.ksaBound;
       img.removeEventListener('click', onEditableImageClick, true);
     });
     document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
@@ -1216,6 +1220,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const key = groupKey ? `group_${groupKey}` : selector;
         pendingImageUploads[key] = {
           selector,
+          targetImg: currentImageTarget,
           origSrc,
           groupKey,
           base64: dataUrl.split(',')[1],
@@ -1601,11 +1606,31 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         e.stopPropagation();
         const clone = pCard.cloneNode(true);
         clone.querySelector('.ksa-card-edit-tools')?.remove();
+
+        // Maak het nieuwe gekloonde paspoort volledig onafhankelijk van het origineel:
+        const cloneImg = clone.querySelector('img');
+        if (cloneImg) {
+          cloneImg.removeAttribute('data-orig-src');
+          delete cloneImg.dataset.origSrc;
+          delete cloneImg.dataset.ksaBound;
+          cloneImg.id = 'paspoort_img_' + Date.now();
+          cloneImg.title = '📸 Klik om de foto van dit nieuwe paspoort te kiezen';
+        }
+        const badge = clone.querySelector('.paspoort-card-badge');
+        if (badge) {
+          badge.textContent = '🔍 Nieuw Paspoort';
+        }
+        clone.title = 'Bekijk paspoort';
+
         pCard.after(clone);
         enableEditMode();
       };
       tools.querySelector('[data-act="del"]').onclick = (e) => {
         e.stopPropagation();
+        if (document.querySelectorAll('.paspoort-grid .paspoort-card').length <= 1) {
+          alert('Je moet minstens één paspoort behouden.');
+          return;
+        }
         pCard.remove();
       };
       pCard.appendChild(tools);
@@ -1697,7 +1722,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           if (imgItem.groupKey && window.groupData && window.groupData[imgItem.groupKey]) {
             window.groupData[imgItem.groupKey].image = repoImgPath;
           }
-          if (imgItem.selector) {
+          if (imgItem.targetImg) {
+            setSmartImageSrc(imgItem.targetImg, repoImgPath);
+          } else if (imgItem.selector) {
             const domImg = document.querySelector(imgItem.selector);
             if (domImg) setSmartImageSrc(domImg, repoImgPath);
           }
@@ -1729,11 +1756,15 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+      // Sla geen teksten op die al in containers (.cal-grid, .paspoort-grid, ...) zitten
+      if (el.closest('.cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(el);
       if (sel && !isGroupManagedSelector(sel)) pageData.texts[sel] = el.innerHTML;
     });
 
     document.querySelectorAll('img.ksa-editable-img').forEach(img => {
+      // Sla geen foto's op die al in containers (.paspoort-grid, .cal-grid, ...) zitten om index-conflicten bij toevoegen te vermijden
+      if (img.closest('.cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(img);
       if (isGroupManagedSelector(sel)) return;
       const srcVal = img.getAttribute('src') || '';
