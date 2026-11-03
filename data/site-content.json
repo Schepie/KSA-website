@@ -11,7 +11,9 @@
         "Pleinspelen",
         "Korte namiddagkampjes",
         "Leiding: Cara & Nore"
-      ]
+      ],
+      "buttonLabel": "6-8 Jaar (Kabouters ✨)",
+      "hidden": false
     },
     "sloebers": {
       "name": "SLOEBERS",
@@ -24,7 +26,9 @@
         "Gezelschapsspelen XL",
         "Samen op weekend",
         "Leiding: Lien & Lies"
-      ]
+      ],
+      "buttonLabel": "8-10 Jaar (Sloebers 🎈)",
+      "hidden": false
     },
     "roodkapjes": {
       "name": "ROODKAPJES",
@@ -37,7 +41,9 @@
         "Vlottentocht & pleinspelen",
         "10 dagen op kamp in tenten",
         "Topteam sfeer"
-      ]
+      ],
+      "buttonLabel": "10-12 Jaar (Roodkapjes 🏕️)",
+      "hidden": true
     },
     "jim": {
       "name": "JIM",
@@ -50,7 +56,9 @@
         "Vlotten bouwen & hike",
         "Eigen groepshonk pimpen",
         "Leiding: Lotte, Lina B. & Lina S."
-      ]
+      ],
+      "buttonLabel": "12-14 Jaar (Jim 🧭)",
+      "hidden": false
     },
     "sim": {
       "name": "SIM",
@@ -63,7 +71,9 @@
         "Zelf activiteiten bedenken",
         "Leiding-skills leren",
         "Leiding: Kato & Fien"
-      ]
+      ],
+      "buttonLabel": "14-16 Jaar (Sim ⚡)",
+      "hidden": false
     },
     "kim": {
       "name": "KIM (+16)",
@@ -76,7 +86,9 @@
         "Grootste feesten organiseren",
         "Levenslange KSA-familie",
         "Leiding: Oonah"
-      ]
+      ],
+      "buttonLabel": "16-17+ Jaar (Kim 🔥)",
+      "hidden": false
     }
   },
   "desktop": {
@@ -130,6 +142,7 @@
       "#cal-poster-sub": "SEPT – JULI",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "<span class=\"cal-excl\">!</span> 8 / 11",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "KSA",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)": "Binnenkort!",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "<font color=\"#e73339\"><span style=\"font-size: 21.6px;\">11</span></font> / 11",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)": "Hololool",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1)": "15 / 11",
@@ -139,32 +152,42 @@
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1)": "29 / 11",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(2) > span:nth-of-type(1)": "KSA",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1)": "6 / 12",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(2) > span:nth-of-type(1)": "👑",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(2) > span:nth-of-type(2)": "KSA",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(1)": "13 / 12",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(7) > div:nth-of-type(2) > span:nth-of-type(1)": "KSA",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(1)": " 18 / 12",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(2) > span:nth-of-type(1)": "🎅",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(8) > div:nth-of-type(2) > span:nth-of-type(2)": "KERST<br>FEESTJE",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(1)": "27 / 12",
-      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(2) > span:nth-of-type(2)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span>",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(9) > div:nth-of-type(2) > span:nth-of-type(1)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span>",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(1)": "03/ 01",
-      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(2) > span:nth-of-type(2)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span><br>",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(10) > div:nth-of-type(2) > span:nth-of-type(1)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span><br>",
       "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(1)": " 10 / 01",
-      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(2) > span:nth-of-type(2)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span>",
+      "#kalender-bord > div:nth-of-type(2) > div:nth-of-type(11) > div:nth-of-type(2) > span:nth-of-type(1)": "<span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span>",
       "#info > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Praktische Informatie",
       "#info > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "UNIFORM &amp; WERKING",
       "#info > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Alles wat je als lid of ouder moet weten over het zondagprogramma en ons KSA-uniform.\n          ",
+      "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "⏰",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > h3:nth-of-type(1)": "WEKELIJKSE ZONDAGEN",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)": "\n              Wij meisjes van KSA Zonhoven komen iedere zondag van <strong>13u30 tot 17u00</strong> samen. Pleinspelen, bosspel, tocht, knutselen... je kan het zo gek niet bedenken of wij doen het!\n            ",
+      "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "👕",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > h3:nth-of-type(1)": "ONS KSA UNIFORM",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > p:nth-of-type(1)": "\n              Elke zondag dragen we hetzelfde! Een donkerblauwe trui of hemd en ons KSA sjaaltje. We dragen het met trots overal naartoe en op de Dag van de Jeugdbeweging kleuren we alle straten blauw!\n            ",
+      "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1)": "🏕️",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > h3:nth-of-type(1)": "WEEKEND &amp; KAMP",
       "#info > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > p:nth-of-type(1)": "\n              Buiten de wekelijkse activiteiten gaan we 1 keer per jaar op weekend én op ons grote 10-daags zomerkamp. Ook doen we mee aan initiatieven van KSA Limburg en KSA Nationaal!\n            ",
+      "#info > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1)": "📝 Inschrijven via RAVOT (ksa.be)",
+      "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)": "1",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > h5:nth-of-type(1)": "Surf naar Ravot",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "Ga naar <a href=\"https://ravot.ksa.be\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--ksa-yellow); text-decoration:underline;\">ravot.ksa.be</a> op je pc of smartphone.",
+      "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)": "2",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > h5:nth-of-type(1)": "Inloggen of Account",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > p:nth-of-type(1)": "Al eerder ingeschreven? Log in. Nieuwe ouder? Maak eenvoudig een gezinsaccount aan.",
+      "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)": "3",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(3) > h5:nth-of-type(1)": "Lid Inschrijven",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(3) > p:nth-of-type(1)": "Klik in het hoofdmenu op de knop “Lid inschrijven” en kies KSA Zonhoven Meisjes.",
+      "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1)": "4",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > h5:nth-of-type(1)": "Gegevens &amp; UiTPAS",
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(4) > p:nth-of-type(1)": "Vul rijksregisternummer &amp; eventueel UiTPAS in (discreet financiële ondersteuning mogelijk).",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Ons Leidingskorps",
@@ -173,21 +196,32 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > h3:nth-of-type(1)": "FIEN AERTS",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > span:nth-of-type(1)": "Hoofdleiding KSA Zonhoven",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > p:nth-of-type(1)": "\n              Het centrale aanspreekpunt voor ouders, leiding, gemeente en KSA Nationaal.\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Cara",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Nore",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > h3:nth-of-type(1)": "KABOUTERS",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(1)": "Cara &amp; Nore (6-8j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > p:nth-of-type(1)": "\n              Koninginnen van de verkleedkist, knutselkampioenen en altijd klaar voor een knuffel of een leuk spelletje.\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > span:nth-of-type(2)": "Creatief &amp; Zorgzaam",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Lien",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lies",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > h3:nth-of-type(1)": "SLOEBERS",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > span:nth-of-type(1)": "Lien &amp; Lies (8-10j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > p:nth-of-type(1)": "\n              Onvermoeibaar, verzot op estafettes en de beste gidsen in het bos om geweldige forten te bouwen.\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > span:nth-of-type(2)": "Vol Energie",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Lotte",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lina's",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > h3:nth-of-type(1)": "JIM",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > span:nth-of-type(1)": "Lotte, Lina B. &amp; Lina S. (12-14j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > p:nth-of-type(1)": "\n              Meesters in gezelligheid, spannende dorpsspelen, hikes en een hechte vriendinnensfeer.\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > span:nth-of-type(2)": "Avontuurlijk",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > h3:nth-of-type(1)": "SIM",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > span:nth-of-type(1)": "Kato &amp; Fien (14-16j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > p:nth-of-type(1)": "\n              Altijd in voor een dropping, vlotten bouwen en knotsgekke grensverleggende uitdagingen in het groen.\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > span:nth-of-type(2)": "Grensverleggend",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > h3:nth-of-type(1)": "KIM (+16)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > span:nth-of-type(1)": "Oonah (16-17+j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > p:nth-of-type(1)": "\n              Klaarstomen voor leiding, leefweek, triptrap en de grootste feesten van KSA organiseren!\n            ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > span:nth-of-type(2)": "Toekomst",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)": "Wie is wie?",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "🔍 Cara • Kabouters",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "🔍 Nore • Kabouters",
@@ -209,7 +243,12 @@
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5)": "✔️ Ideaal voor jeugdverenigingen, weekends en kampen",
       "#contact > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Vragen of Kennismaken?",
       "#contact > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "NEEM CONTACT OP MET ONS",
-      "#contact > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Twijfel je om je dochter in te schrijven of wil je praktische info? Onze leiding staat voor je klaar!\n          "
+      "#contact > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Twijfel je om je dochter in te schrijven of wil je praktische info? Onze leiding staat voor je klaar!\n          ",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1)": "📍",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)": "👑",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)": "📨",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)": "🛒",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1)": "\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" style=\"display:block;\"><path d=\"M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z\"></path></svg>\n              "
     },
     "images": {
       "header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-official.svg?v=blue",
@@ -247,52 +286,76 @@
     "links": {
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": {
         "href": "#nieuws",
+        "text": "🔥 Bekijk het Nieuws",
         "hidden": false
       },
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(2)": {
         "href": "https://ravotshop.ksa.be/hallokien",
+        "text": "🎃 HalloKien Tickets",
         "hidden": true
       },
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(3)": {
         "href": "#groepen",
+        "text": "Ontdek Jouw Groep →",
         "hidden": false
       },
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)": {
         "href": "https://ravotshop.ksa.be/hallokien",
+        "text": "🎟️ Bestel Kaarten →",
         "hidden": false
       },
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(1)": {
         "href": "https://ravotshop.ksa.be/hallokien",
+        "text": "Koop tickets op Ravotshop →",
         "hidden": false
       },
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(2)": {
         "href": "https://ravotshop.ksa.be/hallokien",
+        "text": "🎟️ Tickets",
         "hidden": true
       },
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(1)": {
         "href": "#info",
+        "text": "Gratis komen proberen →",
         "hidden": false
       },
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(2)": {
         "href": "#info",
+        "text": "ℹ️ Gratis Meedoen",
+        "hidden": false
+      },
+      "#groupResultBtn": {
+        "href": "#info",
+        "text": "🚀 Schrijf je in voor deze groep →",
         "hidden": false
       },
       "#info > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > a:nth-of-type(1)": {
         "href": "https://ravot.ksa.be",
+        "text": "🚀 Direct Inschrijven op ravot.ksa.be →",
+        "hidden": false
+      },
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1)": {
+        "href": "mailto:hoofdleiding.ksazonhoven@gmail.com",
+        "text": "✉️ Stuur Fien een Mailtje",
+        "hidden": false
+      },
+      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)": {
+        "href": "https://www.theem.be",
+        "text": "🌐 Surf naar www.theem.be →",
         "hidden": false
       }
     },
     "containers": {
-      ".cal-grid": "\n            <!-- 20/09 (Voorbij) -->\n            \n\n            <!-- 27/09 (Voorbij) -->\n            \n\n            <!-- 4/10 (Voorbij) -->\n            \n\n            <!-- 11/10 (Voorbij) -->\n            \n\n            <!-- 17/10 HALLOKIEN -->\n            \n\n            <!-- 18/10 GEEN KSA -->\n            \n\n            <!-- 25/10 KSA -->\n            \n\n            <!-- 1/11 GEEN KSA -->\n            \n\n            <!-- 8/11 KSA -->\n            <div class=\"cal-item is-current\">\n              <div class=\"cal-date\"><span class=\"cal-excl\">!</span> 8 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">KSA</span>\n              <span class=\"cal-pill-now\">Binnenkort!</span></div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\"><font color=\"#e73339\"><span style=\"font-size: 21.6px;\">11</span></font> / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">Hololool</span>\n              </div>\n            </div>\n\n            <!-- 15/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\">15 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 22/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\">22 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 29/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\">29 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 6/12 KSA (Sint) -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\">6 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-sint\" title=\"Sinterklaas\">👑</span>\n                <span class=\"cal-event-text\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 13/12 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\">13 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 18/12 KERSTFEESTJE -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\"> 18 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-kerst\" title=\"Kerstfeestje\">🎅</span>\n                <span class=\"cal-event-text cal-text-kerst\">KERST<br>FEESTJE</span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\">27 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-kerst\" title=\"Kerstfeestje\">🎅</span>\n                <span class=\"cal-event-text cal-text-kerst\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span></span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\">03/ 01</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-kerst\" title=\"Kerstfeestje\">🎅</span>\n                <span class=\"cal-event-text cal-text-kerst\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span><br></span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\"> 10 / 01</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-kerst\" title=\"Kerstfeestje\">🎅</span>\n                <span class=\"cal-event-text cal-text-kerst\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span></span>\n              </div>\n            </div>\n          ",
-      ".news-grid": "\n\n          <!-- 1. HalloKien (Active Upcoming Event) -->\n          <article class=\"news-card is-past\" data-category=\"hot hallokien\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_hallokien.jpg\" alt=\"Originele HalloKien KSA Zonhoven flyer\" class=\"\">\n              <div class=\"news-badge\" style=\"background-color: rgb(85, 94, 104); color: rgb(255, 255, 255);\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40, 40, 40, 0.85);\">Za 17 Okt 2026 (Voorbij)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: rgb(74, 85, 104);\">HALLOKIEN: SPANNENDE BINGO MET GRIEZELIG VEEL PRIJZEN!</h3>\n              <div class=\"news-meta-details\">\n                <div>📍 <strong>Waar:</strong> Polyvalente zaal, Evenementenhal Zonhoven</div>\n                <div>⏰ <strong>Tijd:</strong> Deuren open 18u30 • Start kien 19u30</div>\n              </div>\n              <p class=\"news-snippet\">\n                Klaar voor een avond vol spanning, geluk en een tikkeltje griezelen? Een gezellige avond met geweldige prijzen, spannende rondes en vooral veel plezier. Wie gaat er dit jaar met de mooiste prijs naar huis? Trommel je vrienden, familie of favoriete kienmaatjes op en schrijf je snel in. <strong>Want vol = vol!</strong>\n              </p>\n              <div class=\"news-actions\">\n                <a href=\"https://ravotshop.ksa.be/hallokien\" target=\"_blank\" rel=\"noopener\" class=\"read-more-link\">\n                  Koop tickets op Ravotshop →\n                </a>\n                <a href=\"https://ravotshop.ksa.be/hallokien\" target=\"_blank\" rel=\"noopener\" class=\"btn btn-primary btn-sm\" data-confetti=\"\" style=\"display: none;\">\n                  <span>🎟️ Tickets</span>\n                </a>\n              </div>\n            </div>\n          </article>\n\n          <!-- 2. Startdag (Past / Faded Event) -->\n          <article class=\"news-card is-past\" data-category=\"startdag\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_startdag.jpg?v=2\" alt=\"Originele startdag KSA Zonhoven afbeelding\" class=\"\">\n              <div class=\"news-badge\" style=\"background-color: rgb(85, 94, 104); color: rgb(255, 255, 255);\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40,40,40,0.85);\">Zo 20 September (Voorbij)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: #4a5568;\">START VAN HET NIEUWE KSA-JAAR &amp; LEIDINGZOEKTOCHT</h3>\n              <div class=\"news-meta-details\">\n                <div>📍 <strong>Waar:</strong> Dijkbeemdenweg 8, Zonhoven</div>\n                <div>⏰ <strong>Tijd:</strong> 13u30 tot 17u00</div>\n              </div>\n              <p class=\"news-snippet\">\n                De feestelijke startdag en leidingzoektocht vond plaats op 20 september! Heb je het gemist? Geen zorgen: nieuwe meisjes van 6 tot 17 jaar mogen <strong>iedere zondag gratis 2 proefnamiddagen</strong> meedoen om te ontdekken hoe leuk KSA is!\n              </p>\n              <div class=\"news-actions\">\n                <a href=\"#info\" class=\"read-more-link\">\n                  Gratis komen proberen →\n                </a>\n                <a href=\"#info\" class=\"btn btn-outline-blue btn-sm\">\n                  <span>ℹ️ Gratis Meedoen</span>\n                </a>\n              </div>\n            </div>\n          </article>\n\n          <!-- 3. Spaghettidag (Past / Faded Event) -->\n          <article class=\"news-card is-past\" data-category=\"spaghetti\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_spaghettidag.jpg?v=2\" alt=\"Originele Spaghettidag KSA Zonhoven affiche\" class=\"\">\n              <div class=\"news-badge\" style=\"background-color: #555e68; color: #ffffff;\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40,40,40,0.85);\">Zo 1 Maart (Afgelopen)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: #4a5568;\">SPAGHETTIDAG: SMULLEN VOOR ONZE NIEUWE KAMPTENT</h3>\n              <div class=\"news-meta-details\">\n                <div>📍 <strong>Waar:</strong> Zaal De Kwint, Zonhoven</div>\n                <div>🍰 <strong>Desserts:</strong> Verzorgd door iTakeAway</div>\n              </div>\n              <p class=\"news-snippet\">\n                Onze jaarlijkse spaghettidag in Zaal De Kwint was een fantastisch succes! Dankzij de massale opkomst en alle bestellingen hebben we ons streefdoel bereikt voor de aankoop van onze nieuwe kamptent. Enorm bedankt aan alle eters, sympathisanten en helpende handen!\n              </p>\n              <div class=\"news-actions\">\n                <span class=\"read-more-link\" style=\"color: #718096;\">\n                  ❤️ Bedankt voor jullie steun!\n                </span>\n              </div>\n            </div>\n          </article>\n\n        ",
-      ".paspoort-grid": "\n            <!-- 1. Cara -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Cara\">\n              <img src=\"images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg\" data-orig-src=\"images/cara.jpg\" alt=\"Leidingspaspoort Cara (Kabouters)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Cara • Kabouters</div>\n            </div>\n\n            <!-- 2. Nore -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Nore\">\n              <img src=\"images/uploads/1793738363773_WhatsApp_Image_2026-11-03_at_17.46.17.jpg\" data-orig-src=\"images/nore.jpg\" alt=\"Leidingspaspoort Nore (Kabouters)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Nore • Kabouters</div>\n            </div>\n\n            <!-- 3. Lien -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lien\">\n              <img src=\"images/uploads/1793738376204_WhatsApp_Image_2026-11-03_at_17.46.15.jpg\" data-orig-src=\"images/lien.jpg\" alt=\"Leidingspaspoort Lien (Sloebers)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Lien • Sloebers</div>\n            </div>\n\n            <!-- 4. Lies -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lies\">\n              <img src=\"images/uploads/1793738387412_WhatsApp_Image_2026-11-03_at_17.46.16__5_.jpg\" data-orig-src=\"images/lies.jpg\" alt=\"Leidingspaspoort Lies (Sloebers)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Lies • Sloebers</div>\n            </div>\n\n            <!-- 5. Lotte -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lotte\">\n              <img src=\"images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg\" data-orig-src=\"images/lotte.jpg\" alt=\"Leidingspaspoort Lotte (Jim)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Lotte • Jim</div>\n            </div>\n\n            <!-- 6. Oonah -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Oonah\">\n              <img src=\"images/uploads/1793739666907_WhatsApp_Image_2026-11-03_at_17.46.16.jpg\" data-orig-src=\"images/Oonah.jpg\" alt=\"Leidingspaspoort Oonah (Kim +16)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Oonah • Kim (+16)</div>\n            </div>\n\n            <!-- 7. Kato & Fien -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk foto van Kato &amp; Fien\">\n              <img src=\"images/sim.jpg\" alt=\"Leidsters Kato &amp; Fien (Sim)\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Kato &amp; Fien • Sim</div>\n            </div>\n\n            <!-- 8. Jim Leiding -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk foto van Jim Leiding\">\n              <img src=\"images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg\" data-orig-src=\"images/jim.jpg\" alt=\"Jim Leiding Lotte, Lina B. &amp; Lina S.\" class=\"\">\n              <div class=\"paspoort-card-badge\">🔍 Lotte &amp; Lina's • Jim</div>\n            </div>\n          "
+      ".cal-grid": "\n            <!-- 20/09 (Voorbij) -->\n            \n\n            <!-- 27/09 (Voorbij) -->\n            \n\n            <!-- 4/10 (Voorbij) -->\n            \n\n            <!-- 11/10 (Voorbij) -->\n            \n\n            <!-- 17/10 HALLOKIEN -->\n            \n\n            <!-- 18/10 GEEN KSA -->\n            \n\n            <!-- 25/10 KSA -->\n            \n\n            <!-- 1/11 GEEN KSA -->\n            \n\n            <!-- 8/11 KSA -->\n            <div class=\"cal-item is-current\">\n              <div class=\"cal-date\" spellcheck=\"false\"><span class=\"cal-excl\">!</span> 8 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              <span class=\"cal-pill-now\" spellcheck=\"false\">Binnenkort!</span></div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\"><font color=\"#e73339\"><span style=\"font-size: 21.6px;\">11</span></font> / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">Hololool</span>\n              </div>\n            </div>\n\n            <!-- 15/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">15 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 22/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">22 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 29/11 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">29 / 11</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 6/12 KSA (Sint) -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">6 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-sint\" title=\"🎨 Klik om dit icoon te wijzigen of te verwijderen\" spellcheck=\"false\">👑</span>\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 13/12 KSA -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">13 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-event-text\" spellcheck=\"false\">KSA</span>\n              </div>\n            </div>\n\n            <!-- 18/12 KERSTFEESTJE -->\n            <div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\"> 18 / 12</div>\n              <div class=\"cal-card\">\n                <span class=\"cal-sticker cal-sticker-kerst\" title=\"🎨 Klik om dit icoon te wijzigen of te verwijderen\" spellcheck=\"false\">🎅</span>\n                <span class=\"cal-event-text cal-text-kerst\" spellcheck=\"false\">KERST<br>FEESTJE</span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">27 / 12</div>\n              <div class=\"cal-card\">\n                \n                <span class=\"cal-event-text cal-text-kerst\" spellcheck=\"false\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span></span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\">03/ 01</div>\n              <div class=\"cal-card\">\n                \n                <span class=\"cal-event-text cal-text-kerst\" spellcheck=\"false\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span><br></span>\n              </div>\n            </div><div class=\"cal-item\">\n              <div class=\"cal-date\" spellcheck=\"false\"> 10 / 01</div>\n              <div class=\"cal-card\">\n                \n                <span class=\"cal-event-text cal-text-kerst\" spellcheck=\"false\"><span style=\"font-size: 23.2px; letter-spacing: 0.4px;\">KSA</span></span>\n              </div>\n            </div>\n          ",
+      ".news-grid": "\n\n          <!-- 1. HalloKien (Active Upcoming Event) -->\n          <article class=\"news-card is-past\" data-category=\"hot hallokien\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_hallokien.jpg\" alt=\"Originele HalloKien KSA Zonhoven flyer\" class=\"\" data-orig-src=\"assets/images/real_hallokien.jpg\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"news-badge\" style=\"background-color: rgb(85, 94, 104); color: rgb(255, 255, 255);\" spellcheck=\"false\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40, 40, 40, 0.85);\" spellcheck=\"false\">Za 17 Okt 2026 (Voorbij)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: rgb(74, 85, 104);\" spellcheck=\"false\">HALLOKIEN: SPANNENDE BINGO MET GRIEZELIG VEEL PRIJZEN!</h3>\n              <div class=\"news-meta-details\">\n                <div spellcheck=\"false\">📍 <strong>Waar:</strong> Polyvalente zaal, Evenementenhal Zonhoven</div>\n                <div spellcheck=\"false\">⏰ <strong>Tijd:</strong> Deuren open 18u30 • Start kien 19u30</div>\n              </div>\n              <p class=\"news-snippet\" spellcheck=\"false\">\n                Klaar voor een avond vol spanning, geluk en een tikkeltje griezelen? Een gezellige avond met geweldige prijzen, spannende rondes en vooral veel plezier. Wie gaat er dit jaar met de mooiste prijs naar huis? Trommel je vrienden, familie of favoriete kienmaatjes op en schrijf je snel in. <strong>Want vol = vol!</strong>\n              </p>\n              <div class=\"news-actions\">\n                <a href=\"https://ravotshop.ksa.be/hallokien\" target=\"_blank\" rel=\"noopener\" class=\"read-more-link ksa-editable-btn\" title=\"🔗 Klik om knoptekst, link of zichtbaarheid aan te passen\">\n                  Koop tickets op Ravotshop →\n                </a>\n                <a href=\"https://ravotshop.ksa.be/hallokien\" target=\"_blank\" rel=\"noopener\" class=\"btn btn-primary btn-sm ksa-link-hidden ksa-editable-btn\" data-confetti=\"\" style=\"display: none;\" title=\"🔗 Klik om knoptekst, link of zichtbaarheid aan te passen\">\n                  <span>🎟️ Tickets</span>\n                </a>\n              </div>\n            </div>\n          </article>\n\n          <!-- 2. Startdag (Past / Faded Event) -->\n          <article class=\"news-card is-past\" data-category=\"startdag\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_startdag.jpg?v=2\" alt=\"Originele startdag KSA Zonhoven afbeelding\" class=\"\" data-orig-src=\"assets/images/real_startdag.jpg?v=2\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"news-badge\" style=\"background-color: rgb(85, 94, 104); color: rgb(255, 255, 255);\" spellcheck=\"false\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40,40,40,0.85);\" spellcheck=\"false\">Zo 20 September (Voorbij)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: #4a5568;\" spellcheck=\"false\">START VAN HET NIEUWE KSA-JAAR &amp; LEIDINGZOEKTOCHT</h3>\n              <div class=\"news-meta-details\">\n                <div spellcheck=\"false\">📍 <strong>Waar:</strong> Dijkbeemdenweg 8, Zonhoven</div>\n                <div spellcheck=\"false\">⏰ <strong>Tijd:</strong> 13u30 tot 17u00</div>\n              </div>\n              <p class=\"news-snippet\" spellcheck=\"false\">\n                De feestelijke startdag en leidingzoektocht vond plaats op 20 september! Heb je het gemist? Geen zorgen: nieuwe meisjes van 6 tot 17 jaar mogen <strong>iedere zondag gratis 2 proefnamiddagen</strong> meedoen om te ontdekken hoe leuk KSA is!\n              </p>\n              <div class=\"news-actions\">\n                <a href=\"#info\" class=\"read-more-link ksa-editable-btn\" title=\"🔗 Klik om knoptekst, link of zichtbaarheid aan te passen\">\n                  Gratis komen proberen →\n                </a>\n                <a href=\"#info\" class=\"btn btn-outline-blue btn-sm ksa-editable-btn\" title=\"🔗 Klik om knoptekst, link of zichtbaarheid aan te passen\">\n                  <span>ℹ️ Gratis Meedoen</span>\n                </a>\n              </div>\n            </div>\n          </article>\n\n          <!-- 3. Spaghettidag (Past / Faded Event) -->\n          <article class=\"news-card is-past\" data-category=\"spaghetti\">\n            <div class=\"news-media\">\n              <img src=\"assets/images/real_spaghettidag.jpg?v=2\" alt=\"Originele Spaghettidag KSA Zonhoven affiche\" class=\"\" data-orig-src=\"assets/images/real_spaghettidag.jpg?v=2\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"news-badge\" style=\"background-color: #555e68; color: #ffffff;\" spellcheck=\"false\">🏁 Reeds voorbij</div>\n              <div class=\"news-date\" style=\"background-color: rgba(40,40,40,0.85);\" spellcheck=\"false\">Zo 1 Maart (Afgelopen)</div>\n            </div>\n            <div class=\"news-content\">\n              <h3 class=\"news-card-title\" style=\"color: #4a5568;\" spellcheck=\"false\">SPAGHETTIDAG: SMULLEN VOOR ONZE NIEUWE KAMPTENT</h3>\n              <div class=\"news-meta-details\">\n                <div spellcheck=\"false\">📍 <strong>Waar:</strong> Zaal De Kwint, Zonhoven</div>\n                <div spellcheck=\"false\">🍰 <strong>Desserts:</strong> Verzorgd door iTakeAway</div>\n              </div>\n              <p class=\"news-snippet\" spellcheck=\"false\">\n                Onze jaarlijkse spaghettidag in Zaal De Kwint was een fantastisch succes! Dankzij de massale opkomst en alle bestellingen hebben we ons streefdoel bereikt voor de aankoop van onze nieuwe kamptent. Enorm bedankt aan alle eters, sympathisanten en helpende handen!\n              </p>\n              <div class=\"news-actions\">\n                <span class=\"read-more-link\" style=\"color: #718096;\">\n                  ❤️ Bedankt voor jullie steun!\n                </span>\n              </div>\n            </div>\n          </article>\n\n        ",
+      ".paspoort-grid": "\n            <!-- 1. Cara -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Cara\">\n              <img src=\"images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg\" data-orig-src=\"images/cara.jpg\" alt=\"Leidingspaspoort Cara (Kabouters)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Cara • Kabouters</div>\n            </div>\n\n            <!-- 2. Nore -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Nore\">\n              <img src=\"images/uploads/1793738363773_WhatsApp_Image_2026-11-03_at_17.46.17.jpg\" data-orig-src=\"images/nore.jpg\" alt=\"Leidingspaspoort Nore (Kabouters)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Nore • Kabouters</div>\n            </div>\n\n            <!-- 3. Lien -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lien\">\n              <img src=\"images/uploads/1793738376204_WhatsApp_Image_2026-11-03_at_17.46.15.jpg\" data-orig-src=\"images/lien.jpg\" alt=\"Leidingspaspoort Lien (Sloebers)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Lien • Sloebers</div>\n            </div>\n\n            <!-- 4. Lies -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lies\">\n              <img src=\"images/uploads/1793738387412_WhatsApp_Image_2026-11-03_at_17.46.16__5_.jpg\" data-orig-src=\"images/lies.jpg\" alt=\"Leidingspaspoort Lies (Sloebers)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Lies • Sloebers</div>\n            </div>\n\n            <!-- 5. Lotte -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Lotte\">\n              <img src=\"images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg\" data-orig-src=\"images/lotte.jpg\" alt=\"Leidingspaspoort Lotte (Jim)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Lotte • Jim</div>\n            </div>\n\n            <!-- 6. Oonah -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk paspoort van Oonah\">\n              <img src=\"images/uploads/1793739666907_WhatsApp_Image_2026-11-03_at_17.46.16.jpg\" data-orig-src=\"images/Oonah.jpg\" alt=\"Leidingspaspoort Oonah (Kim +16)\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Oonah • Kim (+16)</div>\n            </div>\n\n            <!-- 7. Kato & Fien -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk foto van Kato &amp; Fien\">\n              <img src=\"images/sim.jpg\" alt=\"Leidsters Kato &amp; Fien (Sim)\" class=\"\" data-orig-src=\"images/sim.jpg\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Kato &amp; Fien • Sim</div>\n            </div>\n\n            <!-- 8. Jim Leiding -->\n            <div class=\"paspoort-card gallery-item\" title=\"Bekijk foto van Jim Leiding\">\n              <img src=\"images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg\" data-orig-src=\"images/jim.jpg\" alt=\"Jim Leiding Lotte, Lina B. &amp; Lina S.\" class=\"\" title=\"📸 Klik om deze foto te vervangen vanaf je PC of GSM\">\n              <div class=\"paspoort-card-badge\" spellcheck=\"false\">🔍 Lotte &amp; Lina's • Jim</div>\n            </div>\n          "
     }
   },
   "banner": {
     "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T21:03:50.592Z",
+  "updatedAt": "2026-11-03T21:11:23.230Z",
   "imageMap": {
     "assets/images/real_leiding_hoofd.jpg": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
     "images/cara.jpg": "images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg",
