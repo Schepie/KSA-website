@@ -209,7 +209,7 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > p:nth-of-type(1)": "\n              Onvermoeibaar, verzot op estafettes en de beste gidsen in het bos om geweldige forten te bouwen.\n            ",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > span:nth-of-type(2)": "Vol Energie",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Lotte",
-      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lina's",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lina B.",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > h3:nth-of-type(1)": "JIM",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > span:nth-of-type(1)": "Lotte, Lina B. &amp; Lina S. (12-14j)",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > p:nth-of-type(1)": "\n              Meesters in gezelligheid, spannende dorpsspelen, hikes en een hechte vriendinnensfeer.\n            ",
@@ -246,7 +246,10 @@
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)": "👑",
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)": "📨",
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1)": "🛒",
-      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1)": "\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" style=\"display:block;\"><path d=\"M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z\"></path></svg>\n              "
+      "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(4) > div:nth-of-type(1)": "\n                <svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\" style=\"display:block;\"><path d=\"M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z\"></path></svg>\n              ",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1)": "Lina S.",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Kato",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Fien"
     },
     "images": {
       "header:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-official.svg?v=blue",
@@ -267,9 +270,8 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740350356_kabouters.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740361969_lien.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740366301_lies.jpg",
-      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740374652_lotte.jpg",
-      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740392862_jim.jpg",
-      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > img:nth-of-type(1)": "images/sim.jpg",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/WhatsApp Image 2026-11-03 at 17.46.17 (5).jpeg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740468859_nore.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740323116_cara.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(2) > img:nth-of-type(1)": "images/uploads/1793740361969_lien.jpg",
@@ -277,7 +279,10 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(4) > img:nth-of-type(1)": "images/uploads/1793740374652_lotte.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(5) > img:nth-of-type(1)": "images/uploads/1793740468859_nore.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(2) > div:nth-of-type(6) > img:nth-of-type(1)": "images/uploads/1793740468859_nore.jpg",
-      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/theem.jpg"
+      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/theem.jpg",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/WhatsApp Image 2026-11-03 at 17.46.16 (2).jpeg",
+      "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg"
     },
     "links": {
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > a:nth-of-type(1)": {
@@ -351,7 +356,7 @@
     "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T21:14:40.856Z",
+  "updatedAt": "2026-11-03T21:15:42.786Z",
   "imageMap": {
     "assets/images/real_leiding_hoofd.jpg": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
     "images/cara.jpg": "images/uploads/1793740323116_cara.jpg",
