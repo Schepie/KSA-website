@@ -323,8 +323,68 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
   }
 
+  function ensureJimSimCircles() {
+    const cards = document.querySelectorAll('.leiding-grid .leiding-card');
+    if (cards.length < 5) return;
+
+    // Kaart 4 = JIM (3 cirkels: Lotte, Lina B., Lina S.)
+    const jimCard = cards[3];
+    if (jimCard && jimCard.querySelectorAll('.leiding-avatar-item').length < 3) {
+      const duo = jimCard.querySelector('.leiding-avatars-duo');
+      if (duo) {
+        duo.style.gap = '10px';
+        duo.innerHTML = `
+          <div class="leiding-avatar-item gallery-item" title="Klik om foto van Lotte te bekijken">
+            <div class="leiding-avatar-thumb">
+              <img src="images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg" alt="Lotte (Jim)">
+            </div>
+            <span class="leiding-avatar-name">Lotte</span>
+          </div>
+          <div class="leiding-avatar-item gallery-item" title="Klik om foto van Lina B. te bekijken">
+            <div class="leiding-avatar-thumb">
+              <img src="images/WhatsApp Image 2026-11-03 at 17.46.17 (5).jpeg" alt="Lina B. (Jim)">
+            </div>
+            <span class="leiding-avatar-name">Lina B.</span>
+          </div>
+          <div class="leiding-avatar-item gallery-item" title="Klik om foto van Lina S. te bekijken">
+            <div class="leiding-avatar-thumb">
+              <img src="images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg" alt="Lina S. (Jim)">
+            </div>
+            <span class="leiding-avatar-name">Lina S.</span>
+          </div>
+        `;
+      }
+    }
+
+    // Kaart 5 = SIM (2 cirkels: Kato, Fien)
+    const simCard = cards[4];
+    if (simCard && simCard.querySelectorAll('.leiding-avatar-item').length < 2) {
+      const firstDiv = simCard.querySelector('div');
+      if (firstDiv) {
+        const duo = document.createElement('div');
+        duo.className = 'leiding-avatars-duo';
+        duo.innerHTML = `
+          <div class="leiding-avatar-item gallery-item" title="Klik om foto van Kato te bekijken">
+            <div class="leiding-avatar-thumb">
+              <img src="images/WhatsApp Image 2026-11-03 at 17.46.16 (2).jpeg" alt="Kato (Sim)">
+            </div>
+            <span class="leiding-avatar-name">Kato</span>
+          </div>
+          <div class="leiding-avatar-item gallery-item" title="Klik om foto van Fien te bekijken">
+            <div class="leiding-avatar-thumb">
+              <img src="images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg" alt="Fien (Sim)">
+            </div>
+            <span class="leiding-avatar-name">Fien</span>
+          </div>
+        `;
+        firstDiv.replaceWith(duo);
+      }
+    }
+  }
+
   function applyStateToDom(state) {
     if (!state || typeof state !== 'object') return;
+    ensureJimSimCircles();
     const isMobilePage = window.location.pathname.includes('mobile.html');
     const pageKey = isMobilePage ? 'mobile' : 'desktop';
     const pageData = state[pageKey] || {};
@@ -620,6 +680,22 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
       body.ksa-edit-mode-active .ksa-editable-btn:hover {
         outline: 2.5px solid #e3001b;
+      }
+
+      .leiding-avatar-thumb img,
+      .leiding-card > div:first-child > img,
+      .paspoort-card img {
+        object-fit: cover !important;
+        object-position: 50% 34% !important;
+        transform-origin: 50% 36% !important;
+        transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+      }
+      .leiding-avatar-item:hover .leiding-avatar-thumb img,
+      .leiding-card > div:first-child:hover > img {
+        transform: scale(1.85) !important;
+      }
+      .paspoort-card:hover img {
+        transform: scale(1.65) !important;
       }
 
       .ksa-card-edit-tools {

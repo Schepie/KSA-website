@@ -1605,10 +1605,14 @@ img {
   transition: transform var(--transition-bounce), border-color var(--transition-fast);
 }
 
-.leiding-avatar-thumb img {
+.leiding-avatar-thumb img,
+.leiding-card > div:first-child > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 34%;
+  transform-origin: 50% 36%;
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: block;
 }
 
@@ -1617,13 +1621,19 @@ img.paspoort-face-focus {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform-origin: 82% 28%;
-  transform: scale(2.8);
+  object-position: 50% 34%;
+  transform-origin: 50% 36%;
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .leiding-avatar-item:hover .leiding-avatar-thumb {
-  transform: scale(1.12);
+  transform: scale(1.14);
   border-color: var(--ksa-red);
+}
+
+.leiding-avatar-item:hover .leiding-avatar-thumb img,
+.leiding-card > div:first-child:hover > img {
+  transform: scale(1.85) !important;
 }
 
 .leiding-avatar-name {
@@ -1689,7 +1699,14 @@ img.paspoort-face-focus {
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
+  object-position: 50% 34%;
+  transform-origin: 50% 36%;
+  transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: block;
+}
+
+.paspoort-card:hover img {
+  transform: scale(1.65);
 }
 
 .paspoort-card-badge {
