@@ -385,22 +385,31 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     // 5. Globale Foto-vervangingen (imageMap: bv. "images/cara.jpg" -> "images/uploads/...")
     //    Hiermee worden paspoortjes onderaan én de mobiele site automatisch mee bijgewerkt!
-    if (state.imageMap && typeof state.imageMap === 'object') {
-      document.querySelectorAll('img').forEach(img => {
-        if (img.id === 'groupResultImg' || img.id === 'mGroupImg') return;
-        const orig = img.getAttribute('data-orig-src') || img.getAttribute('src') || '';
-        if (orig && state.imageMap[orig]) {
-          setSmartImageSrc(img, state.imageMap[orig]);
-        }
-      });
-      // Ook op mobiele data-paspoort attributen toepassen
-      document.querySelectorAll('[data-paspoort]').forEach(card => {
-        const origP = card.getAttribute('data-paspoort') || '';
-        if (origP && state.imageMap[origP]) {
-          card.setAttribute('data-paspoort', state.imageMap[origP]);
-        }
-      });
-    }
+    const DEFAULT_IMAGE_MAP = {
+      'assets/images/real_leiding_hoofd.jpg': 'images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg',
+      'images/cara.jpg': 'images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg',
+      'images/nore.jpg': 'images/uploads/1793738363773_WhatsApp_Image_2026-11-03_at_17.46.17.jpg',
+      'images/lien.jpg': 'images/uploads/1793738376204_WhatsApp_Image_2026-11-03_at_17.46.15.jpg',
+      'images/lies.jpg': 'images/uploads/1793738387412_WhatsApp_Image_2026-11-03_at_17.46.16__5_.jpg',
+      'images/lotte.jpg': 'images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg',
+      'images/jim.jpg': 'images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg',
+      'images/Oonah.jpg': 'images/uploads/1793739666907_WhatsApp_Image_2026-11-03_at_17.46.16.jpg'
+    };
+    const mergedImageMap = Object.assign({}, DEFAULT_IMAGE_MAP, state.imageMap || {});
+    document.querySelectorAll('img').forEach(img => {
+      if (img.id === 'groupResultImg' || img.id === 'mGroupImg') return;
+      const orig = img.getAttribute('data-orig-src') || img.getAttribute('src') || '';
+      if (orig && mergedImageMap[orig]) {
+        setSmartImageSrc(img, mergedImageMap[orig]);
+      }
+    });
+    // Ook op mobiele data-paspoort attributen toepassen
+    document.querySelectorAll('[data-paspoort]').forEach(card => {
+      const origP = card.getAttribute('data-paspoort') || '';
+      if (origP && mergedImageMap[origP]) {
+        card.setAttribute('data-paspoort', mergedImageMap[origP]);
+      }
+    });
 
     // 6. Knoppen & Links
     if (pageData.links) {
@@ -515,6 +524,49 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       body.ksa-edit-mode-active img.ksa-editable-img:hover {
         filter: brightness(0.85);
         outline: 3px solid #e3001b;
+      }
+      body.ksa-edit-mode-active .cal-sticker {
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        outline: 2px dashed #e3001b;
+        outline-offset: 2px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2px;
+      }
+      body.ksa-edit-mode-active .cal-sticker:hover {
+        transform: scale(1.25) !important;
+        outline: 2px solid #0055a5;
+      }
+      .ksa-sticker-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .ksa-sticker-choice {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px 6px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 10px;
+        background: #f8fafc;
+        cursor: pointer;
+        font-size: 1.35rem;
+        transition: all 0.15s;
+      }
+      .ksa-sticker-choice span {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #334155;
+      }
+      .ksa-sticker-choice:hover {
+        border-color: #0055a5;
+        background: #e0f2fe;
+        transform: translateY(-1px);
       }
 
       .ksa-card-edit-tools {
@@ -840,6 +892,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.cal-poster-sub',
       '.cal-date',
       '.cal-event-text',
+      '.cal-sticker',
+      '.cal-pill-now',
       '#groupResultName',
       '#groupResultAge',
       '#groupResultTagline',
@@ -849,13 +903,18 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.leiding-role-tag',
       '.leiding-desc',
       '.leiding-avatar-name',
+      '.agenda-badge',
       '.paspoort-card-badge',
+      '.info-feature-icon',
       '.info-feature-card h3',
       '.info-feature-card p',
+      '.ravot-badge',
+      '.step-circle',
       '.ravot-step-tile h5',
       '.ravot-step-tile p',
       '#verhuring p',
       '#verhuring li',
+      '.contact-tile-icon',
       '.contact-tile h4',
       '.contact-tile p',
       // Mobiel
@@ -1135,17 +1194,106 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   // --------------------------------------------------------------------------
   // 10. KAARTJES TOEVOEGEN (+), OP 'VOORBIJ' ZETTEN (🏁) OF VERWIJDEREN (🗑️)
   // --------------------------------------------------------------------------
+  function openCalendarStickerModal(calItem) {
+    if (!calItem) return;
+    const card = calItem.querySelector('.cal-card');
+    if (!card) return;
+    const existingSticker = card.querySelector('.cal-sticker');
+    const curVal = existingSticker ? existingSticker.textContent.trim() : '';
+
+    const presets = [
+      { emoji: '', label: 'Geen icoon' },
+      { emoji: '🎅', label: 'Kerstman' },
+      { emoji: '🎄', label: 'Kerstboom' },
+      { emoji: '👑', label: 'Sinterklaas' },
+      { emoji: '🎃', label: 'Halloween' },
+      { emoji: '🎟️', label: 'Kien / Bingo' },
+      { emoji: '🍝', label: 'Spaghetti' },
+      { emoji: '🎉', label: 'Feest / Fuif' },
+      { emoji: '🏕️', label: 'Kamp / Tent' },
+      { emoji: '🔥', label: 'Kampvuur' },
+      { emoji: '🌲', label: 'Bosspel' },
+      { emoji: '🏊', label: 'Zwemmen' },
+      { emoji: '🐣', label: 'Pasen' },
+      { emoji: '❤️', label: 'Vriendinnen' },
+      { emoji: '🏆', label: 'Toernooi' },
+      { emoji: '⭐', label: 'Speciaal' }
+    ];
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    modal.innerHTML = `
+      <h3>🎨 Kalender Icoon / Sticker aanpassen</h3>
+      <p>Kies met 1 klik een icoontje voor dit kalendervakje (of kies <strong>Geen icoon</strong> om bv. de Kerstman te verwijderen):</p>
+      <div class="ksa-sticker-grid">
+        ${presets.map(p => `
+          <button type="button" class="ksa-sticker-choice" data-emoji="${p.emoji}">
+            <div>${p.emoji || '🚫'}</div>
+            <span>${p.label}</span>
+          </button>
+        `).join('')}
+      </div>
+      <label>Of typ zelf een emoji / icoon (maak leeg om te verwijderen):</label>
+      <input type="text" id="ksaCustomStickerInput" value="${curVal}" placeholder="Bv. 🎅 of laat leeg">
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaStickerCancel">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaStickerApply">✔️ Toepassen</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    const applyEmoji = (val) => {
+      const clean = (val || '').trim();
+      card.querySelectorAll('.cal-sticker').forEach(s => s.remove());
+      if (clean) {
+        const span = document.createElement('span');
+        span.className = 'cal-sticker';
+        span.textContent = clean;
+        span.title = 'Klik om icoon te wijzigen of te verwijderen';
+        span.onclick = (e) => {
+          if (!isEditMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openCalendarStickerModal(calItem);
+        };
+        card.insertBefore(span, card.firstChild);
+      }
+      backdrop.style.display = 'none';
+    };
+
+    modal.querySelectorAll('.ksa-sticker-choice').forEach(btn => {
+      btn.onclick = () => applyEmoji(btn.getAttribute('data-emoji'));
+    });
+
+    document.getElementById('ksaStickerCancel').onclick = () => { backdrop.style.display = 'none'; };
+    document.getElementById('ksaStickerApply').onclick = () => {
+      applyEmoji(document.getElementById('ksaCustomStickerInput').value);
+    };
+  }
+
   function injectCardEditTools() {
     document.querySelectorAll('.cal-grid .cal-item').forEach(item => {
+      item.querySelectorAll('.cal-sticker').forEach(sticker => {
+        sticker.title = '🎨 Klik om dit icoon te wijzigen of te verwijderen';
+        sticker.onclick = (e) => {
+          if (!isEditMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openCalendarStickerModal(item);
+        };
+      });
+
       if (item.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
       tools.className = 'ksa-card-edit-tools';
       tools.innerHTML = `
+        <button type="button" class="ksa-mini-btn" data-act="icon" title="Kies of verwijder icoon/sticker (bv. 🎅, 👑)">🎨 Icoon</button>
         <button type="button" class="ksa-mini-btn" data-act="past" title="Zet op Voorbij of Actief">🏁 Voorbij</button>
         <button type="button" class="ksa-mini-btn" data-act="now" title="Markeer als Binnenkort!">🔥 Nu</button>
         <button type="button" class="ksa-mini-btn" data-act="add" title="Voeg extra datum hierna toe">➕</button>
         <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" data-act="del" title="Verwijder datum">🗑️</button>
       `;
+      tools.querySelector('[data-act="icon"]').onclick = () => openCalendarStickerModal(item);
       tools.querySelector('[data-act="past"]').onclick = () => {
         item.classList.toggle('is-past');
         item.classList.remove('is-current');
@@ -1157,6 +1305,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       tools.querySelector('[data-act="add"]').onclick = () => {
         const clone = item.cloneNode(true);
         clone.querySelector('.ksa-card-edit-tools')?.remove();
+        clone.querySelectorAll('.cal-sticker').forEach(s => s.remove());
         item.after(clone);
         enableEditMode();
       };
