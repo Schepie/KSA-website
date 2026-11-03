@@ -297,8 +297,30 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     return el;
   }
 
+  const EDITABLE_LINK_SELECTOR = '.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket, #groupResultBtn, .leiding-card a.btn, #verhuring a.btn, #contact a.btn';
+
   function isGroupManagedSelector(selector) {
     return typeof selector === 'string' && (selector.startsWith('#groupResult') || selector.startsWith('#mGroup'));
+  }
+
+  function applyGroupButtonsState() {
+    if (!window.groupData) return;
+    ['kabouters', 'sloebers', 'roodkapjes', 'jim', 'sim', 'kim'].forEach(grpKey => {
+      const g = window.groupData[grpKey];
+      if (!g) return;
+      const dBtn = document.querySelector(`.quiz-pill-btn[data-group="${grpKey}"]`);
+      if (dBtn) {
+        if (g.buttonLabel) dBtn.textContent = g.buttonLabel;
+        else g.buttonLabel = dBtn.textContent.trim();
+        dBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
+      }
+      const mBtn = document.querySelector(`.group-select-btn[data-group="${grpKey}"]`);
+      if (mBtn) {
+        if (g.mobileButtonLabel) mBtn.textContent = g.mobileButtonLabel;
+        else g.mobileButtonLabel = mBtn.textContent.trim();
+        mBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
+      }
+    });
   }
 
   function applyStateToDom(state) {
@@ -322,7 +344,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           if (gVal.perks) window.mobileGroupData[grpKey].tags = gVal.perks.map(p => p.startsWith('✨') ? p : `✨ ${p}`);
         }
       });
-      const activeDesktopPill = document.querySelector('.quiz-pill-btn.active, .quiz-age-pill.active');
+
+      applyGroupButtonsState();
+
+      let activeDesktopPill = document.querySelector('.quiz-pill-btn.active:not(.ksa-group-hidden), .quiz-age-pill.active:not(.ksa-group-hidden)')
+        || document.querySelector('.quiz-pill-btn:not(.ksa-group-hidden)');
       if (activeDesktopPill) {
         const activeKey = activeDesktopPill.getAttribute('data-group') || 'kabouters';
         const g = window.groupData && window.groupData[activeKey];
@@ -340,7 +366,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         }
         activeDesktopPill.click();
       }
-      const activeMobBtn = document.querySelector('.group-select-btn.active');
+      const activeMobBtn = document.querySelector('.group-select-btn.active:not(.ksa-group-hidden)')
+        || document.querySelector('.group-select-btn:not(.ksa-group-hidden)');
       if (activeMobBtn && typeof window.renderMobileGroup === 'function') {
         window.renderMobileGroup(activeMobBtn.getAttribute('data-group') || 'kabouters');
       }
@@ -417,7 +444,14 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const a = querySmartSelector(selector);
         if (!a || !info) return;
         if (info.href !== undefined) a.setAttribute('href', info.href);
-        if (info.hidden !== undefined) a.style.display = info.hidden ? 'none' : '';
+        if (info.text !== undefined) {
+          const span = a.querySelector('span') || a;
+          span.textContent = info.text;
+        }
+        if (info.hidden !== undefined) {
+          a.classList.toggle('ksa-link-hidden', !!info.hidden);
+          a.style.display = (!isEditMode && info.hidden) ? 'none' : '';
+        }
       });
     }
 
@@ -459,7 +493,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         let nth = 1;
         while ((sib = sib.previousElementSibling)) {
           // Negeer tijdelijke editor-balken bij het tellen zodat selectors 100% stabiel blijven!
-          if (sib.id === 'ksaBannerControlBar' || sib.classList.contains('ksa-card-edit-tools')) {
+          if (sib.id === 'ksaBannerControlBar' || sib.id === 'ksaGroupPillsControlBar' || sib.classList.contains('ksa-card-edit-tools')) {
             continue;
           }
           if (sib.nodeName.toLowerCase() === selector) nth++;
@@ -567,6 +601,25 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         border-color: #0055a5;
         background: #e0f2fe;
         transform: translateY(-1px);
+      }
+
+      body:not(.ksa-edit-mode-active) .ksa-group-hidden,
+      body:not(.ksa-edit-mode-active) .ksa-link-hidden {
+        display: none !important;
+      }
+      body.ksa-edit-mode-active .ksa-group-hidden,
+      body.ksa-edit-mode-active .ksa-link-hidden {
+        opacity: 0.45 !important;
+        text-decoration: line-through !important;
+        outline: 2px dashed #e3001b !important;
+      }
+      body.ksa-edit-mode-active .ksa-editable-btn {
+        outline: 2px dashed #0055a5;
+        outline-offset: 3px;
+        cursor: pointer !important;
+      }
+      body.ksa-edit-mode-active .ksa-editable-btn:hover {
+        outline: 2.5px solid #e3001b;
       }
 
       .ksa-card-edit-tools {
@@ -956,11 +1009,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       img.addEventListener('click', onEditableImageClick, true);
     });
 
-    document.querySelectorAll('.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket').forEach(a => {
+    document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
+      a.classList.add('ksa-editable-btn');
+      a.title = '🔗 Klik om knoptekst, link of zichtbaarheid aan te passen';
       a.addEventListener('click', onEditableLinkClick, true);
     });
 
+    document.querySelectorAll('.quiz-pill-btn, .group-select-btn').forEach(btn => {
+      btn.title = 'Klik om groep te bekijken • Dubbelklik om knoptekst te wijzigen of groep dit jaar te verbergen';
+      btn.ondblclick = (e) => {
+        if (!isEditMode) return;
+        e.preventDefault();
+        e.stopPropagation();
+        openGroupPillsModal(btn.getAttribute('data-group'));
+      };
+    });
+
     injectBannerControlBar();
+    injectGroupPillsControlBar();
     injectCardEditTools();
   }
 
@@ -1003,7 +1069,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       img.classList.remove('ksa-editable-img');
       img.removeEventListener('click', onEditableImageClick, true);
     });
-    document.querySelectorAll('.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket').forEach(a => {
+    document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
+      a.classList.remove('ksa-editable-btn');
       a.removeEventListener('click', onEditableLinkClick, true);
     });
   }
@@ -1110,7 +1177,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const span = currentLinkTarget.querySelector('span') || currentLinkTarget;
     const currentText = span.textContent.trim();
     const currentHref = currentLinkTarget.getAttribute('href') || '';
-    const isHidden = currentLinkTarget.style.display === 'none';
+    const isHidden = currentLinkTarget.classList.contains('ksa-link-hidden') || currentLinkTarget.style.display === 'none';
 
     const modal = document.getElementById('ksaEditorModalContent');
     const backdrop = document.getElementById('ksaEditorModalBackdrop');
@@ -1118,11 +1185,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       <h3>🔗 Knop of Link aanpassen</h3>
       <label>Tekst op de knop:</label>
       <input type="text" id="ksaEditLinkText" value="${currentText.replace(/"/g, '&quot;')}">
-      <label>Link-adres (bv. #nieuws, #agenda of https://...):</label>
+      <label>Link-adres (bv. #info, #nieuws, #agenda of https://...):</label>
       <input type="text" id="ksaEditLinkHref" value="${currentHref.replace(/"/g, '&quot;')}">
       <label style="display:flex; align-items:center; gap:8px; margin-top:14px; cursor:pointer;">
         <input type="checkbox" id="ksaEditLinkHide" ${isHidden ? 'checked' : ''}>
-        <span>Verberg deze knop op de website</span>
+        <span>🙈 Verberg deze knop voor bezoekers op de website</span>
       </label>
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaLinkCancel">Annuleren</button>
@@ -1139,7 +1206,107 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
       if (newText) span.textContent = newText;
       if (newHref) currentLinkTarget.setAttribute('href', newHref);
-      currentLinkTarget.style.display = hide ? 'none' : '';
+      currentLinkTarget.classList.toggle('ksa-link-hidden', hide);
+      currentLinkTarget.style.display = (!isEditMode && hide) ? 'none' : '';
+      backdrop.style.display = 'none';
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // 8B. LEEFTIJDSGROEPEN KNOPPEN BEHEREN (TEKST WIJZIGEN & GROEP VERBERGEN)
+  // --------------------------------------------------------------------------
+  function injectGroupPillsControlBar() {
+    const pillsWrap = document.querySelector('.quiz-pills') || document.querySelector('.scrollable-bar-wrap');
+    if (!pillsWrap || document.getElementById('ksaGroupPillsControlBar')) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'ksaGroupPillsControlBar';
+    bar.className = 'ksa-banner-edit-bar';
+    bar.innerHTML = `
+      <div>🎒 <strong>Leeftijdsgroepen Knoppen:</strong> Pas de tekst op de knoppen aan of verberg een groep als die dit jaar niet bestaat.</div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <button type="button" class="ksa-mini-btn" id="ksaBtnEditGroupPills">✏️ Knopteksten &amp; Groepen Aan/Uit</button>
+        <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" id="ksaBtnToggleActiveGroup">🙈 Verberg / Toon geselecteerde groep</button>
+      </div>
+    `;
+
+    pillsWrap.parentElement.insertBefore(bar, pillsWrap);
+
+    document.getElementById('ksaBtnEditGroupPills').onclick = () => {
+      const card = document.getElementById('groupResultCard');
+      const activeKey = (card && card.getAttribute('data-active-group')) || 'kabouters';
+      openGroupPillsModal(activeKey);
+    };
+
+    document.getElementById('ksaBtnToggleActiveGroup').onclick = () => {
+      if (!window.groupData) return;
+      const card = document.getElementById('groupResultCard');
+      const activeMob = document.querySelector('.group-select-btn.active');
+      const activeKey = (card && card.getAttribute('data-active-group')) || (activeMob && activeMob.getAttribute('data-group')) || 'kabouters';
+      const g = window.groupData[activeKey];
+      if (!g) return;
+      g.hidden = !g.hidden;
+      applyGroupButtonsState();
+    };
+  }
+
+  function openGroupPillsModal(focusGroupKey) {
+    if (!window.groupData) return;
+    applyGroupButtonsState();
+
+    const groupKeys = ['kabouters', 'sloebers', 'roodkapjes', 'jim', 'sim', 'kim'];
+    const isMob = window.location.pathname.includes('mobile.html');
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+
+    modal.innerHTML = `
+      <h3>🎒 Leeftijdsgroepen Knoppen Beheren</h3>
+      <p>Pas hieronder de tekst op de groepsknoppen aan, of vink een groep <strong>uit</strong> als deze leeftijdsgroep dit werkjaar niet beschikbaar is:</p>
+      <div style="display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
+        ${groupKeys.map(k => {
+          const g = window.groupData[k] || {};
+          const lbl = isMob ? (g.mobileButtonLabel || g.name || k) : (g.buttonLabel || g.name || k);
+          const isAvailable = !g.hidden;
+          const isFocus = k === focusGroupKey;
+          return `
+            <div style="background:${isFocus ? '#eff6ff' : '#f8fafc'}; border:1.5px solid ${isFocus ? '#3b82f6' : '#cbd5e1'}; border-radius:10px; padding:10px 12px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
+                <strong style="font-size:0.85rem; color:#0f172a;">${(g.name || k).toUpperCase()}</strong>
+                <label style="display:inline-flex; align-items:center; gap:6px; margin:0; cursor:pointer; font-size:0.8rem; color:${isAvailable ? '#166534' : '#dc2626'};">
+                  <input type="checkbox" class="ksa-grp-avail-cb" data-group="${k}" ${isAvailable ? 'checked' : ''}>
+                  <span>Beschikbaar dit jaar (toon knop)</span>
+                </label>
+              </div>
+              <input type="text" class="ksa-grp-lbl-input" data-group="${k}" value="${lbl.replace(/"/g, '&quot;')}" placeholder="Tekst op de knop">
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaGrpModalCancel">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaGrpModalSave">✔️ Toepassen</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    document.getElementById('ksaGrpModalCancel').onclick = () => { backdrop.style.display = 'none'; };
+    document.getElementById('ksaGrpModalSave').onclick = () => {
+      modal.querySelectorAll('.ksa-grp-lbl-input').forEach(inp => {
+        const k = inp.getAttribute('data-group');
+        const val = inp.value.trim();
+        if (window.groupData[k] && val) {
+          if (isMob) window.groupData[k].mobileButtonLabel = val;
+          else window.groupData[k].buttonLabel = val;
+        }
+      });
+      modal.querySelectorAll('.ksa-grp-avail-cb').forEach(cb => {
+        const k = cb.getAttribute('data-group');
+        if (window.groupData[k]) {
+          window.groupData[k].hidden = !cb.checked;
+        }
+      });
+      applyGroupButtonsState();
       backdrop.style.display = 'none';
     };
   }
