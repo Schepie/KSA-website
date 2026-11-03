@@ -1670,12 +1670,14 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
     });
 
-    document.querySelectorAll('.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket').forEach(a => {
+    document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
       const sel = getUniqueSelector(a);
       if (sel) {
+        const span = a.querySelector('span') || a;
         pageData.links[sel] = {
           href: a.getAttribute('href'),
-          hidden: a.style.display === 'none'
+          text: span.textContent.trim(),
+          hidden: a.classList.contains('ksa-link-hidden') || a.style.display === 'none'
         };
       }
     });
@@ -1690,7 +1692,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             ageRange: window.groupData[k].ageRange,
             tagline: window.groupData[k].tagline,
             desc: window.groupData[k].desc,
-            perks: window.groupData[k].perks
+            perks: window.groupData[k].perks,
+            buttonLabel: window.groupData[k].buttonLabel,
+            mobileButtonLabel: window.groupData[k].mobileButtonLabel,
+            hidden: !!window.groupData[k].hidden
           };
         }
       });
