@@ -166,9 +166,6 @@ const mobileGroupData = {
   }
 };
 
-// Expose mobileGroupData globally for sheets CMS sync
-window.mobileGroupData = mobileGroupData;
-
 function initGroupTabs() {
   const buttons = document.querySelectorAll('.group-select-btn');
   const imgEl = document.getElementById('mGroupImg');
@@ -223,7 +220,9 @@ function initGroupTabs() {
 
   // Initialize with first group
   renderGroup('kabouters');
+  window.mobileGroupData = mobileGroupData;
   window.renderMobileGroup = renderGroup;
+  window.initPaspoortModal = initPaspoortModal;
 }
 
 /* ==========================================================================
@@ -264,8 +263,7 @@ function initMobileCountdown() {
   }
 
   update();
-  if (window.ksaMobileCountdownInterval) clearInterval(window.ksaMobileCountdownInterval);
-  window.ksaMobileCountdownInterval = setInterval(update, 1000);
+  setInterval(update, 1000);
 }
 
 /* ==========================================================================
@@ -351,4 +349,3 @@ function initPaspoortModal() {
     }
   });
 }
-window.initPaspoortModal = initPaspoortModal;

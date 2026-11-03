@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
    1. Live Countdown (HalloKien & Major Events)
    -------------------------------------------------------------------------- */
 function initCountdown() {
-  // HalloKien date (17 October binnen huidig KSA-werkjaar)
   const now = new Date();
   const workYearStart = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
   const targetDate = new Date(workYearStart, 9, 17, 19, 30, 0, 0);
@@ -29,16 +28,11 @@ function initCountdown() {
     const now = Date.now();
     const diff = activeTarget.getTime() - now;
 
-    const daysEl = document.getElementById('days');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
-
     if (diff <= 0) {
-      if (daysEl) daysEl.innerText = '00';
-      if (hoursEl) hoursEl.innerText = '00';
-      if (minutesEl) minutesEl.innerText = '00';
-      if (secondsEl) secondsEl.innerText = '00';
+      document.getElementById('days').innerText = '00';
+      document.getElementById('hours').innerText = '00';
+      document.getElementById('minutes').innerText = '00';
+      document.getElementById('seconds').innerText = '00';
       return;
     }
 
@@ -47,6 +41,11 @@ function initCountdown() {
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
 
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
     if (daysEl) daysEl.innerText = String(d).padStart(2, '0');
     if (hoursEl) hoursEl.innerText = String(h).padStart(2, '0');
     if (minutesEl) minutesEl.innerText = String(m).padStart(2, '0');
@@ -54,8 +53,7 @@ function initCountdown() {
   }
 
   update();
-  if (window.ksaDesktopCountdownInterval) clearInterval(window.ksaDesktopCountdownInterval);
-  window.ksaDesktopCountdownInterval = setInterval(update, 1000);
+  setInterval(update, 1000);
 }
 
 /* --------------------------------------------------------------------------
@@ -155,6 +153,8 @@ const groupData = {
 groupData.springers = groupData.sloebers;
 groupData.roodkappen = groupData.roodkapjes;
 groupData.plus = groupData.kim;
+window.groupData = groupData;
+window.initLightbox = initLightbox;
 
 function applyGroupColors(groupKey) {
   const data = groupData[groupKey];
@@ -195,51 +195,6 @@ function applyGroupColors(groupKey) {
     }
   });
 }
-
-// Expose groupData and renderers globally for sheets CMS sync
-window.groupData = groupData;
-window.applyGroupColors = applyGroupColors;
-
-window.renderDesktopGroup = function(groupKey) {
-  const data = (window.groupData || groupData)[groupKey];
-  if (!data) return;
-
-  const card = document.getElementById('groupResultCard');
-  if (card) card.setAttribute('data-active-group', groupKey);
-
-  const img = document.getElementById('groupResultImg');
-  if (img && data.image) {
-    img.src = data.image;
-    img.alt = (data.name || 'Groep') + ' Groepsfoto';
-  }
-
-  const nameEl = document.getElementById('groupResultName');
-  if (nameEl) nameEl.innerText = data.name;
-
-  const ageEl = document.getElementById('groupResultAge');
-  if (ageEl) ageEl.innerText = data.ageRange;
-
-  const taglineEl = document.getElementById('groupResultTagline');
-  if (taglineEl) taglineEl.innerText = data.tagline;
-
-  const descEl = document.getElementById('groupResultDesc');
-  if (descEl) descEl.innerText = data.desc;
-
-  const perksContainer = document.getElementById('groupResultPerks');
-  if (perksContainer) {
-    perksContainer.innerHTML = '';
-    (data.perks || []).forEach(perk => {
-      const span = document.createElement('span');
-      span.className = 'group-tag-pill';
-      span.innerText = '✨ ' + perk;
-      perksContainer.appendChild(span);
-    });
-  }
-
-  if (typeof applyGroupColors === 'function') {
-    applyGroupColors(groupKey);
-  }
-};
 
 function initGroupQuiz() {
   const pills = document.querySelectorAll('.quiz-pill-btn, .quiz-age-pill');
@@ -439,8 +394,6 @@ function initLightbox() {
     });
   });
 }
-
-window.initLightbox = initLightbox;
 
 /* --------------------------------------------------------------------------
    7. Contact & Newsletter Form Handling with Instant Toast

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "updatedAt": null,
+  "banner": {
+    "hidden": false,
+    "targetIso": null
+  },
+  "groups": {},
+  "desktop": {
+    "texts": {},
+    "images": {},
+    "links": {},
+    "containers": {}
+  },
+  "mobile": {
+    "texts": {},
+    "images": {},
+    "links": {},
+    "containers": {}
+  }
+}
+
