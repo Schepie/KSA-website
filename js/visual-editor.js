@@ -10,10 +10,10 @@
  * 3. Pas elke tekst, titel, datum, leeftijdgroep, knop of link rechtstreeks
  *    op de pagina aan.
  * 4. Klik op eender welke foto om een nieuwe foto van je PC of GSM te kiezen.
- * 5. Voeg de Event Banner met aftelklok toe, verberg hem of kies een nieuwe
- *    afteldatum met de ingebouwde kalender-kiezer.
- * 6. Klik op "💾 Opslaan naar GitHub" om alle wijzigingen én nieuwe foto's
- *    rechtstreeks in de GitHub repository (Schepie/KSA-website) op te slaan!
+ *    Foto's die op meerdere plekken voorkomen (bv. leidster-icoon + paspoort +
+ *    mobiele site) worden automatisch overal tegelijk bijgewerkt!
+ * 5. Directe weergave via de GitHub API & Raw fallback zodat nieuwe foto's en
+ *    teksten binnen 1 seconde live zichtbaar zijn op elk toestel!
  * ============================================================================
  */
 
@@ -23,14 +23,27 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   repoName: 'KSA-website',
   defaultBranch: 'main',
   contentFilePath: 'data/site-content.json',
-  storageKey: 'ksa_website_github_edits_v1'
+  storageKey: 'ksa_website_github_edits_v2'
 };
 
 (function initKsaVisualEditor() {
   let isEditMode = false;
   let currentLinkTarget = null;
   let currentImageTarget = null;
-  let pendingImageUploads = {}; // { selectorOrGroupKey: { base64, fileName, dataUrl, isGroup, groupKey } }
+  let pendingImageUploads = {}; // { key: { selector, origSrc, groupKey, base64, fileName, dataUrl } }
+
+  // Bewaar bij het opstarten van de pagina op elke <img> de originele src (bv. "images/cara.jpg")
+  // zodat we bij het vervangen van een foto ook dezelfde foto in het paspoort-overzicht en op mobiel kunnen vervangen!
+  function tagOriginalImageSources() {
+    document.querySelectorAll('img').forEach(img => {
+      if (!img.getAttribute('data-orig-src')) {
+        const rawSrc = img.getAttribute('src') || '';
+        if (rawSrc && !rawSrc.startsWith('data:')) {
+          img.setAttribute('data-orig-src', rawSrc);
+        }
+      }
+    });
+  }
 
   // --------------------------------------------------------------------------
   // 1. AUTOMATISCHE DATUMCONTROLE ('VOORBIJ' OP BASIS VAN HUIDIGE DATUM)
@@ -175,7 +188,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
     });
 
-    // D. Countdown Banner (op basis van ingestelde doel-datum of beschrijving)
+    // D. Countdown Banner
     const bannerTarget = window.ksaCountdownTargetDate;
     const staticBanner = document.querySelector('.countdown-banner-wrap .ksa-event-banner');
     if (staticBanner) {
@@ -194,35 +207,93 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
-  // 2. LAAD OPGESLAGEN INHOUD UIT data/site-content.json EN LOCALSTORAGE
+  // 2. LAAD OPGESLAGEN INHOUD DIRECT VANAF GITHUB (ZONDER 60s CACHE VERTRAGING)
   // --------------------------------------------------------------------------
-  async function loadAndApplySiteContent() {
-    // 1. Laad gepubliceerde JSON uit de GitHub repository (data/site-content.json)
+  async function fetchLatestGithubState() {
+    const owner = localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner;
+    const repo = localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName;
+    const branch = localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch;
+    const path = KSA_GITHUB_EDITOR_CONFIG.contentFilePath;
+
+    let candidates = [];
+
+    // 1. Probeer rechtstreeks via GitHub Raw / API (0 seconden vertraging!)
     try {
-      const res = await fetch(`${KSA_GITHUB_EDITOR_CONFIG.contentFilePath}?t=${Date.now()}`);
-      if (res.ok) {
-        const repoState = await res.json();
-        if (repoState && repoState.updatedAt) {
-          applyStateToDom(repoState);
-        }
+      const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}?t=${Date.now()}`;
+      const resRaw = await fetch(rawUrl, { cache: 'no-store' });
+      if (resRaw.ok) {
+        const s = await resRaw.json();
+        if (s && s.updatedAt) candidates.push(s);
       }
-    } catch (e) {
-      // Bestand nog leeg of offline
-    }
+    } catch (e) {}
 
-    // 2. Pas eventuele recentere lokale wijzigingen toe
-    const localRaw = localStorage.getItem(KSA_GITHUB_EDITOR_CONFIG.storageKey);
-    if (localRaw) {
-      try {
-        const localState = JSON.parse(localRaw);
-        applyStateToDom(localState);
-      } catch (e) {
-        console.warn('[KSA Editor] Kon lokale status niet lezen:', e);
+    // 2. Probeer het lokale pad op de server (data/site-content.json)
+    try {
+      const resLocal = await fetch(`${path}?t=${Date.now()}`, { cache: 'no-store' });
+      if (resLocal.ok) {
+        const s = await resLocal.json();
+        if (s && s.updatedAt) candidates.push(s);
       }
-    }
+    } catch (e) {}
 
-    // 3. Voer altijd automatische datumcontrole uit zodat verlopen items op 'Voorbij' staan!
+    // 3. Check localStorage (alleen als deze nieuwer is dan GitHub!)
+    try {
+      const localRaw = localStorage.getItem(KSA_GITHUB_EDITOR_CONFIG.storageKey);
+      if (localRaw) {
+        const s = JSON.parse(localRaw);
+        if (s && s.updatedAt) candidates.push(s);
+      }
+    } catch (e) {}
+
+    if (candidates.length === 0) return null;
+
+    // Sorteer op updatedAt (nieuwste eerst!) zodat oude localStorage NOOIT een nieuwere GitHub-versie overschrijft!
+    candidates.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return candidates[0];
+  }
+
+  async function loadAndApplySiteContent() {
+    tagOriginalImageSources();
+    const bestState = await fetchLatestGithubState();
+    if (bestState) {
+      applyStateToDom(bestState);
+      // Synchroniseer ook localStorage met de nieuwste status
+      localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(bestState));
+    }
     autoUpdateDatesToPast();
+  }
+
+  /**
+   * Zet een afbeeldingspad veilig op een <img> element.
+   * Als een pas geüploade foto in 'images/uploads/...' op GitHub Pages nog aan het bouwen is (eerste 45 sec),
+   * valt de afbeelding automatisch terug op de directe raw.githubusercontent.com link zodat hij METEEN zichtbaar is!
+   */
+  function setSmartImageSrc(img, src) {
+    if (!img || !src) return;
+    const owner = localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner;
+    const repo = localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName;
+    const branch = localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch;
+
+    if (src.startsWith('images/uploads/')) {
+      img.onerror = function() {
+        this.onerror = null;
+        this.src = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${src}`;
+      };
+    }
+    img.src = src;
+  }
+
+  function querySmartSelector(selector) {
+    if (!selector) return null;
+    let el = document.querySelector(selector);
+    if (!el && selector.includes('#mainContent > div:nth-of-type(2)') && !document.getElementById('ksaBannerControlBar')) {
+      el = document.querySelector(selector.replace('#mainContent > div:nth-of-type(2)', '#mainContent > div:nth-of-type(1)'));
+    }
+    return el;
+  }
+
+  function isGroupManagedSelector(selector) {
+    return typeof selector === 'string' && (selector.startsWith('#groupResult') || selector.startsWith('#mGroup'));
   }
 
   function applyStateToDom(state) {
@@ -246,9 +317,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           if (gVal.perks) window.mobileGroupData[grpKey].tags = gVal.perks.map(p => p.startsWith('✨') ? p : `✨ ${p}`);
         }
       });
-      // Her-render actieve groep
       const activeDesktopPill = document.querySelector('.quiz-pill-btn.active, .quiz-age-pill.active');
-      if (activeDesktopPill) activeDesktopPill.click();
+      if (activeDesktopPill) {
+        const activeKey = activeDesktopPill.getAttribute('data-group') || 'kabouters';
+        const g = window.groupData && window.groupData[activeKey];
+        if (g) {
+          const nameEl = document.getElementById('groupResultName');
+          const ageEl = document.getElementById('groupResultAge');
+          const tagEl = document.getElementById('groupResultTagline');
+          const descEl = document.getElementById('groupResultDesc');
+          const imgEl = document.getElementById('groupResultImg');
+          if (nameEl && g.name) nameEl.textContent = g.name;
+          if (ageEl && g.ageRange) ageEl.textContent = g.ageRange;
+          if (tagEl && g.tagline) tagEl.textContent = g.tagline;
+          if (descEl && g.desc) descEl.textContent = g.desc;
+          if (imgEl && g.image) setSmartImageSrc(imgEl, g.image);
+        }
+        activeDesktopPill.click();
+      }
       const activeMobBtn = document.querySelector('.group-select-btn.active');
       if (activeMobBtn && typeof window.renderMobileGroup === 'function') {
         window.renderMobileGroup(activeMobBtn.getAttribute('data-group') || 'kabouters');
@@ -258,38 +344,70 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     // 2. Sectie-containers (Kalender, Nieuws, Paspoortjes)
     if (pageData.containers) {
       Object.entries(pageData.containers).forEach(([selector, html]) => {
-        const el = document.querySelector(selector);
-        if (el && html) el.innerHTML = html;
+        const el = querySmartSelector(selector);
+        if (el && html) {
+          el.innerHTML = html;
+          // Zorg dat buiten Edit Mode geen contenteditable achterblijft
+          if (!isEditMode) {
+            el.querySelectorAll('[contenteditable]').forEach(c => c.removeAttribute('contenteditable'));
+            el.querySelectorAll('.ksa-editable-img').forEach(c => c.classList.remove('ksa-editable-img'));
+          }
+        }
       });
     }
+
+    tagOriginalImageSources();
 
     // 3. Tekst-elementen
     if (pageData.texts) {
       Object.entries(pageData.texts).forEach(([selector, html]) => {
-        const el = document.querySelector(selector);
+        if (isGroupManagedSelector(selector)) return;
+        const el = querySmartSelector(selector);
         if (el && html !== undefined) el.innerHTML = html;
       });
     }
 
-    // 4. Foto's
+    // 4. Foto's per selector
     if (pageData.images) {
       Object.entries(pageData.images).forEach(([selector, src]) => {
-        const img = document.querySelector(selector);
-        if (img && src) img.src = src;
+        if (isGroupManagedSelector(selector)) return;
+        const img = querySmartSelector(selector);
+        if (img && src) {
+          setSmartImageSrc(img, src);
+        }
       });
     }
 
-    // 5. Knoppen & Links
+    // 5. Globale Foto-vervangingen (imageMap: bv. "images/cara.jpg" -> "images/uploads/...")
+    //    Hiermee worden paspoortjes onderaan én de mobiele site automatisch mee bijgewerkt!
+    if (state.imageMap && typeof state.imageMap === 'object') {
+      document.querySelectorAll('img').forEach(img => {
+        if (img.id === 'groupResultImg' || img.id === 'mGroupImg') return;
+        const orig = img.getAttribute('data-orig-src') || img.getAttribute('src') || '';
+        if (orig && state.imageMap[orig]) {
+          setSmartImageSrc(img, state.imageMap[orig]);
+        }
+      });
+      // Ook op mobiele data-paspoort attributen toepassen
+      document.querySelectorAll('[data-paspoort]').forEach(card => {
+        const origP = card.getAttribute('data-paspoort') || '';
+        if (origP && state.imageMap[origP]) {
+          card.setAttribute('data-paspoort', state.imageMap[origP]);
+        }
+      });
+    }
+
+    // 6. Knoppen & Links
     if (pageData.links) {
       Object.entries(pageData.links).forEach(([selector, info]) => {
-        const a = document.querySelector(selector);
+        const a = querySmartSelector(selector);
         if (!a || !info) return;
         if (info.href !== undefined) a.setAttribute('href', info.href);
         if (info.hidden !== undefined) a.style.display = info.hidden ? 'none' : '';
       });
     }
 
-    // 6. Event Banner zichtbaarheid & aftelklok datum
+    // 7. Event Banner zichtbaarheid & aftelklok datum
     if (state.banner) {
       const b = state.banner;
       const desktopWrap = document.querySelector('.countdown-banner-wrap');
@@ -305,9 +423,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         }
       }
     }
-
-    if (typeof window.initLightbox === 'function') window.initLightbox();
-    if (typeof window.initPaspoortModal === 'function') window.initPaspoortModal();
   }
 
   // --------------------------------------------------------------------------
@@ -329,6 +444,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         let sib = curr;
         let nth = 1;
         while ((sib = sib.previousElementSibling)) {
+          // Negeer tijdelijke editor-balken bij het tellen zodat selectors 100% stabiel blijven!
+          if (sib.id === 'ksaBannerControlBar' || sib.classList.contains('ksa-card-edit-tools')) {
+            continue;
+          }
           if (sib.nodeName.toLowerCase() === selector) nth++;
         }
         selector += `:nth-of-type(${nth})`;
@@ -578,7 +697,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     `;
     document.head.appendChild(style);
 
-    // Vervang de oude Google Sheets link in de footer door de "✏️ Bewerk Website" knop
     const footerSupport = document.querySelector('.footer-support-tags');
     if (footerSupport) {
       footerSupport.innerHTML = '';
@@ -590,7 +708,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       footerSupport.appendChild(btn);
     }
 
-    // Op mobile.html ook onderaan het Info-tabblad
     const mobInfoTab = document.getElementById('tab-info');
     if (mobInfoTab) {
       const wrap = document.createElement('div');
@@ -600,7 +717,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       mobInfoTab.appendChild(wrap);
     }
 
-    // Verborgen file-input voor foto's
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -609,7 +725,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     fileInput.addEventListener('change', handleInlinePhotoSelected);
     document.body.appendChild(fileInput);
 
-    // Onderste Editor-werkbalk
     const dock = document.createElement('div');
     dock.className = 'ksa-editor-dock';
     dock.innerHTML = `
@@ -694,6 +809,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   function enableEditMode() {
     isEditMode = true;
     document.body.classList.add('ksa-edit-mode-active');
+    tagOriginalImageSources();
 
     const textSelectors = [
       '.ksa-topbar-badge',
@@ -727,6 +843,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.leiding-name',
       '.leiding-role-tag',
       '.leiding-desc',
+      '.leiding-avatar-name',
       '.paspoort-card-badge',
       '.info-feature-card h3',
       '.info-feature-card p',
@@ -766,10 +883,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       el.setAttribute('spellcheck', 'false');
     });
 
-    // Koppel groepsbewerkingen direct aan window.groupData zodat wisselen tussen takken alles onthoudt
     bindGroupLiveSync();
 
-    // Maak alle foto's klikbaar om te wijzigen
     document.querySelectorAll('img').forEach(img => {
       if (img.closest('.ksa-editor-dock') || img.closest('.nav-item-icon-wrap')) return;
       img.classList.add('ksa-editable-img');
@@ -777,7 +892,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       img.addEventListener('click', onEditableImageClick, true);
     });
 
-    // Maak knoppen & links klikbaar om tekst en URL te wijzigen
     document.querySelectorAll('.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket').forEach(a => {
       a.addEventListener('click', onEditableLinkClick, true);
     });
@@ -831,7 +945,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
-  // 7. FOTO'S DIRECT VERVANGEN OP DE PAGINA
+  // 7. FOTO'S DIRECT VERVANGEN OP DE PAGINA (+ AUTOMATISCHE PASPOORT SYNC)
   // --------------------------------------------------------------------------
   function onEditableImageClick(e) {
     if (!isEditMode) return;
@@ -846,6 +960,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   function handleInlinePhotoSelected(e) {
     const file = e.target.files && e.target.files[0];
     if (!file || !currentImageTarget) return;
+
+    const isGroupImg = currentImageTarget.id === 'groupResultImg' || currentImageTarget.id === 'mGroupImg';
+    const origSrc = isGroupImg ? '' : (currentImageTarget.getAttribute('data-orig-src') || currentImageTarget.getAttribute('src') || '');
 
     const reader = new FileReader();
     reader.onload = function(ev) {
@@ -869,12 +986,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         canvas.getContext('2d').drawImage(imgObj, 0, 0, w, h);
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
+        // 1. Vervang op het aangeklikte element
         currentImageTarget.src = dataUrl;
+
+        // 2. Vervang direct ook alle andere afbeeldingen op de pagina die dezelfde originele bron hadden
+        //    (bv. als je de cirkel van Cara wijzigt, wijzigt haar grote paspoort onderaan automatisch mee!)
+        if (origSrc && !origSrc.startsWith('data:')) {
+          document.querySelectorAll('img').forEach(otherImg => {
+            if (otherImg.id === 'groupResultImg' || otherImg.id === 'mGroupImg') return;
+            const otherOrig = otherImg.getAttribute('data-orig-src') || otherImg.getAttribute('src') || '';
+            if (otherOrig === origSrc) {
+              otherImg.src = dataUrl;
+            }
+          });
+        }
 
         const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').replace(/\.[^.]+$/, '') + '.jpg';
         const selector = getUniqueSelector(currentImageTarget);
 
-        // Check of dit de groepsfoto in de groepskiezer is
         let groupKey = null;
         if (currentImageTarget.id === 'groupResultImg') {
           const card = document.getElementById('groupResultCard');
@@ -893,6 +1022,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const key = groupKey ? `group_${groupKey}` : selector;
         pendingImageUploads[key] = {
           selector,
+          origSrc,
           groupKey,
           base64: dataUrl.split(',')[1],
           fileName: `${Date.now()}_${cleanFileName}`,
@@ -1001,7 +1131,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   // 10. KAARTJES TOEVOEGEN (+), OP 'VOORBIJ' ZETTEN (🏁) OF VERWIJDEREN (🗑️)
   // --------------------------------------------------------------------------
   function injectCardEditTools() {
-    // 1. Desktop Kalender (.cal-grid .cal-item)
     document.querySelectorAll('.cal-grid .cal-item').forEach(item => {
       if (item.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
@@ -1030,7 +1159,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       item.appendChild(tools);
     });
 
-    // 2. Nieuws kaarten (.news-grid .news-card)
     document.querySelectorAll('.news-grid .news-card').forEach(card => {
       if (card.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
@@ -1059,7 +1187,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       card.appendChild(tools);
     });
 
-    // 3. Leidingspaspoortjes (.paspoort-grid .paspoort-card)
     document.querySelectorAll('.paspoort-grid .paspoort-card').forEach(pCard => {
       if (pCard.querySelector('.ksa-card-edit-tools')) return;
       const tools = document.createElement('div');
@@ -1084,7 +1211,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
-  // 11. GITHUB REST API HULPFUNCTIE (COMMIT BESTAND NAAR REPOSITORY)
+  // 11. GITHUB REST API HULPFUNCTIE
   // --------------------------------------------------------------------------
   async function commitFileToGithub(token, owner, repo, branch, filePath, base64Content, commitMessage) {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
@@ -1094,7 +1221,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       'Content-Type': 'application/json'
     };
 
-    // Controleer of het bestand al bestaat om de huidige SHA op te halen
     let sha = undefined;
     const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, { headers });
     if (getRes.ok) {
@@ -1122,7 +1248,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     return await putRes.json();
   }
 
-  // UTF-8 string veilig naar Base64 omzetten voor GitHub API
   function utf8ToBase64(str) {
     return btoa(unescape(encodeURIComponent(str)));
   }
@@ -1136,25 +1261,20 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     saveBtn.disabled = true;
     saveBtn.innerHTML = '⏳ Bezig met opslaan...';
 
-    // Verwijder tijdelijk de edit-knopjes uit de kaartjes voordat we de HTML uitlezen
     document.querySelectorAll('.ksa-card-edit-tools').forEach(el => el.remove());
 
     const isMobilePage = window.location.pathname.includes('mobile.html');
     const pageKey = isMobilePage ? 'mobile' : 'desktop';
 
-    let fullState = {};
-    try {
-      fullState = JSON.parse(localStorage.getItem(KSA_GITHUB_EDITOR_CONFIG.storageKey) || '{}');
-    } catch (e) {
-      fullState = {};
-    }
+    let fullState = (await fetchLatestGithubState()) || {};
+    fullState.imageMap = fullState.imageMap || {};
 
     const ghToken = (localStorage.getItem('ksa_github_token') || '').trim();
     const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
     const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
     const ghBranch = (localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch).trim();
 
-    // 1. Als er een GitHub token is ingesteld, upload dan eerst eventuele nieuwe foto's naar images/uploads/ in GitHub!
+    // 1. Upload nieuwe foto's naar images/uploads/ in GitHub
     if (ghToken && Object.keys(pendingImageUploads).length > 0) {
       for (const [key, imgItem] of Object.entries(pendingImageUploads)) {
         const repoImgPath = `images/uploads/${imgItem.fileName}`;
@@ -1168,16 +1288,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             imgItem.base64,
             `📸 Nieuwe website foto: ${imgItem.fileName}`
           );
-          // Vervang data-URL door het echte bestandspad in de repository
           if (imgItem.groupKey && window.groupData && window.groupData[imgItem.groupKey]) {
             window.groupData[imgItem.groupKey].image = repoImgPath;
           }
+          if (imgItem.origSrc && !imgItem.origSrc.startsWith('data:')) {
+            fullState.imageMap[imgItem.origSrc] = repoImgPath;
+            document.querySelectorAll('img').forEach(otherImg => {
+              const otherOrig = otherImg.getAttribute('data-orig-src') || '';
+              if (otherOrig === imgItem.origSrc) {
+                setSmartImageSrc(otherImg, repoImgPath);
+              }
+            });
+          }
           if (imgItem.selector) {
             const domImg = document.querySelector(imgItem.selector);
-            if (domImg) domImg.setAttribute('src', repoImgPath);
+            if (domImg) setSmartImageSrc(domImg, repoImgPath);
           }
         } catch (err) {
-          console.warn('[KSA GitHub Editor] Kon foto niet naar GitHub uploaden, bewaart inline:', err);
+          console.warn('[KSA GitHub Editor] Kon foto niet naar GitHub uploaden:', err);
         }
       }
       pendingImageUploads = {};
@@ -1191,19 +1319,34 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       containers: {}
     };
 
+    // Maak een schone kopie van de containers zonder contenteditable attributen
     ['.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
       const c = document.querySelector(sel);
-      if (c) pageData.containers[sel] = c.innerHTML;
+      if (c) {
+        const clone = c.cloneNode(true);
+        clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+        clone.querySelectorAll('.ksa-editable-img').forEach(el => el.classList.remove('ksa-editable-img'));
+        clone.querySelectorAll('.ksa-card-edit-tools').forEach(el => el.remove());
+        pageData.containers[sel] = clone.innerHTML;
+      }
     });
 
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
       const sel = getUniqueSelector(el);
-      if (sel) pageData.texts[sel] = el.innerHTML;
+      if (sel && !isGroupManagedSelector(sel)) pageData.texts[sel] = el.innerHTML;
     });
 
     document.querySelectorAll('img.ksa-editable-img').forEach(img => {
       const sel = getUniqueSelector(img);
-      if (sel) pageData.images[sel] = img.getAttribute('src');
+      if (isGroupManagedSelector(sel)) return;
+      const srcVal = img.getAttribute('src') || '';
+      const origVal = img.getAttribute('data-orig-src') || '';
+      // Als er een raw.githubusercontent fallback actief was, bewaar het schone repo-pad
+      const cleanSrc = srcVal.replace(/^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+\//, '');
+      if (sel) pageData.images[sel] = cleanSrc;
+      if (origVal && cleanSrc && origVal !== cleanSrc && !cleanSrc.startsWith('data:')) {
+        fullState.imageMap[origVal] = cleanSrc;
+      }
     });
 
     document.querySelectorAll('.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket').forEach(a => {
@@ -1216,7 +1359,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
     });
 
-    // Bewaar ook alle 6 de leeftijdsgroepen
     if (window.groupData) {
       fullState.groups = {};
       ['kabouters', 'sloebers', 'roodkapjes', 'jim', 'sim', 'kim'].forEach(k => {
@@ -1270,7 +1412,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         alert(`⚠️ Lokaal opgeslagen, maar GitHub publicatie gaf een melding:\n${err.message}\n\nControleer je GitHub Token via de knop "⚙️ GitHub Koppeling".`);
       }
     } else {
-      // Als er nog geen GitHub token is ingevuld, open eenmalig het GitHub-koppeling venster met uitleg
       openGithubConfigModal(true);
     }
 
@@ -1350,7 +1491,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     window.location.reload();
   }
 
-  // Start bij het laden van de pagina
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       injectEditorUI();
@@ -1361,4 +1501,3 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     loadAndApplySiteContent();
   }
 })();
-
