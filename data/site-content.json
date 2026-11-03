@@ -98,8 +98,8 @@
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "KSA ZONHOVEN MEISJES",
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2)": "Elke zondag van 13u30 tot 17u00",
       "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "🔥 GROOT KSA ZONHOVEN EVENEMENT",
-      "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "HALLOKIEN BINGO NIGHT 2026 🎃",
-      "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "Zaterdag 17 oktober • Polyvalente Zaal Evenementenhal Zonhoven • Vol = Vol!",
+      "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "HOLOLOOL&nbsp;&nbsp;<span style=\"font-size: 15.2px; font-weight: 400; letter-spacing: 1px; text-transform: none;\">🔥&nbsp;</span><span style=\"font-size: 15.2px; font-weight: 400; letter-spacing: 1px; text-transform: none;\">🔥&nbsp;</span><span style=\"font-size: 15.2px; font-weight: 400; letter-spacing: 1px; text-transform: none;\">🔥&nbsp;</span><span style=\"font-size: 15.2px; font-weight: 400; letter-spacing: 1px; text-transform: none;\">🔥&nbsp;</span>",
+      "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "Dinsdag 11 November, Hololool&nbsp;&nbsp;",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Wat gebeurt er bij KSA Zonhoven?",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "NIEUWS &amp; EVENEMENTEN",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Blijf op de hoogte van onze activiteiten, inschrijvingen, kienavond en spaghettidag!\n          ",
@@ -124,14 +124,10 @@
       "#groepen > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Onze Leeftijdsgroepen",
       "#groepen > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "WELKE GROEP HOOR JIJ BIJ?",
       "#groepen > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            KSA Zonhoven telt 5 enthousiaste leeftijdsgroepen en de leiding (+16). Klik op jouw groep of leeftijd en ontdek wat jouw bende doet!\n          ",
-      "#groupResultName": "KABOUTERS",
-      "#groupResultAge": "6 - 8 jaar (1ste &amp; 2de leerjaar)",
-      "#groupResultTagline": "Spelen, ontdekken &amp; oneindig veel fantasie!",
-      "#groupResultDesc": "Bij de kabouters stappen de allerjongste meisjes binnen in een magische wereld vol plezier. Van tikkertje in het gras en verkleedpartijtjes tot het bouwen van reusachtige zandkastelen.",
-      "#groupResultPerks > span:nth-of-type(1)": "✨ Knutselen &amp; dansen",
-      "#groupResultPerks > span:nth-of-type(2)": "✨ Pleinspelen",
-      "#groupResultPerks > span:nth-of-type(3)": "✨ Korte namiddagkampjes",
-      "#groupResultPerks > span:nth-of-type(4)": "✨ Leiding: Cara &amp; Nore",
+      "#groupResultName": "ROODKAPJES",
+      "#groupResultAge": "10 - 12 jaar (5de &amp; 6de leerjaar)",
+      "#groupResultTagline": "Creatief, stoer en altijd klaar voor een uitdaging!",
+      "#groupResultDesc": "De roodkapjes zijn echte ontdekkers. Ze leren sjorren, koken op kampvuurtjes, spelen strategische dorpsspelen en zingen de luidste kampliederen.",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Werkjaarplanning",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "OFFICIËLE KALENDER",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Bekijk hieronder de officiële kalender van KSA Zonhoven Meisjes voor het werkjaar.\n          ",
@@ -230,7 +226,7 @@
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/images/real_hallokien.jpg",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/images/real_startdag.jpg?v=2",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(3) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/images/real_spaghettidag.jpg?v=2",
-      "#groupResultImg": "images/kabouters.jpg",
+      "#groupResultImg": "images/ksakinderen.jpg",
       "#kalender-bord > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-official.svg?v=blue",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738487375_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg",
@@ -266,7 +262,7 @@
       },
       "#mainContent > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)": {
         "href": "https://ravotshop.ksa.be/hallokien",
-        "hidden": false
+        "hidden": true
       },
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(2) > article:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > a:nth-of-type(1)": {
         "href": "https://ravotshop.ksa.be/hallokien",
@@ -296,8 +292,8 @@
     }
   },
   "banner": {
-    "hidden": true,
-    "targetIso": "2027-03-08T11:00:00.000Z"
+    "hidden": false,
+    "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T20:42:16.060Z"
+  "updatedAt": "2026-11-03T20:46:26.751Z"
 }
