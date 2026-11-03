@@ -128,6 +128,10 @@
       "#groupResultAge": "10 - 12 jaar (5de &amp; 6de leerjaar)",
       "#groupResultTagline": "Creatief, stoer en altijd klaar voor een uitdaging!",
       "#groupResultDesc": "De roodkapjes zijn echte ontdekkers. Ze leren sjorren, koken op kampvuurtjes, spelen strategische dorpsspelen en zingen de luidste kampliederen.",
+      "#groupResultPerks > span:nth-of-type(1)": "✨ Kampvuur &amp; marshmallows",
+      "#groupResultPerks > span:nth-of-type(2)": "✨ Vlottentocht &amp; pleinspelen",
+      "#groupResultPerks > span:nth-of-type(3)": "✨ 10 dagen op kamp in tenten",
+      "#groupResultPerks > span:nth-of-type(4)": "✨ Topteam sfeer",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Werkjaarplanning",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "OFFICIËLE KALENDER",
       "#agenda > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Bekijk hieronder de officiële kalender van KSA Zonhoven Meisjes voor het werkjaar.\n          ",
@@ -295,5 +299,5 @@
     "hidden": false,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T20:46:26.751Z"
+  "updatedAt": "2026-11-03T20:50:58.603Z"
 }
