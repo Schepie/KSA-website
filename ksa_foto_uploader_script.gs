@@ -14,6 +14,11 @@
  */
 
 const KSA_DRIVE_FOLDER_NAME = 'KSA_Zonhoven_Website_Fotos';
+// Optioneel: Wil je een specifieke bestaande Google Drive map gebruiken?
+// Plak dan hieronder het map-ID (het stukje achter /folders/ in de URL van je Drive-map).
+// Laat je dit leeg (''), dan maakt het script automatisch de map 'KSA_Zonhoven_Website_Fotos'
+// aan in precies dezelfde Google Drive-map als waar deze Google Sheet staat!
+const CUSTOM_DRIVE_FOLDER_ID = '';
 
 /**
  * Voegt automatisch het menu "📸 KSA Foto's" toe zodra de Google Sheet opent.
@@ -24,8 +29,63 @@ function onOpen() {
     .addItem('📤 Foto uploaden naar geselecteerde cel...', 'openUploadDialog')
     .addItem('📌 Open Foto-Uploader Zijpaneel (voor meerdere foto\'s)', 'openUploadSidebar')
     .addSeparator()
+    .addItem('📋 Stel alle Dropdown-keuzelijstjes in', 'setupAllDropdowns')
+    .addItem('📂 Open Foto-map in Google Drive', 'showDriveFolderLink')
     .addItem('ℹ️ Hoe werkt het?', 'showPhotoHelp')
     .addToUi();
+}
+
+/**
+ * Stelt in alle tabbladen van de Google Sheet automatisch handige dropdown-keuzelijstjes in
+ * voor kolommen met vaste waarden (zoals Tonen, Status, Onderlijnd, Groep, Onderdeel, Type).
+ */
+function setupAllDropdowns() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function applyDropdown(sheetName, colIndex, values, maxRows, allowOther) {
+    const sh = ss.getSheetByName(sheetName);
+    if (!sh) return;
+    const rule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(values, true)
+      .setAllowInvalid(Boolean(allowOther))
+      .build();
+    sh.getRange(2, colIndex, maxRows, 1).setDataValidation(rule);
+  }
+
+  // 1. Home
+  applyDropdown('Home', 1, ['Topbalk', 'Hero', 'HeroKnop1', 'HeroKnop2', 'HeroKnop3', 'HeroFoto', 'Stat1', 'Stat2', 'Stat3', 'Stat4', 'Banner'], 50, true);
+  applyDropdown('Home', 8, ['Ja', 'Nee', 'Voorbij'], 50, false);
+
+  // 2. Kalender
+  applyDropdown('Kalender', 2, ['KSA', 'GEEN KSA', 'STARTDAG', 'HALLOKIEN', 'SPAGHETTIDAG', 'SLOTDAG', 'ZOMERKAMP'], 100, true);
+  applyDropdown('Kalender', 3, ['Nu', 'Voorbij'], 100, true);
+  applyDropdown('Kalender', 4, ['🎉', '🎃', '🎁', '🎄', '🎆', '🎭', '🍝', '🐣', '☀️', '⛺'], 100, true);
+  applyDropdown('Kalender', 5, ['Ja', 'Nee'], 100, false);
+
+  // 3. Nieuws
+  applyDropdown('Nieuws', 3, ['🔥 Groot Evenement', '🎉 Startdag', '🍝 Eetdag', '⛺ Zomerkamp', '📣 KSA Nieuws', '🎟️ Actie'], 50, true);
+  applyDropdown('Nieuws', 10, ['Nu', 'Voorbij'], 50, false);
+
+  // 4. Groepen
+  applyDropdown('Groepen', 1, ['KABOUTERS', 'SLOEBERS', 'ROODKAPJES', 'JIM', 'SIM', 'KIM'], 20, false);
+
+  // 5. Leiding
+  applyDropdown('Leiding', 1, ['Hoofdleiding', 'Kabouters', 'Sloebers', 'Roodkapjes', 'JIM', 'SIM', 'KIM'], 60, false);
+
+  // 6. Info
+  applyDropdown('Info', 1, ['Kaart', 'RavotStap'], 30, false);
+
+  // 7. HetHeem
+  applyDropdown('HetHeem', 1, ['Algemeen', 'Kenmerk'], 30, false);
+
+  // 8. Contact
+  applyDropdown('Contact', 1, ['Adres', 'Email', 'Persoon', 'Social'], 30, false);
+
+  SpreadsheetApp.getUi().alert(
+    '✅ Dropdown-keuzelijstjes ingesteld!',
+    'Alle velden met vaste waarden (zoals Tonen, Status, Onderlijnd, Groep, Onderdeel en Type) hebben nu een handig dropdown-keuzemenu gekregen.',
+    SpreadsheetApp.getUi().ButtonSet.OK
+  );
 }
 
 /**
@@ -87,17 +147,58 @@ function getSelectedCellInfo() {
 
 /**
  * Zoekt of maakt de gedeelde Google Drive map 'KSA_Zonhoven_Website_Fotos' aan.
+ * Standaard wordt deze aangemaakt in dezelfde map als de Google Sheet zelf (of in Mijn Drive).
  */
 function getOrCreateKsaPhotoFolder_() {
-  const folders = DriveApp.getFoldersByName(KSA_DRIVE_FOLDER_NAME);
-  let folder;
-  if (folders.hasNext()) {
-    folder = folders.next();
-  } else {
-    folder = DriveApp.createFolder(KSA_DRIVE_FOLDER_NAME);
-    folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  // 1. Als er een specifiek map-ID is ingesteld, gebruik die map:
+  if (CUSTOM_DRIVE_FOLDER_ID && CUSTOM_DRIVE_FOLDER_ID.trim() !== '') {
+    try {
+      return DriveApp.getFolderById(CUSTOM_DRIVE_FOLDER_ID.trim());
+    } catch (e) {
+      // Val terug op automatische map als het ID ongeldig is
+    }
   }
+
+  // 2. Zoek of de map 'KSA_Zonhoven_Website_Fotos' al bestaat
+  const folders = DriveApp.getFoldersByName(KSA_DRIVE_FOLDER_NAME);
+  if (folders.hasNext()) {
+    return folders.next();
+  }
+
+  // 3. Maak de map aan in dezelfde Google Drive-map als waar deze Google Sheet staat
+  //    (zodat alles netjes bij elkaar staat), of anders in de hoofdmap 'Mijn Drive'.
+  let folder;
+  try {
+    const ssFile = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId());
+    const parents = ssFile.getParents();
+    if (parents.hasNext()) {
+      const parentFolder = parents.next();
+      folder = parentFolder.createFolder(KSA_DRIVE_FOLDER_NAME);
+    } else {
+      folder = DriveApp.createFolder(KSA_DRIVE_FOLDER_NAME);
+    }
+  } catch (e) {
+    folder = DriveApp.createFolder(KSA_DRIVE_FOLDER_NAME);
+  }
+
+  folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return folder;
+}
+
+/**
+ * Toont een klikbare link naar de Google Drive map waarin alle foto's staan.
+ */
+function showDriveFolderLink() {
+  const folder = getOrCreateKsaPhotoFolder_();
+  const url = folder.getUrl();
+  const html = HtmlService.createHtmlOutput(
+    '<div style="font-family:sans-serif; padding:12px; font-size:14px; color:#1e293b;">' +
+      '<p style="margin-top:0;">Alle geüploade websitefoto\'s worden bewaard in de Google Drive-map:</p>' +
+      '<p><strong>📂 ' + folder.getName() + '</strong></p>' +
+      '<p><a href="' + url + '" target="_blank" style="display:inline-block; padding:10px 16px; background:#0055a5; color:#fff; text-decoration:none; border-radius:8px; font-weight:bold;">Open map in Google Drive &rarr;</a></p>' +
+    '</div>'
+  ).setWidth(380).setHeight(170);
+  SpreadsheetApp.getUi().showModalDialog(html, '📂 Google Drive Foto-map');
 }
 
 /**
