@@ -263,7 +263,7 @@
     "hidden": false,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T12:30:49.295Z",
+  "updatedAt": "2026-11-04T12:32:35.540Z",
   "shortcutsHidden": true,
   "mobile": {
     "texts": {
@@ -330,9 +330,9 @@
     },
     "links": {
       "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(3) > a:nth-of-type(1)": {
-        "href": "https://ravotshop.ksa.be/hallokien",
-        "text": "🎟️ Bestel Tickets via Ravotshop →",
-        "hidden": true
+        "href": "http://hololool.net",
+        "text": "🎟️ Hololool.net →",
+        "hidden": false
       }
     },
     "containers": {
