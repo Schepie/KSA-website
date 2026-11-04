@@ -108,7 +108,7 @@
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2)": "Elke zondag van 13u30 tot 17u00",
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "🔥 GROOT EVENEMENT",
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "HOLOLOOL&nbsp;",
-      "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "Dinsdag 10 Oktober, vanaf 18h30&nbsp; <br>Dijkbeemdenweg Zonhoven<br>",
+      "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "Dinsdag 10 november, vanaf 18h30&nbsp; <br>Dijkbeemdenweg Zonhoven<br>",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Wat gebeurt er bij KSA Zonhoven?",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "NIEUWS &amp; EVENEMENTEN",
       "#nieuws > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Blijf op de hoogte van onze activiteiten, inschrijvingen, kienavond en spaghettidag!\n          ",
@@ -264,7 +264,7 @@
     "hidden": false,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T12:45:31.652Z",
+  "updatedAt": "2026-11-04T12:46:28.688Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
