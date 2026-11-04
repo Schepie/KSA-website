@@ -1463,7 +1463,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '#mGroupAge',
       '#mGroupTagline',
       '#mGroupDesc',
-      '#mGroupLeaders',
       '.group-tag',
       '.hoofd-name',
       '.hoofd-desc',
