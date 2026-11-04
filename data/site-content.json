@@ -107,7 +107,7 @@
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(3) > span:nth-of-type(2)": "Groot Zomerkamp",
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > span:nth-of-type(1)": "13U30",
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(4) > span:nth-of-type(2)": "Elke Zondag",
-      "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "KSA ZONHOVEN MEISJES",
+      "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1)": "KSA ZONHOVEN&nbsp;",
       "#mainContent > section:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(2)": "Elke zondag van 13u30 tot 17u00",
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "🔥 GROOT KSA ZONHOVEN EVENEMENT",
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "HALLOKIEN BINGO NIGHT 2026 🎃",
@@ -298,5 +298,5 @@
     "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T07:46:38.943Z"
+  "updatedAt": "2026-11-04T07:47:20.874Z"
 }
