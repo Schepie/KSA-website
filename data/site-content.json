@@ -195,7 +195,7 @@
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > ul:nth-of-type(1) > li:nth-of-type(5)": "✔️ Ideaal voor jeugdverenigingen, weekends en kampen",
       "#contact > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Vragen of Kennismaken?",
       "#contact > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "NEEM CONTACT OP MET ONS",
-      "#contact > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Twijfel je om je dochter in te schrijven of wil je praktische info? Onze leiding staat voor je klaar!\n          ",
+      "#contact > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n            Twijfel je om je dochter in te schrijven of wil je praktische info? <br>Onze leiding staat voor je klaar!\n          ",
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > a:nth-of-type(1) > div:nth-of-type(1)": "📍",
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1)": "👑",
       "#contact > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1)": "📨",
@@ -298,5 +298,5 @@
     "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-03T22:03:46.155Z"
+  "updatedAt": "2026-11-04T07:46:38.943Z"
 }
