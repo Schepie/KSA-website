@@ -1143,6 +1143,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.contact-tile-icon',
       '.contact-tile h4',
       '.contact-tile p',
+      '#footerCopyright',
+      '.footer-copyright',
       // Mobiel
       '.hero-live-title',
       '.hero-live-desc',
