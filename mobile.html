@@ -17,7 +17,7 @@
   <link rel="apple-touch-icon" href="assets/icons/ksa-logo.png">
 
   <!-- Mobile App Stylesheet -->
-  <link rel="stylesheet" href="css/mobile.css?v=crisp">
+  <link rel="stylesheet" href="css/mobile.css?v=gh15">
 
   <!-- Automatic Device & Screen Detection -->
   <script src="js/device-detect.js"></script>
@@ -196,7 +196,7 @@
           <h2 class="app-section-title">📅 Kalender 2026</h2>
           <span style="font-size:0.75rem; color:var(--text-muted);">Zondagactiviteiten &amp; Evenementen</span>
         </div>
-        <a href="assets/images/real_agenda.jpg" download="KSA_Zonhoven_Kalender.jpg" target="_blank" rel="noopener" class="cal-download-btn-compact" title="Download kalender poster">
+        <a href="assets/images/real_agenda.jpg" download="KSA_Zonhoven_Kalender.jpg" class="cal-download-btn-compact" id="mobileCalDownloadBtn" title="Download actuele kalender als afbeelding">
           <span>📥 Download</span>
         </a>
       </div>
@@ -208,8 +208,18 @@
         <button type="button" class="cal-filter-chip" data-filter="special">Speciaal &amp; Feest</button>
       </div>
 
-            <!-- Agenda Items List (Vanaf heden / Binnenkort) -->
-      <div class="cal-list">
+      <!-- Board container for crisp export -->
+      <div class="mobile-kalender-board" id="mobile-kalender-board">
+        <div class="mobile-cal-board-header" id="mobileCalBoardHeader">
+          <img src="assets/icons/ksa-logo-official.svg?v=blue" alt="KSA Logo" style="width:34px; height:34px; object-fit:contain;">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; color:var(--ksa-red); text-transform:uppercase; letter-spacing:0.5px;">KSA Zonhoven Meisjes</div>
+            <div style="font-size:1.05rem; font-weight:900; color:var(--ksa-blue); line-height:1.2;">Officiële Kalender 2026</div>
+          </div>
+        </div>
+
+        <!-- Agenda Items List (Vanaf heden / Binnenkort) -->
+        <div class="cal-list">
 
         <!-- 08/11 KSA (Binnenkort!) -->
         <div class="cal-card-item is-current" data-category="ksa">
@@ -377,6 +387,11 @@
         </div>
 
       </div>
+
+      <div class="mobile-cal-board-footer" id="mobileCalBoardFooter">
+        <span>📍 Dijkbeemdenweg 8, Zonhoven &bull; 🌐 www.ksazonhoven.be</span>
+      </div>
+    </div>
 
     </div>
 
@@ -814,9 +829,11 @@
     </a>
   </nav>
 
+  <!-- Html2Canvas voor Live Kalender Download -->
+  <script src="js/html2canvas.min.js"></script>
   <!-- Mobile App Controller Script -->
-  <script src="js/mobile.js?v=gh13"></script>
+  <script src="js/mobile.js?v=gh15"></script>
   <!-- Rechtstreekse Visuele Website Editor (via GitHub) -->
-  <script src="js/visual-editor.js?v=gh14"></script>
+  <script src="js/visual-editor.js?v=gh15"></script>
 </body>
 </html>

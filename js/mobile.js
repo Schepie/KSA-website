@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initGroupTabs();
   initMobileCountdown();
   initCalendarFilters();
+  initMobileCalendarDownload();
   initPaspoortModal();
 });
 
@@ -299,6 +300,72 @@ function initCalendarFilters() {
       const filter = chip.getAttribute('data-filter') || 'all';
       applyFilter(filter);
     });
+  });
+}
+
+/* ==========================================================================
+   4b. DYNAMIC CALENDAR DOWNLOAD (ACTUELE HIGH-RES JPG EXPORT)
+   ========================================================================== */
+function initMobileCalendarDownload() {
+  const btn = document.getElementById('mobileCalDownloadBtn');
+  if (!btn) return;
+
+  btn.addEventListener('click', async (e) => {
+    const board = document.getElementById('mobile-kalender-board') || document.querySelector('.cal-list');
+    if (!board || typeof html2canvas !== 'function') {
+      // Laat de directe href-download doorgaan naar assets/images/real_agenda.jpg
+      return;
+    }
+
+    e.preventDefault();
+    const originalText = btn.innerHTML;
+
+    try {
+      btn.innerHTML = '<span>⏳ Genereren...</span>';
+
+      // Zorg dat alle kalenderitems tijdelijk zichtbaar zijn tijdens export
+      const allItems = board.querySelectorAll('.cal-card-item');
+      const prevDisplays = [];
+      allItems.forEach((it, idx) => {
+        prevDisplays[idx] = it.style.display;
+        it.style.display = 'flex';
+      });
+
+      const canvas = await html2canvas(board, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      // Herstel de filterweergave
+      allItems.forEach((it, idx) => {
+        it.style.display = prevDisplays[idx];
+      });
+
+      canvas.toBlob((blob) => {
+        if (!blob) throw new Error('Canvas blob failed');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'KSA_Zonhoven_Kalender.jpg';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, 2000);
+
+        btn.innerHTML = '<span>✓ Gedownload!</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+        }, 2500);
+      }, 'image/jpeg', 0.95);
+    } catch (err) {
+      console.warn('Fout bij exporteren mobiele kalender via canvas:', err);
+      window.location.href = 'assets/images/real_agenda.jpg';
+      btn.innerHTML = originalText;
+    }
   });
 }
 

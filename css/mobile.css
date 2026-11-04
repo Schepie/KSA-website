@@ -708,6 +708,33 @@ body.ksa-edit-mode-active .ksa-header-edit-btn {
   color: #ffffff;
 }
 
+.mobile-kalender-board {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-cal-board-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 12px 6px;
+  border-bottom: 2px solid var(--ksa-blue-soft);
+  margin-bottom: 12px;
+}
+
+.mobile-cal-board-footer {
+  text-align: center;
+  padding: 12px 4px 4px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border-subtle);
+  margin-top: 12px;
+}
+
 .cal-list {
   display: flex;
   flex-direction: column;
