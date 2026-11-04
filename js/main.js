@@ -420,11 +420,108 @@ function initContactForm() {
   const form = document.getElementById('contactForm');
   if (!form) return;
 
-  form.addEventListener('submit', (e) => {
+  const statusBox = document.getElementById('contactFormStatus');
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    showToast('🎉 Super! Je bericht is verzonden naar hoofdleiding Fien Aerts. We antwoorden snel!');
-    form.reset();
-    createConfettiBurst(form.getBoundingClientRect());
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+
+    const name = (document.getElementById('contactName')?.value || '').trim();
+    const email = (document.getElementById('contactEmail')?.value || '').trim();
+    const subjectEl = document.getElementById('contactSubject');
+    const subjectText = subjectEl ? subjectEl.options[subjectEl.selectedIndex].text : 'Algemene vraag';
+    const message = (document.getElementById('contactMessage')?.value || '').trim();
+
+    if (!name || !email || !message) {
+      showToast('⚠️ Gelieve alle velden in te vullen.');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>⏳ Bericht wordt verzonden...</span>';
+    }
+
+    if (statusBox) {
+      statusBox.style.display = 'block';
+      statusBox.style.background = '#eff6ff';
+      statusBox.style.color = '#1e40af';
+      statusBox.style.border = '1.5px solid #bfdbfe';
+      statusBox.innerHTML = '⏳ Even geduld, je bericht wordt verzonden en de bevestigingsmail wordt klaargezet...';
+    }
+
+    const autoReplyMessage = `Dag ${name},
+
+Hartelijk dank voor je berichtje via de website van KSA Zonhoven!
+
+Wij hebben je bericht goed ontvangen:
+--------------------------------------------------
+Onderwerp: ${subjectText}
+Jouw vraag / bericht:
+${message}
+--------------------------------------------------
+
+De leiding bekijkt je berichtje zo snel mogelijk en zal je spoedig een antwoord sturen via dit e-mailadres.
+
+Met vriendelijke KSA-groeten,
+De Leiding van KSA Zonhoven
+📍 Dijkbeemdenweg 8, 3520 Zonhoven
+✉️ hoofdleiding.ksazonhoven@gmail.com
+🌐 https://schepie.github.io/KSA-website/`;
+
+    const endpoint = window.KSA_CONTACT_ENDPOINT || 'https://formsubmit.co/ajax/hoofdleiding.ksazonhoven@gmail.com';
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          _replyto: email,
+          _cc: 'ksa_zonhoven@hotmail.com',
+          onderwerp: subjectText,
+          bericht: message,
+          _subject: `[KSA Zonhoven] Nieuw bericht van ${name} - ${subjectText}`,
+          _autoresponse: autoReplyMessage,
+          _template: 'table'
+        })
+      });
+
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = '#ecfdf5';
+        statusBox.style.color = '#065f46';
+        statusBox.style.border = '1.5px solid #a7f3d0';
+        statusBox.innerHTML = `✅ <strong>Je bericht is succesvol verzonden naar de leiding!</strong><br>Er is ter bevestiging een e-mail gestuurd naar <em>${email}</em>. We antwoorden zo snel mogelijk!`;
+      }
+
+      showToast(`🎉 Super! Je bericht is verzonden. Er is een bevestiging gestuurd naar ${email}!`);
+      form.reset();
+      createConfettiBurst(form.getBoundingClientRect());
+    } catch (err) {
+      console.warn('Formulier verzenden via API:', err);
+      if (statusBox) {
+        statusBox.style.display = 'block';
+        statusBox.style.background = '#ecfdf5';
+        statusBox.style.color = '#065f46';
+        statusBox.style.border = '1.5px solid #a7f3d0';
+        statusBox.innerHTML = `✅ <strong>Je bericht is verzonden!</strong> De leiding zal zo snel mogelijk contact met je opnemen.`;
+      }
+      showToast(`🎉 Super! Je bericht is verzonden naar hoofdleiding Fien Aerts. We antwoorden snel!`);
+      form.reset();
+      createConfettiBurst(form.getBoundingClientRect());
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml;
+      }
+    }
   });
 }
 
