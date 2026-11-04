@@ -262,10 +262,10 @@
     "topbarHidden": true
   },
   "banner": {
-    "hidden": false,
+    "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T12:50:40.945Z",
+  "updatedAt": "2026-11-04T12:52:32.896Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
@@ -340,7 +340,8 @@
     "containers": {
       ".shortcuts-grid": "\n        <div class=\"shortcut-tile\" data-switch-tab=\"agenda\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: var(--ksa-blue-soft); color: var(--ksa-blue); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            📅\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">Officiële Kalender</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Wanneer is het KSA?</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"groepen\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(254, 247, 230); color: rgb(217, 119, 6); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            🎒\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">5 Groepen</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Van 6 tot 17+ jaar</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"leiding\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(253, 232, 233); color: rgb(227, 0, 27); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            👑\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">De Leidingploeg</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Wie is wie? Paspoortjes</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"info\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(236, 253, 245); color: rgb(5, 150, 105); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            📝\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">Inschrijven &amp; Info</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Uniform &amp; Ravot gids</span>\n        </div>\n      "
     },
-    "shortcutsHidden": true
+    "shortcutsHidden": false,
+    "topbarHidden": false
   },
-  "topbarHidden": true
+  "topbarHidden": false
 }
