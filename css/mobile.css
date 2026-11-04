@@ -961,6 +961,20 @@ body.ksa-edit-mode-active .ksa-header-edit-btn {
   box-shadow: 0 4px 10px rgba(0, 48, 86, 0.2);
 }
 
+body:not(.ksa-edit-mode-active) .ksa-group-hidden,
+body:not(.ksa-edit-mode-active) .group-select-btn.ksa-group-hidden,
+body:not(.ksa-edit-mode-active) .ksa-link-hidden {
+  display: none !important;
+}
+
+body.ksa-edit-mode-active .group-select-btn.ksa-group-hidden,
+body.ksa-edit-mode-active .ksa-group-hidden {
+  display: inline-flex !important;
+  opacity: 0.55 !important;
+  text-decoration: line-through !important;
+  outline: 2px dashed #e3001b !important;
+}
+
 .group-image-wrap {
   width: 100%;
   position: relative;

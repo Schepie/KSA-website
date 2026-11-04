@@ -304,21 +304,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   function applyGroupButtonsState() {
-    if (!window.groupData) return;
+    const groups = window.groupData || window.mobileGroupData;
+    if (!groups) return;
     ['kabouters', 'sloebers', 'roodkapjes', 'jim', 'sim', 'kim'].forEach(grpKey => {
-      const g = window.groupData[grpKey];
+      const g = (window.groupData && window.groupData[grpKey]) || (window.mobileGroupData && window.mobileGroupData[grpKey]) || groups[grpKey];
       if (!g) return;
       const dBtn = document.querySelector(`.quiz-pill-btn[data-group="${grpKey}"]`);
       if (dBtn) {
         if (g.buttonLabel) dBtn.textContent = g.buttonLabel;
         else g.buttonLabel = dBtn.textContent.trim();
         dBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
+        dBtn.style.display = (!isEditMode && g.hidden) ? 'none' : '';
       }
       const mBtn = document.querySelector(`.group-select-btn[data-group="${grpKey}"]`);
       if (mBtn) {
         if (g.mobileButtonLabel) mBtn.textContent = g.mobileButtonLabel;
-        else g.mobileButtonLabel = mBtn.textContent.trim();
+        else if (g.buttonLabel) mBtn.textContent = g.buttonLabel;
         mBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
+        mBtn.style.display = (!isEditMode && g.hidden) ? 'none' : '';
       }
     });
   }
@@ -525,6 +528,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     // 1. Leeftijdsgroepen data (Kabouters, Sloebers, Roodkapjes, JIM, SIM, KIM)
     if (state.groups && typeof state.groups === 'object') {
+      if (!window.groupData) {
+        window.groupData = JSON.parse(JSON.stringify(state.groups));
+      }
       Object.entries(state.groups).forEach(([grpKey, gVal]) => {
         if (window.groupData && window.groupData[grpKey]) {
           Object.assign(window.groupData[grpKey], gVal);
@@ -536,6 +542,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           if (gVal.desc) window.mobileGroupData[grpKey].desc = gVal.desc;
           if (gVal.image) window.mobileGroupData[grpKey].image = gVal.image;
           if (gVal.perks) window.mobileGroupData[grpKey].tags = gVal.perks.map(p => p.startsWith('✨') ? p : `✨ ${p}`);
+          window.mobileGroupData[grpKey].hidden = !!gVal.hidden;
         }
       });
 
