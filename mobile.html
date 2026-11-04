@@ -7,17 +7,23 @@
   
   <title>KSA Zonhoven Meisjes | Mobiele App</title>
   <meta name="description" content="KSA Zonhoven Meisjes - Mobiele versie met live agenda, groepen, leiding en praktische info voor smartphone.">
+  <!-- Web App Manifest & PWA Configuration -->
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0067b1">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="KSA Zonhoven">
 
-  <!-- Favicon -->
+  <!-- App Icons & Favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/icons/ksa-logo-official.svg?v=blue">
-  <link rel="apple-touch-icon" href="assets/icons/ksa-logo.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/pwa-icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/pwa-icon-512.png">
 
   <!-- Mobile App Stylesheet -->
-  <link rel="stylesheet" href="css/mobile.css?v=gh15">
+  <link rel="stylesheet" href="css/mobile.css?v=gh16">
 
   <!-- Automatic Device & Screen Detection -->
   <script src="js/device-detect.js"></script>
@@ -670,6 +676,23 @@
         </div>
       </div>
 
+      <!-- PWA App Install Card -->
+      <div class="info-card-box pwa-install-card" id="pwaInstallInfoCard" style="border: 2px solid var(--border-blue); background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <img src="assets/icons/pwa-icon-192.png" alt="KSA App Icoon" style="width:44px; height:44px; border-radius:12px; box-shadow:var(--shadow-sm); border:1px solid #e2e8f0;">
+          <div>
+            <h3 style="margin:0; font-size:1rem; color:var(--ksa-blue);">📲 KSA Zonhoven App</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Installeer op je startscherm</span>
+          </div>
+        </div>
+        <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;" id="pwaInstallStatusText">
+          Gebruik KSA Zonhoven als een echte app op je smartphone: snel overal de agenda, leiding en foto's bij de hand!
+        </p>
+        <button type="button" class="hero-btn hero-btn-primary" id="pwaManualInstallBtn" style="width:100%; justify-content:center; padding:10px 14px; font-size:0.86rem; font-weight:800; cursor:pointer;">
+          📲 Installeer KSA App
+        </button>
+      </div>
+
       <!-- Zondagen Info -->
       <div class="info-card-box">
         <h3>⏰ Zondagnamiddagen</h3>
@@ -786,6 +809,45 @@
         <span class="paspoort-modal-title" id="modalPaspoortTitle">Leidingspaspoort</span>
         <span style="font-size:0.75rem; color:var(--ksa-red); font-weight:700;">❤️💙 KSA Zonhoven</span>
       </div>
+    </div>
+  </div>
+
+  <!-- Floating PWA Install Prompt Banner -->
+  <div class="pwa-install-banner" id="pwaInstallBanner" style="display:none;">
+    <div class="pwa-banner-content">
+      <img src="assets/icons/pwa-icon-192.png" alt="KSA App" class="pwa-banner-icon">
+      <div class="pwa-banner-text">
+        <strong>KSA Zonhoven App</strong>
+        <span>Voeg toe aan je startscherm</span>
+      </div>
+      <button type="button" class="pwa-banner-btn-install" id="pwaBannerInstallBtn">Installeer</button>
+      <button type="button" class="pwa-banner-btn-close" id="pwaBannerCloseBtn" aria-label="Sluiten">✕</button>
+    </div>
+  </div>
+
+  <!-- iOS Install Instructions Modal -->
+  <div class="pwa-ios-modal" id="pwaIosModal">
+    <div class="pwa-ios-sheet">
+      <div style="width:40px; height:4px; background:#cbd5e1; border-radius:2px; margin:0 auto 16px auto;"></div>
+      <h3>📲 KSA App Installeren op iPhone</h3>
+      <p>Installeer KSA Zonhoven in 3 eenvoudige stappen:</p>
+      
+      <div class="pwa-ios-step">
+        <div class="pwa-ios-step-num">1</div>
+        <div>Tik onderaan in Safari op het <strong>Deel-icoon</strong> (vierkantje met pijltje ⎋).</div>
+      </div>
+
+      <div class="pwa-ios-step">
+        <div class="pwa-ios-step-num">2</div>
+        <div>Scroll naar beneden en kies <strong>'Zet op beginscherm' ➕</strong>.</div>
+      </div>
+
+      <div class="pwa-ios-step">
+        <div class="pwa-ios-step-num">3</div>
+        <div>Tik rechtsboven op <strong>'Voeg toe'</strong>. Klaar!</div>
+      </div>
+
+      <button type="button" class="pwa-ios-close-btn" id="pwaIosCloseBtn">Begrepen</button>
     </div>
   </div>
 
