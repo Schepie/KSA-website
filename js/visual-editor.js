@@ -1360,6 +1360,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '#footerCopyright',
       '.footer-copyright',
       // Mobiel
+      '.shortcut-title',
+      '.shortcut-desc',
+      '.shortcut-icon-bubble',
       '.hero-live-title',
       '.hero-live-desc',
       '.event-title',
@@ -1411,6 +1414,20 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         e.stopPropagation();
         openGroupPillsModal(btn.getAttribute('data-group'));
       };
+    });
+
+    document.querySelectorAll('.shortcut-icon-bubble').forEach(bubble => {
+      bubble.style.cursor = 'pointer';
+      bubble.title = '🎨 Klik om dit icoon aan te passen';
+      if (!bubble.dataset.ksaBound) {
+        bubble.dataset.ksaBound = '1';
+        bubble.addEventListener('click', (e) => {
+          if (!isEditMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openShortcutIconModal(bubble);
+        });
+      }
     });
 
     injectBannerControlBar();
@@ -2110,6 +2127,68 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
   }
 
+  function openShortcutIconModal(bubble) {
+    if (!bubble) return;
+    const curVal = bubble.textContent.trim();
+    const presets = [
+      { emoji: '📅', label: 'Kalender' },
+      { emoji: '🎒', label: 'Groepen' },
+      { emoji: '👑', label: 'Leiding' },
+      { emoji: '📝', label: 'Info' },
+      { emoji: '🔥', label: 'Vuur' },
+      { emoji: '🏕️', label: 'Kamp' },
+      { emoji: '🎈', label: 'Sloeber' },
+      { emoji: '🧭', label: 'Kompas' },
+      { emoji: '⚡', label: 'Sim' },
+      { emoji: '📸', label: 'Foto' },
+      { emoji: '🍝', label: 'Eten' },
+      { emoji: '💌', label: 'Contact' },
+      { emoji: '⭐', label: 'Ster' },
+      { emoji: '🎉', label: 'Feest' },
+      { emoji: '💙', label: 'KSA Blauw' },
+      { emoji: '❤️', label: 'KSA Rood' }
+    ];
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    modal.innerHTML = `
+      <h3>⚡ Snelle Toegang Icoon Aanpassen</h3>
+      <p>Kies een nieuw icoontje of typ zelf een emoji:</p>
+      <div class="ksa-sticker-grid">
+        ${presets.map(p => `
+          <button type="button" class="ksa-sticker-choice" data-emoji="${p.emoji}">
+            <div>${p.emoji}</div>
+            <span>${p.label}</span>
+          </button>
+        `).join('')}
+      </div>
+      <label>Of typ een eigen emoji / icoon:</label>
+      <input type="text" id="ksaCustomShortcutEmoji" value="${curVal}" placeholder="Bv. 🚀 of 🎯" style="font-size:1.6rem; text-align:center;">
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaShortcutCancel">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaShortcutApply">✔️ Toepassen</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    const applyEmoji = (val) => {
+      const clean = (val || '').trim();
+      if (clean) {
+        bubble.textContent = clean;
+      }
+      backdrop.style.display = 'none';
+    };
+
+    modal.querySelectorAll('.ksa-sticker-choice').forEach(btn => {
+      btn.onclick = () => applyEmoji(btn.getAttribute('data-emoji'));
+    });
+
+    document.getElementById('ksaShortcutCancel').onclick = () => { backdrop.style.display = 'none'; };
+    document.getElementById('ksaShortcutApply').onclick = () => {
+      applyEmoji(document.getElementById('ksaCustomShortcutEmoji').value);
+    };
+  }
+
   function ensureCalStickerSlot(item) {
     if (!item) return;
     const card = item.querySelector('.cal-card');
@@ -2419,7 +2498,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
 
     // Maak een schone kopie van de containers zonder contenteditable attributen (hoofdcontainers worden op desktop beheerd en live gesynchroniseerd naar mobiel)
-    const containerSelectors = isMobilePage ? [] : ['#ksaTopbar', '.hero-cta-group', '.cal-grid', '.news-grid', '.paspoort-grid'];
+    const containerSelectors = isMobilePage ? ['.shortcuts-grid'] : ['#ksaTopbar', '.hero-cta-group', '.cal-grid', '.news-grid', '.paspoort-grid'];
     containerSelectors.forEach(sel => {
       const c = document.querySelector(sel);
       if (c) {
@@ -2432,8 +2511,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-      // Sla geen teksten op die al in containers (.cal-grid, .paspoort-grid, ...) zitten
-      if (el.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
+      // Sla geen teksten op die al in containers (.cal-grid, .paspoort-grid, .shortcuts-grid, ...) zitten
+      if (el.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list, .shortcuts-grid')) return;
       const sel = getUniqueSelector(el);
       if (sel && !isGroupManagedSelector(sel)) pageData.texts[sel] = el.innerHTML;
     });

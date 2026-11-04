@@ -83,13 +83,17 @@ function initMobileNavigation() {
     });
   });
 
-  // Bind any in-page trigger buttons (e.g. data-switch-tab="agenda")
-  document.querySelectorAll('[data-switch-tab]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = btn.getAttribute('data-switch-tab');
-      activateTab(target);
-    });
+  // Bind any in-page trigger buttons (e.g. data-switch-tab="agenda") via event delegation
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-switch-tab]');
+    if (!btn) return;
+    if (document.body.classList.contains('ksa-edit-mode-active')) {
+      // In Edit Mode: voorkom tab-wissel zodat iconen en teksten bewerkt kunnen worden
+      return;
+    }
+    e.preventDefault();
+    const target = btn.getAttribute('data-switch-tab');
+    if (target) activateTab(target);
   });
 
   // Check URL parameter (?tab=) or hash (#...) on initial load
