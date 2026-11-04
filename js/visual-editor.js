@@ -918,6 +918,48 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
       .ksa-dock-btn-exit:hover { background: #1e293b; color: #fff; }
 
+      @media (max-width: 768px), (pointer: coarse) {
+        body.ksa-edit-mode-active .mobile-bottom-nav {
+          position: fixed !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          z-index: 100000 !important;
+          display: flex !important;
+          background: rgba(255, 255, 255, 0.98) !important;
+          box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15) !important;
+        }
+        body.ksa-edit-mode-active .ksa-editor-dock {
+          bottom: calc(var(--nav-height, 64px) + env(safe-area-inset-bottom, 0px)) !important;
+          z-index: 99999 !important;
+          padding: 8px 10px !important;
+          gap: 6px !important;
+        }
+        body.ksa-edit-mode-active .ksa-dock-hint {
+          display: none !important;
+        }
+        body.ksa-edit-mode-active .ksa-dock-left {
+          gap: 6px !important;
+        }
+        body.ksa-edit-mode-active .ksa-dock-actions {
+          width: 100% !important;
+          justify-content: flex-start !important;
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+          flex-wrap: nowrap !important;
+          padding-bottom: 2px !important;
+        }
+        body.ksa-edit-mode-active .ksa-dock-btn {
+          padding: 6px 12px !important;
+          font-size: 11.5px !important;
+          white-space: nowrap !important;
+          flex-shrink: 0 !important;
+        }
+        body.ksa-edit-mode-active {
+          padding-bottom: calc(var(--nav-height, 64px) + 140px + env(safe-area-inset-bottom, 0px)) !important;
+        }
+      }
+
       .ksa-editor-modal-backdrop {
         position: fixed;
         inset: 0;
@@ -986,13 +1028,14 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       footerSupport.appendChild(btn);
     }
 
-    const mobInfoTab = document.getElementById('tab-info');
-    if (mobInfoTab) {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'text-align:center; padding: 20px 0 30px;';
-      wrap.innerHTML = `<button type="button" class="ksa-edit-trigger-btn" style="padding:10px 18px; font-size:0.9rem;">✏️ Bewerk Website (Leiding Edit Mode)</button>`;
-      wrap.querySelector('button').onclick = promptAndEnableEditMode;
-      mobInfoTab.appendChild(wrap);
+    const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
+    if (mobHeaderBtn) {
+      mobHeaderBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isEditMode) disableEditMode();
+        else promptAndEnableEditMode();
+      };
     }
 
     const fileInput = document.createElement('input');
@@ -1211,6 +1254,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
       el.style.display = '';
     });
+
+    const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
+    if (mobHeaderBtn) {
+      mobHeaderBtn.classList.add('active');
+      mobHeaderBtn.title = 'Sluit bewerk-modus';
+      mobHeaderBtn.innerHTML = '✖';
+    }
+
+    document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(item => {
+      if (!item.dataset.ksaTabBound) {
+        item.dataset.ksaTabBound = '1';
+        item.addEventListener('click', () => {
+          if (isEditMode) {
+            setTimeout(enableEditMode, 60);
+          }
+        });
+      }
+    });
   }
 
   function bindGroupLiveSync() {
@@ -1267,6 +1328,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
       el.style.display = 'none';
     });
+    const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
+    if (mobHeaderBtn) {
+      mobHeaderBtn.classList.remove('active');
+      mobHeaderBtn.title = 'Bewerk website (Leiding Edit Mode)';
+      mobHeaderBtn.innerHTML = '✏️';
+    }
   }
 
   // --------------------------------------------------------------------------

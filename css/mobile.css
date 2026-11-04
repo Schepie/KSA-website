@@ -175,6 +175,29 @@ button {
   color: var(--ksa-red);
 }
 
+.ksa-header-edit-btn {
+  background: var(--ksa-yellow-soft);
+  color: var(--text-main);
+  border: 1.5px solid rgba(253, 185, 0, 0.45);
+  font-size: 1.15rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.ksa-header-edit-btn:active {
+  transform: scale(0.92);
+}
+
+body.ksa-edit-mode-active .ksa-header-edit-btn {
+  background: var(--ksa-red);
+  color: #ffffff;
+  border-color: var(--ksa-red-dark);
+  box-shadow: 0 0 10px rgba(227, 0, 27, 0.45);
+}
+
 /* ==========================================================================
    APP BOTTOM NAVIGATION DOCK (FIXED BOTTOM)
    ========================================================================== */
