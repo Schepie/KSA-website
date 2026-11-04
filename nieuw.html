@@ -24,8 +24,8 @@
     :root {
       --ksa-blue: #0067b1;
       --ksa-blue-hover: #005491;
-      --ksa-blue-dark: #150958;
-      --ksa-navy: #0d0638;
+      --ksa-blue-dark: #072658;
+      --ksa-navy: #04142e;
       --ksa-red: #e73339;
       --ksa-red-hover: #c9242a;
       --ksa-orange: #ed7d34;
@@ -57,7 +57,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Background image & gradient overlay */
+    /* Background image & gradient overlay - Rich KSA Blue without purple/red tint */
     .bg-layer {
       position: fixed;
       top: 0;
@@ -65,27 +65,27 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(circle at 15% 20%, rgba(231, 51, 57, 0.22) 0%, transparent 40%),
-        radial-gradient(circle at 85% 75%, rgba(0, 103, 177, 0.35) 0%, transparent 45%),
-        linear-gradient(180deg, rgba(13, 6, 56, 0.88) 0%, rgba(21, 9, 88, 0.94) 50%, rgba(13, 6, 56, 0.98) 100%),
+        radial-gradient(circle at 18% 15%, rgba(0, 140, 255, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 82% 78%, rgba(0, 103, 177, 0.45) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(4, 20, 46, 0.90) 0%, rgba(7, 38, 88, 0.93) 50%, rgba(3, 15, 36, 0.98) 100%),
         url('assets/images/real_hero_banner.jpg');
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
       z-index: 0;
-      filter: saturate(1.1);
+      filter: saturate(1.15);
     }
 
-    /* Ambient animated glow blobs */
+    /* Ambient animated glow blobs - Deep royal & azure blues */
     .glow-blob-1 {
       position: absolute;
       top: -100px;
       left: 50%;
       transform: translateX(-50%);
-      width: 600px;
-      height: 350px;
-      background: radial-gradient(ellipse, rgba(0, 103, 177, 0.45) 0%, transparent 70%);
-      filter: blur(50px);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0, 103, 177, 0.55) 0%, transparent 70%);
+      filter: blur(55px);
       z-index: 0;
       pointer-events: none;
       animation: pulseGlow 6s ease-in-out infinite alternate;
@@ -93,11 +93,11 @@
 
     .glow-blob-2 {
       position: absolute;
-      bottom: 10%;
-      right: -100px;
-      width: 450px;
-      height: 450px;
-      background: radial-gradient(ellipse, rgba(231, 51, 57, 0.25) 0%, transparent 70%);
+      bottom: 5%;
+      right: -80px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(0, 150, 255, 0.3) 0%, transparent 70%);
       filter: blur(60px);
       z-index: 0;
       pointer-events: none;
@@ -175,31 +175,31 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(231, 51, 57, 0.2);
-      border: 1px solid rgba(231, 51, 57, 0.5);
-      color: #ff9498;
+      background: rgba(0, 103, 177, 0.25);
+      border: 1px solid rgba(0, 140, 255, 0.5);
+      color: #93c5fd;
       padding: 6px 14px;
       border-radius: 9999px;
       font-size: 12.5px;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      box-shadow: 0 2px 10px rgba(231, 51, 57, 0.2);
+      box-shadow: 0 2px 12px rgba(0, 103, 177, 0.3);
     }
 
     .pulse-dot {
       width: 8px;
       height: 8px;
-      background-color: var(--ksa-red);
+      background-color: #38bdf8;
       border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(231, 51, 57, 0.7);
+      box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7);
       animation: pulseDot 2s infinite;
     }
 
     @keyframes pulseDot {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 51, 57, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(231, 51, 57, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(231, 51, 57, 0); }
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
     }
 
     /* Hero announcement section */
@@ -214,8 +214,8 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: linear-gradient(135deg, rgba(0, 103, 177, 0.4), rgba(21, 9, 88, 0.6));
-      border: 1px solid rgba(0, 103, 177, 0.5);
+      background: linear-gradient(135deg, rgba(0, 103, 177, 0.5), rgba(7, 38, 88, 0.75));
+      border: 1px solid rgba(0, 140, 255, 0.5);
       color: #93c5fd;
       padding: 8px 18px;
       border-radius: 999px;
@@ -383,7 +383,7 @@
     .icon-red { background: rgba(231, 51, 57, 0.25); border: 1px solid rgba(231, 51, 57, 0.5); }
     .icon-yellow { background: rgba(255, 196, 0, 0.25); border: 1px solid rgba(255, 196, 0, 0.5); }
     .icon-orange { background: rgba(237, 125, 52, 0.25); border: 1px solid rgba(237, 125, 52, 0.5); }
-    .icon-purple { background: rgba(147, 51, 234, 0.25); border: 1px solid rgba(147, 51, 234, 0.5); }
+    .icon-purple { background: rgba(6, 182, 212, 0.25); border: 1px solid rgba(6, 182, 212, 0.5); }
     .icon-green { background: rgba(34, 197, 94, 0.25); border: 1px solid rgba(34, 197, 94, 0.5); }
 
     .feature-title {
@@ -401,8 +401,8 @@
 
     /* Current Sunday Activities banner */
     .sunday-banner {
-      background: linear-gradient(135deg, rgba(21, 9, 88, 0.8) 0%, rgba(0, 103, 177, 0.4) 100%);
-      border: 1px solid rgba(0, 103, 177, 0.4);
+      background: linear-gradient(135deg, rgba(6, 30, 71, 0.92) 0%, rgba(0, 103, 177, 0.5) 100%);
+      border: 1px solid rgba(0, 140, 255, 0.45);
       border-radius: 20px;
       padding: 32px;
       margin-bottom: 48px;
