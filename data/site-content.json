@@ -261,15 +261,15 @@
   },
   "banner": {
     "hidden": false,
-    "targetIso": "2026-11-11T17:00:00.000Z"
+    "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T12:30:02.669Z",
+  "updatedAt": "2026-11-04T12:30:49.295Z",
   "shortcutsHidden": true,
   "mobile": {
     "texts": {
       "#tab-intro > div:nth-of-type(1) > h1:nth-of-type(1)": "\n          DÉ JEUGDBEWEGING VOOR <span>ALLE TOFFE MEISJES</span>!\n        ",
       "#tab-intro > div:nth-of-type(1) > p:nth-of-type(1)": "\n          Zondagnamiddag vol pleinspelen, bosspelen, vriendschap en een onvergetelijk zomerkamp.\n        ",
-      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "11 Nov 2026",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "10 Nov 2026",
       "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > h2:nth-of-type(1)": "HOLOLOOL&nbsp;",
       "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "📍 Dijk Zonhoven",
       "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)": "⏰ Deuren 18u00 •&nbsp;",
