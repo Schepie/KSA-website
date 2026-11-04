@@ -23,7 +23,14 @@
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/pwa-icon-512.png">
 
   <!-- Mobile App Stylesheet -->
-  <link rel="stylesheet" href="css/mobile.css?v=gh17">
+  <link rel="stylesheet" href="css/mobile.css?v=gh18">
+
+  <!-- Instant Standalone App Detection -->
+  <script>
+    if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches || localStorage.getItem('ksa_app_installed') === '1') {
+      document.documentElement.classList.add('ksa-standalone-mode');
+    }
+  </script>
 
   <!-- Automatic Device & Screen Detection -->
   <script src="js/device-detect.js"></script>

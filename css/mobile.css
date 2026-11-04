@@ -1480,6 +1480,22 @@ body.ksa-edit-mode-active .ksa-group-hidden {
 /* ==========================================================================
    PWA INSTALL BANNER & MODAL
    ========================================================================== */
+@media all and (display-mode: standalone) {
+  .pwa-install-banner,
+  .pwa-install-card,
+  #pwaInstallInfoCard,
+  #pwaInstallBanner {
+    display: none !important;
+  }
+}
+
+.ksa-standalone-mode .pwa-install-card,
+.ksa-standalone-mode #pwaInstallInfoCard,
+.ksa-standalone-mode .pwa-install-banner,
+.ksa-standalone-mode #pwaInstallBanner {
+  display: none !important;
+}
+
 .pwa-install-banner {
   position: fixed;
   bottom: calc(var(--bottom-nav-height) + 12px);

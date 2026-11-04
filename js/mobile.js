@@ -440,23 +440,27 @@ function initPwaInstall() {
   const bannerInstallBtn = document.getElementById('pwaBannerInstallBtn');
   const bannerCloseBtn = document.getElementById('pwaBannerCloseBtn');
   const manualInstallBtn = document.getElementById('pwaManualInstallBtn');
-  const statusText = document.getElementById('pwaInstallStatusText');
+  const infoCard = document.getElementById('pwaInstallInfoCard');
   const iosModal = document.getElementById('pwaIosModal');
   const iosCloseBtn = document.getElementById('pwaIosCloseBtn');
 
-  // Check of de app al geopend is als geïnstalleerde standalone app
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (isStandalone) {
+  function checkIsAppInstalled() {
+    if (window.matchMedia('(display-mode: standalone)').matches) return true;
+    if (window.navigator.standalone === true) return true;
+    if (document.referrer && document.referrer.includes('android-app://')) return true;
+    if (localStorage.getItem('ksa_app_installed') === '1') return true;
+    return false;
+  }
+
+  function hideAllInstallPrompts() {
     if (banner) banner.style.display = 'none';
-    if (manualInstallBtn) {
-      manualInstallBtn.disabled = true;
-      manualInstallBtn.innerHTML = '✅ Geïnstalleerd op startscherm';
-      manualInstallBtn.style.background = '#e2e8f0';
-      manualInstallBtn.style.color = '#334155';
-    }
-    if (statusText) {
-      statusText.textContent = 'Je gebruikt de KSA Zonhoven app nu rechtstreeks vanaf je startscherm!';
-    }
+    if (infoCard) infoCard.style.display = 'none';
+    document.documentElement.classList.add('ksa-standalone-mode');
+  }
+
+  // Als de app al geopend is als geïnstalleerde standalone app, verberg alle installatie-elementen
+  if (checkIsAppInstalled()) {
+    hideAllInstallPrompts();
     return;
   }
 
@@ -470,7 +474,7 @@ function initPwaInstall() {
 
     const dismissedUntil = localStorage.getItem('ksa_pwa_dismissed');
     if (!dismissedUntil || Date.now() > parseInt(dismissedUntil, 10)) {
-      if (banner) banner.style.display = 'block';
+      if (banner && !checkIsAppInstalled()) banner.style.display = 'block';
     }
   });
 
@@ -479,10 +483,8 @@ function initPwaInstall() {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        if (banner) banner.style.display = 'none';
-        if (manualInstallBtn) {
-          manualInstallBtn.innerHTML = '✅ App wordt geïnstalleerd!';
-        }
+        localStorage.setItem('ksa_app_installed', '1');
+        hideAllInstallPrompts();
       }
       deferredPrompt = null;
     } else if (isIos) {
@@ -517,10 +519,7 @@ function initPwaInstall() {
   }
 
   window.addEventListener('appinstalled', () => {
-    if (banner) banner.style.display = 'none';
-    if (manualInstallBtn) {
-      manualInstallBtn.disabled = true;
-      manualInstallBtn.innerHTML = '✅ App geïnstalleerd!';
-    }
+    localStorage.setItem('ksa_app_installed', '1');
+    hideAllInstallPrompts();
   });
 }
