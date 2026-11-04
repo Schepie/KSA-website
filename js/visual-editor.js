@@ -382,12 +382,146 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
   }
 
+  function convertDesktopCalToMobileList(calGridHtml) {
+    if (!calGridHtml || typeof calGridHtml !== 'string') return '';
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<div>${calGridHtml}</div>`, 'text/html');
+      const items = doc.querySelectorAll('.cal-item');
+      if (!items || items.length === 0) return '';
+
+      const monthNames = {
+        '1': 'JAN', '01': 'JAN',
+        '2': 'FEB', '02': 'FEB',
+        '3': 'MRT', '03': 'MRT',
+        '4': 'APR', '04': 'APR',
+        '5': 'MEI', '05': 'MEI',
+        '6': 'JUN', '06': 'JUN',
+        '7': 'JULI', '07': 'JULI',
+        '8': 'AUG', '08': 'AUG',
+        '9': 'SEP', '09': 'SEP',
+        '10': 'OKT',
+        '11': 'NOV',
+        '12': 'DEC'
+      };
+
+      const mobileCards = [];
+
+      items.forEach(item => {
+        const dateEl = item.querySelector('.cal-date');
+        let rawDate = dateEl ? (dateEl.innerText || dateEl.textContent).replace('!', '').trim() : '';
+        let day = '01';
+        let monthStr = 'KSA';
+
+        if (rawDate.includes('/')) {
+          const parts = rawDate.split('/');
+          const dPart = parts[0].trim();
+          const mPart = parts[1].trim();
+          day = dPart.length === 1 ? '0' + dPart : dPart;
+          monthStr = monthNames[mPart] || mPart;
+        } else if (rawDate) {
+          day = rawDate;
+        }
+
+        const stickerEl = item.querySelector('.cal-sticker');
+        const sticker = stickerEl ? (stickerEl.innerText || stickerEl.textContent).trim() : '';
+
+        const textEl = item.querySelector('.cal-event-text');
+        let title = textEl ? (textEl.innerText || textEl.textContent).replace(/\n+/g, ' ').trim() : 'KSA';
+        if (!title) title = 'KSA';
+
+        const isCurrent = item.classList.contains('is-current') || !!item.querySelector('.cal-pill-now');
+        const isPast = item.classList.contains('is-past');
+
+        const lowerTitle = title.toLowerCase();
+        const isGeenKsa = lowerTitle.includes('geen ksa');
+        const isHololool = lowerTitle.includes('hololool') || sticker === '🔥';
+        const isKerst = lowerTitle.includes('kerst') || sticker === '🎅';
+        const isSint = lowerTitle.includes('sint') || sticker === '👑';
+        const isSpaghetti = lowerTitle.includes('spaghetti') || sticker === '🍝';
+        const isKamp = lowerTitle.includes('kamp') || sticker === '⛺';
+
+        let category = 'ksa';
+        let badgeHtml = '<span class="cal-event-badge badge-active">13u30 - 17u00</span>';
+        let subtext = 'Aan ons lokaal &bull; Dijkbeemdenweg 8';
+        let dateBlockStyle = '';
+
+        if (isGeenKsa) {
+          category = 'special';
+          badgeHtml = '<span class="cal-event-badge badge-none">Geen KSA</span>';
+          subtext = 'Geen KSA activiteit deze zondag';
+          dateBlockStyle = 'style="background:#f1f5f9; color:#64748b;"';
+        } else if (isCurrent) {
+          badgeHtml = '<span class="cal-event-badge badge-highlight">Binnenkort!</span>';
+        } else if (isPast) {
+          badgeHtml = '<span class="cal-event-badge badge-none">Reeds voorbij</span>';
+          dateBlockStyle = 'style="background:#f1f5f9; color:#94a3b8;"';
+        }
+
+        if (isHololool) {
+          category = 'special';
+          if (!isCurrent && !isPast) badgeHtml = '<span class="cal-event-badge badge-highlight">Hololool!</span>';
+          subtext = 'Samen rond het vuur &bull; Gezelligheid!';
+          dateBlockStyle = 'style="background:#fef3c7; color:#d97706;"';
+        } else if (isKerst) {
+          category = 'special';
+          if (!isCurrent && !isPast) badgeHtml = '<span class="cal-event-badge badge-highlight">Kerstfeestje!</span>';
+          subtext = 'Gezellig samen kerst vieren aan ons lokaal';
+          dateBlockStyle = 'style="background:var(--ksa-red-soft); color:var(--ksa-red);"';
+        } else if (isSint) {
+          category = 'special';
+          if (!isCurrent && !isPast) badgeHtml = '<span class="cal-event-badge badge-active">Sint op bezoek!</span>';
+          subtext = '13u30 tot 17u00 &bull; Hoog bezoek aan ons lokaal!';
+          dateBlockStyle = 'style="background:var(--ksa-red-soft); color:var(--ksa-red);"';
+        } else if (isSpaghetti) {
+          category = 'special';
+          if (!isCurrent && !isPast) badgeHtml = '<span class="cal-event-badge badge-highlight">Spaghettidag</span>';
+          subtext = 'Lekker eten & gezelligheid aan ons lokaal';
+          dateBlockStyle = 'style="background:var(--ksa-yellow-soft); color:#b45309;"';
+        } else if (isKamp) {
+          category = 'special';
+          if (!isCurrent && !isPast) badgeHtml = '<span class="cal-event-badge badge-highlight">Zomerkamp!</span>';
+          subtext = 'Het absolute hoogtepunt van ons KSA-jaar!';
+          dateBlockStyle = 'style="background:var(--ksa-blue-soft); color:var(--ksa-blue);"';
+        } else if (sticker || (lowerTitle !== 'ksa' && !isGeenKsa)) {
+          category = 'special';
+        }
+
+        let fullTitle = title;
+        if (sticker && !fullTitle.includes(sticker)) {
+          fullTitle = `${fullTitle} ${sticker}`;
+        }
+
+        mobileCards.push(`
+        <div class="cal-card-item ${isCurrent ? 'is-current' : ''} ${isPast ? 'is-past' : ''}" data-category="${category}">
+          <div class="cal-date-block" ${dateBlockStyle}>
+            <span class="cal-day-num">${day}</span>
+            <span class="cal-month-str">${monthStr}</span>
+          </div>
+          <div class="cal-info-block">
+            <div class="cal-event-title-row">
+              <span class="cal-event-name">${fullTitle}</span>
+              ${badgeHtml}
+            </div>
+            <div class="cal-event-subtext">${subtext}</div>
+          </div>
+        </div>`);
+      });
+
+      return mobileCards.join('\n');
+    } catch (err) {
+      console.warn('[KSA Visual Editor] Fout bij converteren desktop kalender naar mobiel:', err);
+      return '';
+    }
+  }
+
   function applyStateToDom(state) {
     if (!state || typeof state !== 'object') return;
     ensureJimSimCircles();
     const isMobilePage = window.location.pathname.includes('mobile.html');
     const pageKey = isMobilePage ? 'mobile' : 'desktop';
     const pageData = state[pageKey] || {};
+    const desktopData = state.desktop || {};
 
     // 1. Leeftijdsgroepen data (Kabouters, Sloebers, Roodkapjes, JIM, SIM, KIM)
     if (state.groups && typeof state.groups === 'object') {
@@ -436,6 +570,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     // 2. Sectie-containers (Kalender, Nieuws, Paspoortjes)
     if (pageData.containers) {
       Object.entries(pageData.containers).forEach(([selector, html]) => {
+        if (isMobilePage && selector === '.cal-list') return;
         const el = querySmartSelector(selector);
         if (el && html) {
           el.innerHTML = html;
@@ -446,6 +581,24 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           }
         }
       });
+    }
+
+    // 2b. Synchroniseer Kalender van Desktop naar Mobiel
+    if (isMobilePage) {
+      const desktopContainers = desktopData.containers || {};
+      const calGridHtml = desktopContainers['.cal-grid'];
+      if (calGridHtml) {
+        const calList = document.querySelector('.cal-list');
+        if (calList) {
+          const convertedMobileCal = convertDesktopCalToMobileList(calGridHtml);
+          if (convertedMobileCal) {
+            calList.innerHTML = convertedMobileCal;
+            if (typeof window.initCalendarFilters === 'function') {
+              window.initCalendarFilters();
+            }
+          }
+        }
+      }
     }
 
     // 3. Tekst-elementen
@@ -460,8 +613,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
 
     // 4. Foto's per selector (elke foto is 100% onafhankelijk!)
-    if (pageData.images) {
-      Object.entries(pageData.images).forEach(([selector, src]) => {
+    const imagesToApply = Object.assign({}, desktopData.images || {}, pageData.images || {});
+    if (Object.keys(imagesToApply).length > 0) {
+      Object.entries(imagesToApply).forEach(([selector, src]) => {
         if (isGroupManagedSelector(selector)) return;
         const img = querySmartSelector(selector);
         if (img && src) {
@@ -1077,6 +1231,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     document.getElementById('ksaBtnGithubConfig').onclick = openGithubConfigModal;
     document.getElementById('ksaBtnResetEdits').onclick = resetAllEdits;
 
+    const isMobilePage = window.location.pathname.includes('mobile.html');
+    if (isMobilePage) {
+      const topbarBtn = document.getElementById('ksaBtnEditTopbar');
+      if (topbarBtn) topbarBtn.style.display = 'none';
+      const hintEl = dock.querySelector('.ksa-dock-hint');
+      if (hintEl) {
+        hintEl.innerHTML = '📱 <strong>Mobiele bewerk-modus:</strong> Wijzigingen in groepen, foto\'s en mobiele teksten worden gesynchroniseerd. De <strong>kalender</strong> wordt automatisch overgenomen van de desktop!';
+      }
+    }
+
     if (window.location.search.includes('edit=1') || window.location.hash === '#edit') {
       promptAndEnableEditMode();
     }
@@ -1194,10 +1358,6 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       '.event-title',
       '.event-media-badge',
       '.event-meta div',
-      '.cal-day-num',
-      '.cal-month-str',
-      '.cal-event-name',
-      '.cal-event-subtext',
       '#mGroupName',
       '#mGroupAge',
       '#mGroupTagline',
@@ -2251,8 +2411,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       containers: {}
     };
 
-    // Maak een schone kopie van de containers zonder contenteditable attributen
-    ['#ksaTopbar', '.hero-cta-group', '.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
+    // Maak een schone kopie van de containers zonder contenteditable attributen (hoofdcontainers worden op desktop beheerd en live gesynchroniseerd naar mobiel)
+    const containerSelectors = isMobilePage ? [] : ['#ksaTopbar', '.hero-cta-group', '.cal-grid', '.news-grid', '.paspoort-grid'];
+    containerSelectors.forEach(sel => {
       const c = document.querySelector(sel);
       if (c) {
         const clone = c.cloneNode(true);
