@@ -579,7 +579,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       Object.entries(pageData.containers).forEach(([selector, html]) => {
         if (isMobilePage && selector === '.cal-list') return;
         const el = querySmartSelector(selector);
-        if (el && html) {
+        if (el && typeof html === 'string') {
           el.innerHTML = html;
           // Zorg dat buiten Edit Mode geen contenteditable achterblijft
           if (!isEditMode) {
@@ -588,6 +588,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           }
         }
       });
+      updateShortcutsVisibility();
     }
 
     // 2b. Synchroniseer Kalender van Desktop naar Mobiel
@@ -1493,14 +1494,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     document.querySelectorAll('.shortcut-icon-bubble').forEach(bubble => {
       bubble.style.cursor = 'pointer';
-      bubble.title = '🎨 Klik om dit icoon aan te passen';
+      bubble.title = '🎨 Klik om dit icoon of instellingen aan te passen';
       if (!bubble.dataset.ksaBound) {
         bubble.dataset.ksaBound = '1';
         bubble.addEventListener('click', (e) => {
           if (!isEditMode) return;
           e.preventDefault();
           e.stopPropagation();
-          openShortcutIconModal(bubble);
+          const tile = bubble.closest('.shortcut-tile');
+          if (tile) openShortcutSettingsModal(tile);
+          else openShortcutIconModal(bubble);
         });
       }
     });
@@ -1508,8 +1511,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectBannerControlBar();
     injectGroupPillsControlBar();
     injectCardEditTools();
+    injectShortcutTools();
     injectTopbarEditTools();
     injectButtonGroupTools();
+    injectShortcutTools();
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
       el.style.display = '';
     });
@@ -1591,6 +1596,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
     const calNotice = document.getElementById('ksaMobileCalNotice');
     if (calNotice) calNotice.remove();
+
+    document.querySelectorAll('.ksa-shortcut-tools, .shortcut-tile-add').forEach(el => el.remove());
+    updateShortcutsVisibility();
 
     const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
     if (mobHeaderBtn) {
@@ -2269,6 +2277,274 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
   }
 
+  function updateShortcutsVisibility() {
+    const grid = document.querySelector('.shortcuts-grid');
+    if (!grid) return;
+    const head = document.getElementById('shortcutsSectionHead') || grid.previousElementSibling;
+    const tileCount = grid.querySelectorAll('.shortcut-tile:not(.shortcut-tile-add)').length;
+    if (!isEditMode && tileCount === 0) {
+      grid.style.display = 'none';
+      if (head && head.classList.contains('app-section-head')) head.style.display = 'none';
+    } else {
+      grid.style.display = '';
+      if (head && head.classList.contains('app-section-head')) head.style.display = '';
+    }
+  }
+
+  function injectShortcutTools() {
+    const grid = document.querySelector('.shortcuts-grid');
+    if (!grid) return;
+
+    // 1. Voeg op elke bestaande tegel de bewerk-knoppen toe (als nog niet aanwezig)
+    grid.querySelectorAll('.shortcut-tile:not(.shortcut-tile-add)').forEach(tile => {
+      if (tile.querySelector('.ksa-shortcut-tools')) return;
+
+      const tools = document.createElement('div');
+      tools.className = 'ksa-shortcut-tools';
+      tools.innerHTML = `
+        <button type="button" class="ksa-shortcut-btn" data-act="settings" title="Doel, link of kleur aanpassen">⚙️</button>
+        <button type="button" class="ksa-shortcut-btn ksa-shortcut-btn-del" data-act="del" title="Verwijder deze knop">🗑️</button>
+      `;
+
+      tools.querySelector('[data-act="settings"]').onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openShortcutSettingsModal(tile);
+      };
+
+      tools.querySelector('[data-act="del"]').onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const titleEl = tile.querySelector('.shortcut-title');
+        const name = titleEl ? titleEl.textContent.trim() : 'deze knop';
+        if (confirm(`Weet je zeker dat je de knop '${name}' wilt verwijderen?`)) {
+          tile.remove();
+          updateShortcutsVisibility();
+        }
+      };
+
+      tile.appendChild(tools);
+    });
+
+    // 2. Voeg de "+ Knop Toevoegen" tegel toe als hij er nog niet is
+    if (!grid.querySelector('.shortcut-tile-add')) {
+      const addTile = document.createElement('div');
+      addTile.className = 'shortcut-tile shortcut-tile-add';
+      addTile.title = 'Voeg een extra snelle toegang knop toe';
+      addTile.innerHTML = `
+        <div class="shortcut-icon-bubble" style="background:#f1f5f9; color:#0284c7; font-size:1.4rem;">➕</div>
+        <span class="shortcut-title" style="color:var(--ksa-blue, #002B49); font-weight:800;">Knop Toevoegen</span>
+        <span class="shortcut-desc">Extra tegel in raster</span>
+      `;
+      addTile.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addNewShortcutTile();
+      };
+      grid.appendChild(addTile);
+    }
+
+    updateShortcutsVisibility();
+  }
+
+  function addNewShortcutTile() {
+    const grid = document.querySelector('.shortcuts-grid');
+    if (!grid) return;
+
+    const addBtn = grid.querySelector('.shortcut-tile-add');
+    const newTile = document.createElement('div');
+    newTile.className = 'shortcut-tile';
+    newTile.setAttribute('data-switch-tab', 'agenda');
+    newTile.innerHTML = `
+      <div class="shortcut-icon-bubble" style="background:var(--ksa-blue-soft); color:var(--ksa-blue);">⭐</div>
+      <span class="shortcut-title">Nieuwe Knop</span>
+      <span class="shortcut-desc">Klik om te openen</span>
+    `;
+
+    if (addBtn) {
+      grid.insertBefore(newTile, addBtn);
+    } else {
+      grid.appendChild(newTile);
+    }
+
+    enableEditMode();
+    openShortcutSettingsModal(newTile);
+  }
+
+  function openShortcutSettingsModal(tile) {
+    if (!tile) return;
+    const titleEl = tile.querySelector('.shortcut-title');
+    const descEl = tile.querySelector('.shortcut-desc');
+    const bubble = tile.querySelector('.shortcut-icon-bubble');
+
+    const curTitle = titleEl ? titleEl.textContent.trim() : '';
+    const curDesc = descEl ? descEl.textContent.trim() : '';
+    const curEmoji = bubble ? bubble.textContent.trim() : '⭐';
+    const curSwitchTab = tile.getAttribute('data-switch-tab') || '';
+    const curHref = tile.getAttribute('data-href') || '';
+    const curTargetMode = curHref ? 'custom' : (curSwitchTab || 'agenda');
+
+    const colorPresets = [
+      { id: 'blue', label: 'Blauw', bg: 'var(--ksa-blue-soft)', color: 'var(--ksa-blue)', swatch: '#e0f2fe' },
+      { id: 'yellow', label: 'Geel/Oranje', bg: '#fef7e6', color: '#d97706', swatch: '#fef7e6' },
+      { id: 'red', label: 'Rood', bg: '#fde8e9', color: '#e3001b', swatch: '#fde8e9' },
+      { id: 'green', label: 'Groen', bg: '#ecfdf5', color: '#059669', swatch: '#ecfdf5' },
+      { id: 'purple', label: 'Paars', bg: '#f3e8ff', color: '#7c3aed', swatch: '#f3e8ff' },
+      { id: 'gray', label: 'Grijs', bg: '#f1f5f9', color: '#475569', swatch: '#f1f5f9' }
+    ];
+
+    const iconPresets = [
+      { emoji: '📅', label: 'Kalender' },
+      { emoji: '🎒', label: 'Groepen' },
+      { emoji: '👑', label: 'Leiding' },
+      { emoji: '📝', label: 'Info' },
+      { emoji: '🔥', label: 'Vuur' },
+      { emoji: '🏕️', label: 'Kamp' },
+      { emoji: '🎈', label: 'Sloeber' },
+      { emoji: '🧭', label: 'Kompas' },
+      { emoji: '⚡', label: 'Sim' },
+      { emoji: '📸', label: 'Foto' },
+      { emoji: '🍝', label: 'Eten' },
+      { emoji: '💌', label: 'Contact' },
+      { emoji: '⭐', label: 'Ster' },
+      { emoji: '🎉', label: 'Feest' },
+      { emoji: '💙', label: 'KSA Blauw' },
+      { emoji: '❤️', label: 'KSA Rood' },
+      { emoji: '🏆', label: 'Wedstrijd' },
+      { emoji: 'ℹ️', label: 'Informatie' },
+      { emoji: '📱', label: 'App' },
+      { emoji: '🎟️', label: 'Tickets' }
+    ];
+
+    let selectedBg = bubble ? bubble.style.background : 'var(--ksa-blue-soft)';
+    let selectedColor = bubble ? bubble.style.color : 'var(--ksa-blue)';
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    modal.innerHTML = `
+      <h3>⚡ Snelle Toegang Knop Bewerken</h3>
+      
+      <label for="ksaShortcutTitleInput">Titel van de knop:</label>
+      <input type="text" id="ksaShortcutTitleInput" value="${curTitle.replace(/"/g, '&quot;')}" placeholder="Bv. Officiële Kalender">
+
+      <label for="ksaShortcutDescInput">Korte beschrijving (ondertitel):</label>
+      <input type="text" id="ksaShortcutDescInput" value="${curDesc.replace(/"/g, '&quot;')}" placeholder="Bv. Wanneer is het KSA?">
+
+      <label>Icoon (Emoji):</label>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <input type="text" id="ksaShortcutEmojiInput" value="${curEmoji}" style="width:65px; font-size:1.6rem; text-align:center; padding:4px; border-radius:8px; border:1px solid #cbd5e1;">
+        <span style="font-size:12px; color:#64748b;">Kies hieronder of typ een eigen emoji</span>
+      </div>
+      <div class="ksa-sticker-grid" style="max-height:115px; overflow-y:auto; margin-bottom:14px; border:1px solid #e2e8f0; padding:6px; border-radius:8px;">
+        ${iconPresets.map(p => `
+          <button type="button" class="ksa-sticker-choice" data-emoji="${p.emoji}" style="padding:6px 2px;">
+            <div style="font-size:1.3rem;">${p.emoji}</div>
+            <span style="font-size:10px;">${p.label}</span>
+          </button>
+        `).join('')}
+      </div>
+
+      <label>Icoon Kleur:</label>
+      <div id="ksaColorChoiceRow" style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+        ${colorPresets.map(c => `
+          <button type="button" class="ksa-color-pill-btn" data-bg="${c.bg}" data-color="${c.color}" style="background:${c.swatch}; color:${c.color}; border:1px solid #cbd5e1; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">
+            ${c.label}
+          </button>
+        `).join('')}
+      </div>
+
+      <label for="ksaShortcutTargetSelect">Waar moet de knop naartoe gaan?</label>
+      <select id="ksaShortcutTargetSelect" style="width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; font-size:13.5px; margin-bottom:10px; background:#fff;">
+        <option value="agenda" ${curTargetMode === 'agenda' ? 'selected' : ''}>📅 Kalender / Agenda tabblad</option>
+        <option value="groepen" ${curTargetMode === 'groepen' ? 'selected' : ''}>🎒 5 Groepen tabblad</option>
+        <option value="leiding" ${curTargetMode === 'leiding' ? 'selected' : ''}>👑 De Leidingploeg tabblad</option>
+        <option value="info" ${curTargetMode === 'info' ? 'selected' : ''}>📝 Inschrijven & Info tabblad</option>
+        <option value="custom" ${curTargetMode === 'custom' ? 'selected' : ''}>🌐 Eigen weblink / URL (bv. inschrijving of externe pagina)</option>
+      </select>
+
+      <div id="ksaShortcutUrlWrap" style="display:${curTargetMode === 'custom' ? 'block' : 'none'}; margin-bottom:14px;">
+        <label for="ksaShortcutUrlInput">Webadres (URL):</label>
+        <input type="text" id="ksaShortcutUrlInput" value="${curHref.replace(/"/g, '&quot;')}" placeholder="Bv. https://instagram.com/ksa_zonhoven of https://...">
+      </div>
+
+      <div class="ksa-editor-modal-actions" style="justify-content:space-between; margin-top:16px;">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaShortcutModalDelete" style="background:#fee2e2; color:#b91c1c; border-color:#fca5a5;">🗑️ Verwijder knop</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaShortcutModalCancel">Annuleren</button>
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaShortcutModalSave">✔️ Opslaan</button>
+        </div>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    // Emoji preset click handlers
+    modal.querySelectorAll('.ksa-sticker-choice').forEach(btn => {
+      btn.onclick = () => {
+        document.getElementById('ksaShortcutEmojiInput').value = btn.getAttribute('data-emoji');
+      };
+    });
+
+    // Color choices click handlers
+    modal.querySelectorAll('.ksa-color-pill-btn').forEach(btn => {
+      btn.onclick = () => {
+        selectedBg = btn.getAttribute('data-bg');
+        selectedColor = btn.getAttribute('data-color');
+        modal.querySelectorAll('.ksa-color-pill-btn').forEach(b => b.style.outline = 'none');
+        btn.style.outline = '2px solid #2563eb';
+      };
+    });
+
+    // Target select dropdown change
+    const targetSelect = document.getElementById('ksaShortcutTargetSelect');
+    const urlWrap = document.getElementById('ksaShortcutUrlWrap');
+    targetSelect.onchange = () => {
+      urlWrap.style.display = targetSelect.value === 'custom' ? 'block' : 'none';
+    };
+
+    // Delete button
+    document.getElementById('ksaShortcutModalDelete').onclick = () => {
+      if (confirm('Weet je zeker dat je deze knop wilt verwijderen?')) {
+        tile.remove();
+        updateShortcutsVisibility();
+        backdrop.style.display = 'none';
+      }
+    };
+
+    // Cancel button
+    document.getElementById('ksaShortcutModalCancel').onclick = () => {
+      backdrop.style.display = 'none';
+    };
+
+    // Save button
+    document.getElementById('ksaShortcutModalSave').onclick = () => {
+      const newTitle = document.getElementById('ksaShortcutTitleInput').value.trim();
+      const newDesc = document.getElementById('ksaShortcutDescInput').value.trim();
+      const newEmoji = document.getElementById('ksaShortcutEmojiInput').value.trim() || '⭐';
+      const newTarget = targetSelect.value;
+      const newUrl = document.getElementById('ksaShortcutUrlInput').value.trim();
+
+      if (titleEl) titleEl.textContent = newTitle || 'Knop';
+      if (descEl) descEl.textContent = newDesc;
+      if (bubble) {
+        bubble.textContent = newEmoji;
+        if (selectedBg) bubble.style.background = selectedBg;
+        if (selectedColor) bubble.style.color = selectedColor;
+      }
+
+      if (newTarget === 'custom') {
+        tile.removeAttribute('data-switch-tab');
+        tile.setAttribute('data-href', newUrl || '#');
+      } else {
+        tile.removeAttribute('data-href');
+        tile.setAttribute('data-switch-tab', newTarget);
+      }
+
+      backdrop.style.display = 'none';
+      enableEditMode();
+      updateShortcutsVisibility();
+    };
+  }
+
   function ensureCalStickerSlot(item) {
     if (!item) return;
     const card = item.querySelector('.cal-card');
@@ -2585,7 +2861,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const clone = c.cloneNode(true);
         clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
         clone.querySelectorAll('.ksa-editable-img').forEach(el => el.classList.remove('ksa-editable-img'));
-        clone.querySelectorAll('.ksa-card-edit-tools, .ksa-topbar-edit-pill, #ksaTopbarEditBtn, .ksa-btn-add-pill').forEach(el => el.remove());
+        clone.querySelectorAll('.ksa-card-edit-tools, .ksa-topbar-edit-pill, #ksaTopbarEditBtn, .ksa-btn-add-pill, .ksa-shortcut-tools, .shortcut-tile-add').forEach(el => el.remove());
         pageData.containers[sel] = clone.innerHTML;
       }
     });
@@ -2681,6 +2957,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
 
     injectCardEditTools();
+    injectShortcutTools();
     saveBtn.disabled = false;
     saveBtn.innerHTML = githubSuccess ? '✅ Live gepubliceerd op GitHub!' : '✅ Lokaal Opgeslagen!';
     setTimeout(() => { saveBtn.innerHTML = origText; }, 3500);

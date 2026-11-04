@@ -178,17 +178,29 @@ function initMobileNavigation() {
     });
   });
 
-  // Bind any in-page trigger buttons (e.g. data-switch-tab="agenda") via event delegation
+  // Bind in-page trigger buttons (e.g. data-switch-tab="agenda" of shortcut data-href) via event delegation
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-switch-tab]');
+    const btn = e.target.closest('[data-switch-tab], .shortcut-tile[data-href]');
     if (!btn) return;
     if (document.body.classList.contains('ksa-edit-mode-active')) {
-      // In Edit Mode: voorkom tab-wissel zodat iconen en teksten bewerkt kunnen worden
+      // In Edit Mode: voorkom actie zodat knoppen en teksten bewerkt kunnen worden
       return;
     }
-    e.preventDefault();
+    const href = btn.getAttribute('data-href');
+    if (href) {
+      e.preventDefault();
+      if (href.startsWith('#')) {
+        activateTab(href.replace('#', ''));
+      } else {
+        window.open(href, href.startsWith('http') ? '_blank' : '_self');
+      }
+      return;
+    }
     const target = btn.getAttribute('data-switch-tab');
-    if (target) activateTab(target);
+    if (target) {
+      e.preventDefault();
+      activateTab(target);
+    }
   });
 
   // Check URL parameter (?tab=) or hash (#...) on initial load

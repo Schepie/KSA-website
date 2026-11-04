@@ -590,6 +590,62 @@ body.ksa-edit-mode-active .ksa-header-edit-btn {
   flex-direction: column;
   align-items: flex-start;
   transition: transform 0.15s ease;
+  position: relative;
+}
+
+.ksa-shortcut-tools {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.ksa-shortcut-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.ksa-shortcut-btn:active {
+  transform: scale(0.92);
+}
+
+.ksa-shortcut-btn-del {
+  color: #e3001b;
+  border-color: #fca5a5;
+  background: #fff5f5;
+}
+
+.shortcut-tile.shortcut-tile-add {
+  border: 2px dashed #93c5fd;
+  background: rgba(239, 246, 255, 0.6);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 110px;
+}
+
+.shortcut-tile.shortcut-tile-add:active {
+  transform: scale(0.97);
+  background: #eff6ff;
+}
+
+body:not(.ksa-edit-mode-active) .shortcut-tile-add,
+body:not(.ksa-edit-mode-active) .ksa-shortcut-tools {
+  display: none !important;
 }
 
 .shortcut-tile:active {
