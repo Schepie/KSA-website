@@ -3,14 +3,109 @@
  * Logic for navigation tabs, group switching, countdown, lightbox, filters & PWA install.
  */
 
-// Register Service Worker for PWA installability
-if ('serviceWorker' in navigator) {
+/* ==========================================================================
+   0. SERVICE WORKER & AUTOMATISCHE PWA APP UPDATES
+   ========================================================================== */
+let refreshing = false;
+
+function showAppUpdateNotification(reg) {
+  if (document.getElementById('ksaPwaUpdateToast')) return;
+
+  const toast = document.createElement('div');
+  toast.id = 'ksaPwaUpdateToast';
+  toast.className = 'pwa-update-toast';
+  toast.setAttribute('role', 'alert');
+  toast.innerHTML = `
+    <div class="pwa-update-toast-content">
+      <div class="pwa-update-icon">✨</div>
+      <div class="pwa-update-text">
+        <strong>Nieuwe versie beschikbaar!</strong>
+        <span>Tik om direct bij te werken</span>
+      </div>
+      <button type="button" class="pwa-update-btn" id="pwaUpdateBtn">Vernieuwen</button>
+      <button type="button" class="pwa-update-close" id="pwaUpdateClose" aria-label="Sluiten">✕</button>
+    </div>
+  `;
+
+  document.body.appendChild(toast);
+
+  const updateBtn = document.getElementById('pwaUpdateBtn');
+  const closeBtn = document.getElementById('pwaUpdateClose');
+
+  if (updateBtn) {
+    updateBtn.addEventListener('click', () => {
+      updateBtn.disabled = true;
+      updateBtn.textContent = 'Bezig...';
+      if (reg && reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } else {
+        window.location.reload();
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      toast.remove();
+    });
+  }
+}
+
+function registerServiceWorkerWithAutoUpdate() {
+  if (!('serviceWorker' in navigator)) return;
+
+  // Luister naar controllerwisseling (nieuwe service worker is geactiveerd) -> herlaad de app één keer
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
+
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('[PWA] Service Worker geregistreerd:', reg.scope))
-      .catch(err => console.warn('[PWA] Service Worker registratie mislukt:', err));
+      .then((reg) => {
+        console.log('[PWA] Service Worker geregistreerd:', reg.scope);
+
+        // 1. Controleer of er al een nieuwe worker in de wachtrij staat
+        if (reg.waiting) {
+          showAppUpdateNotification(reg);
+        }
+
+        // 2. Ontdek nieuwe versies op de achtergrond
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showAppUpdateNotification(reg);
+            }
+          });
+        });
+
+        // 3. Proactief direct controleren op updates bij openen
+        reg.update().catch(() => {});
+
+        // 4. Controleer op updates zodra de gebruiker terugkeert naar de app
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            reg.update().catch(() => {});
+          }
+        });
+
+        // 5. Periodieke updatecheck elke 15 minuten als de app open blijft staan
+        setInterval(() => {
+          reg.update().catch(() => {});
+        }, 15 * 60 * 1000);
+      })
+      .catch((err) => {
+        console.warn('[PWA] Service Worker registratie mislukt:', err);
+      });
   });
 }
+
+registerServiceWorkerWithAutoUpdate();
 
 document.addEventListener('DOMContentLoaded', () => {
   initMobileNavigation();

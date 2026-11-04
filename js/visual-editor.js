@@ -2685,4 +2685,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectEditorUI();
     loadAndApplySiteContent();
   }
+
+  // Automatische inhoud-synchronisatie zodra de app/tab weer actief wordt
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !isEditMode) {
+      loadAndApplySiteContent();
+    }
+  });
 })();

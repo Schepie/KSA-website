@@ -1655,3 +1655,86 @@ body.ksa-edit-mode-active .ksa-group-hidden {
   font-size: 0.9rem;
   cursor: pointer;
 }
+
+/* PWA Live Update Toast Notification */
+.pwa-update-toast {
+  position: fixed;
+  top: calc(var(--header-height) + 12px);
+  left: 12px;
+  right: 12px;
+  max-width: 440px;
+  margin: 0 auto;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 14px;
+  z-index: 2000;
+  animation: pwaSlideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pwa-update-toast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pwa-update-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.pwa-update-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-update-text strong {
+  font-size: 0.86rem;
+  color: #ffffff;
+}
+
+.pwa-update-text span {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.pwa-update-btn {
+  background: var(--ksa-red);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.pwa-update-btn:active {
+  transform: scale(0.95);
+}
+
+.pwa-update-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+@keyframes pwaSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

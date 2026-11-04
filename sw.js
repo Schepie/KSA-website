@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ksa-app-v2';
+const CACHE_NAME = 'ksa-app-v3';
 const STATIC_ASSETS = [
   './mobile.html',
   './manifest.json',
@@ -17,14 +17,14 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch((err) => {
-        console.warn('[SW] Niet alle statische bestanden konden direct worden gecachet:', err);
+        console.warn('[SW] Pre-cache gedeeltelijk gelukt:', err);
       });
     })
   );
   self.skipWaiting();
 });
 
-// Activate: clean up older caches
+// Activate: ruim oude caches direct op
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -40,12 +40,27 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network first (altijd meest actuele website), cache fallback offline
+// Luister naar expliciet update-commando vanuit de app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// Fetch: Netwerk-eerst (altijd meest actuele website), val terug op cache bij geen internet
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  // Sla externe API's / form endpoints over
+  // Inhoud van de website (data/site-content.json) en GitHub API's ALTIJD vers ophalen
+  if (url.pathname.includes('site-content.json') || url.hostname.includes('github')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Sla externe diensten / mail forms over
   if (url.origin !== location.origin) return;
 
   event.respondWith(
@@ -69,4 +84,3 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
-
