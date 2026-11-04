@@ -214,7 +214,7 @@ img {
 .brand-local-name {
   font-family: var(--font-heading);
   font-size: 1.7rem;
-  line-height: 0.9;
+  line-height: 1;
   color: var(--ksa-blue);
   letter-spacing: 1px;
 }
