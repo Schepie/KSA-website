@@ -24,14 +24,16 @@
 <body>
 
   <!-- KSA.BE Topbar -->
-  <div class="ksa-topbar">
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-      <div class="ksa-topbar-left">
-        <span class="ksa-topbar-badge">KSA LIMBURG</span>
-        <span>Aangesloten bij <strong>KSA Nationaal</strong> &bull; <a href="https://www.ksa.be" target="_blank" rel="noopener">www.ksa.be</a></span>
+  <div class="ksa-topbar" id="ksaTopbar">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:8px;">
+      <div class="ksa-topbar-left" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="ksa-topbar-badge" id="topbarBadge">KSA LIMBURG</span>
+        <span class="ksa-topbar-desc" id="topbarDesc">Aangesloten bij <strong>KSA Nationaal</strong> &bull;</span>
+        <a href="https://www.ksa.be" target="_blank" rel="noopener" id="topbarLinkLeft" class="topbar-link">www.ksa.be</a>
       </div>
-      <div>
-        <span>🎃 <strong>HalloKien 2026:</strong> <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener">Bestel tickets via Ravotshop &rarr;</a></span>
+      <div class="ksa-topbar-right" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span class="ksa-topbar-promo" id="topbarPromo">🎃 <strong>HalloKien 2026:</strong></span>
+        <a href="https://ravotshop.ksa.be/hallokien" target="_blank" rel="noopener" id="topbarLinkRight" class="topbar-link">Bestel tickets via Ravotshop &rarr;</a>
       </div>
     </div>
   </div>
@@ -959,7 +961,7 @@
 
   <!-- Scripts -->
   <script src="js/html2canvas.min.js"></script>
-  <script src="js/main.js?v=gh8"></script>
-  <script src="js/visual-editor.js?v=gh8"></script>
+  <script src="js/main.js?v=gh9"></script>
+  <script src="js/visual-editor.js?v=gh9"></script>
 </body>
 </html>

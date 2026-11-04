@@ -297,7 +297,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     return el;
   }
 
-  const EDITABLE_LINK_SELECTOR = '.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket, #groupResultBtn, .leiding-card a.btn, #verhuring a.btn, #contact a.btn';
+  const EDITABLE_LINK_SELECTOR = '.hero-cta-group a, .ksa-event-banner a.btn, .news-actions a, .btn-ravot, .btn-ticket, #groupResultBtn, .leiding-card a.btn, #verhuring a.btn, #contact a.btn, .topbar-link, .ksa-topbar a';
 
   function isGroupManagedSelector(selector) {
     return typeof selector === 'string' && (selector.startsWith('#groupResult') || selector.startsWith('#mGroup'));
@@ -580,6 +580,54 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       body.ksa-edit-mode-active [contenteditable="true"]:focus {
         outline: 2px solid #e3001b;
         background-color: rgba(254, 243, 199, 0.4);
+      }
+      body.ksa-edit-mode-active .ksa-topbar [contenteditable="true"] {
+        outline: 1.5px dashed #fdb900;
+        outline-offset: 3px;
+        border-radius: 4px;
+        color: #ffffff;
+        cursor: text;
+        transition: all 0.2s;
+      }
+      body.ksa-edit-mode-active .ksa-topbar [contenteditable="true"]:hover,
+      body.ksa-edit-mode-active .ksa-topbar [contenteditable="true"]:focus {
+        outline: 2px solid #ffffff;
+        background-color: rgba(253, 185, 0, 0.25);
+      }
+      body.ksa-edit-mode-active .ksa-topbar a.topbar-link {
+        outline: 1.5px dashed #22c55e;
+        outline-offset: 3px;
+        border-radius: 4px;
+        padding: 1px 4px;
+        cursor: pointer !important;
+        transition: all 0.2s;
+      }
+      body.ksa-edit-mode-active .ksa-topbar a.topbar-link:hover {
+        outline: 2px solid #ffffff;
+        background-color: rgba(34, 197, 94, 0.25);
+      }
+      .ksa-topbar-edit-pill {
+        display: none;
+      }
+      body.ksa-edit-mode-active .ksa-topbar-edit-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #fdb900;
+        color: #001f3f;
+        font-weight: 800;
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        margin-left: 8px;
+        transition: all 0.2s;
+      }
+      body.ksa-edit-mode-active .ksa-topbar-edit-pill:hover {
+        background: #ffffff;
+        transform: scale(1.05);
       }
       body.ksa-edit-mode-active img.ksa-editable-img {
         outline: 2.5px dashed #0055a5;
@@ -935,6 +983,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <span class="ksa-dock-hint">Klik op eender welke <strong>tekst</strong> om te typen, op een <strong>foto</strong> om een nieuwe te kiezen, of op een <strong>knop</strong> om de link te wijzigen.</span>
       </div>
       <div class="ksa-dock-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnEditTopbar" title="Pas de bovenste blauwe KSA-balk aan">📢 Topbalk</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnToggleBanner" title="Toon of verberg de Event Aftelbanner">🎯 Banner Aan/Uit</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnGithubConfig" title="Stel GitHub toegangstoken in voor live publicatie">⚙️ GitHub Koppeling</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnResetEdits" title="Herstel standaard waarden">↩️ Reset</button>
@@ -950,6 +999,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     modalBackdrop.innerHTML = `<div class="ksa-editor-modal" id="ksaEditorModalContent"></div>`;
     document.body.appendChild(modalBackdrop);
 
+    document.getElementById('ksaBtnEditTopbar').onclick = openTopbarModal;
     document.getElementById('ksaBtnSaveEdits').onclick = saveAllEditsToGithub;
     document.getElementById('ksaBtnExitEdit').onclick = disableEditMode;
     document.getElementById('ksaBtnToggleBanner').onclick = toggleBannerVisibility;
@@ -1014,8 +1064,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     tagOriginalImageSources();
 
     const textSelectors = [
+      '#topbarBadge',
+      '#topbarDesc',
+      '#topbarPromo',
       '.ksa-topbar-badge',
-      '.ksa-topbar span',
+      '.ksa-topbar-desc',
+      '.ksa-topbar-promo',
       '.hero-tag span',
       '.hero-title',
       '.hero-lead',
@@ -1122,6 +1176,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectBannerControlBar();
     injectGroupPillsControlBar();
     injectCardEditTools();
+    injectTopbarEditTools();
   }
 
   function bindGroupLiveSync() {
@@ -1172,6 +1227,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       a.classList.remove('ksa-editable-btn');
       a.removeEventListener('click', onEditableLinkClick, true);
     });
+    const tbBtn = document.getElementById('ksaTopbarEditBtn');
+    if (tbBtn) tbBtn.remove();
   }
 
   // --------------------------------------------------------------------------
@@ -1296,6 +1353,135 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (newHref) currentLinkTarget.setAttribute('href', newHref);
       currentLinkTarget.classList.toggle('ksa-link-hidden', hide);
       currentLinkTarget.style.display = (!isEditMode && hide) ? 'none' : '';
+      backdrop.style.display = 'none';
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // 8A. BOVENSTE KSA-BALK BEHEREN (TOPBAR)
+  // --------------------------------------------------------------------------
+  function injectTopbarEditTools() {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    if (!topbar) return;
+    const container = topbar.querySelector('.container') || topbar;
+    if (container.querySelector('#ksaTopbarEditBtn')) return;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'ksaTopbarEditBtn';
+    btn.className = 'ksa-topbar-edit-pill';
+    btn.innerHTML = '✏️ Topbalk';
+    btn.title = 'Pas badge, tekst of links in de bovenste KSA-balk aan';
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openTopbarModal();
+    };
+    container.appendChild(btn);
+  }
+
+  function openTopbarModal() {
+    const badgeEl = document.getElementById('topbarBadge') || document.querySelector('.ksa-topbar-badge');
+    const descEl = document.getElementById('topbarDesc') || document.querySelector('.ksa-topbar-desc');
+    const linkLeftEl = document.getElementById('topbarLinkLeft') || document.querySelector('.ksa-topbar-left a, .ksa-topbar a');
+    const promoEl = document.getElementById('topbarPromo') || document.querySelector('.ksa-topbar-promo');
+    const linkRightEl = document.getElementById('topbarLinkRight') || document.querySelector('.ksa-topbar-right a');
+
+    const curBadge = badgeEl ? badgeEl.innerText.trim() : 'KSA LIMBURG';
+    const curDesc = descEl ? descEl.innerHTML.trim() : 'Aangesloten bij <strong>KSA Nationaal</strong> &bull;';
+    const curLeftText = linkLeftEl ? linkLeftEl.innerText.trim() : 'www.ksa.be';
+    const curLeftHref = linkLeftEl ? (linkLeftEl.getAttribute('href') || 'https://www.ksa.be') : 'https://www.ksa.be';
+
+    const curPromo = promoEl ? promoEl.innerHTML.trim() : '🎃 <strong>HalloKien 2026:</strong>';
+    const curRightText = linkRightEl ? linkRightEl.innerText.trim() : 'Bestel tickets via Ravotshop →';
+    const curRightHref = linkRightEl ? (linkRightEl.getAttribute('href') || 'https://ravotshop.ksa.be/hallokien') : 'https://ravotshop.ksa.be/hallokien';
+    const isPromoHidden = linkRightEl ? (linkRightEl.classList.contains('ksa-link-hidden') || linkRightEl.style.display === 'none') : false;
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+
+    modal.innerHTML = `
+      <h3>📢 Bovenste KSA-Balk Aanpassen</h3>
+      <p style="font-size:13px; color:#64748b; margin-top:-6px; margin-bottom:14px;">
+        Pas hier de teksten en links aan van de donkerblauwe balk helemaal bovenaan de website. Je kunt ook direct op de teksten in de balk klikken om ze live te bewerken!
+      </p>
+
+      <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:12px;">
+        <h4 style="margin:0 0 8px 0; font-size:14px; color:#0055a5;">Linkerkant (KSA Nationaal)</h4>
+        <label>Badge tekst (rood label):</label>
+        <input type="text" id="tbBadgeInput" value="${curBadge.replace(/"/g, '&quot;')}">
+        <label style="margin-top:8px;">Ondertitel / beschrijving:</label>
+        <input type="text" id="tbDescInput" value="${curDesc.replace(/"/g, '&quot;')}">
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <div style="flex:1;">
+            <label>Link tekst:</label>
+            <input type="text" id="tbLeftTextInput" value="${curLeftText.replace(/"/g, '&quot;')}">
+          </div>
+          <div style="flex:1;">
+            <label>Link adres (URL):</label>
+            <input type="text" id="tbLeftHrefInput" value="${curLeftHref.replace(/"/g, '&quot;')}">
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:14px;">
+        <h4 style="margin:0 0 8px 0; font-size:14px; color:#e3001b;">Rechterkant (Promo / Evenement)</h4>
+        <label>Promo tekst:</label>
+        <input type="text" id="tbPromoInput" value="${curPromo.replace(/"/g, '&quot;')}">
+        <div style="display:flex; gap:10px; margin-top:8px;">
+          <div style="flex:1;">
+            <label>Actieknop tekst:</label>
+            <input type="text" id="tbRightTextInput" value="${curRightText.replace(/"/g, '&quot;')}">
+          </div>
+          <div style="flex:1;">
+            <label>Actieknop adres (URL):</label>
+            <input type="text" id="tbRightHrefInput" value="${curRightHref.replace(/"/g, '&quot;')}">
+          </div>
+        </div>
+        <label style="display:flex; align-items:center; gap:8px; margin-top:10px; cursor:pointer; font-size:13px;">
+          <input type="checkbox" id="tbHidePromoInput" ${isPromoHidden ? 'checked' : ''}>
+          <span>🙈 Verberg de rechter promo / actielink</span>
+        </label>
+      </div>
+
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="tbCancelBtn">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="tbApplyBtn">✔️ Toepassen</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    document.getElementById('tbCancelBtn').onclick = () => { backdrop.style.display = 'none'; };
+    document.getElementById('tbApplyBtn').onclick = () => {
+      const newBadge = document.getElementById('tbBadgeInput').value.trim();
+      const newDesc = document.getElementById('tbDescInput').value.trim();
+      const newLeftText = document.getElementById('tbLeftTextInput').value.trim();
+      const newLeftHref = document.getElementById('tbLeftHrefInput').value.trim();
+
+      const newPromo = document.getElementById('tbPromoInput').value.trim();
+      const newRightText = document.getElementById('tbRightTextInput').value.trim();
+      const newRightHref = document.getElementById('tbRightHrefInput').value.trim();
+      const hidePromo = document.getElementById('tbHidePromoInput').checked;
+
+      if (badgeEl && newBadge) badgeEl.innerText = newBadge;
+      if (descEl && newDesc) descEl.innerHTML = newDesc;
+      if (linkLeftEl) {
+        if (newLeftText) linkLeftEl.innerText = newLeftText;
+        if (newLeftHref) linkLeftEl.setAttribute('href', newLeftHref);
+      }
+
+      if (promoEl && newPromo) promoEl.innerHTML = newPromo;
+      if (linkRightEl) {
+        if (newRightText) linkRightEl.innerText = newRightText;
+        if (newRightHref) linkRightEl.setAttribute('href', newRightHref);
+        linkRightEl.classList.toggle('ksa-link-hidden', hidePromo);
+        linkRightEl.style.display = (!isEditMode && hidePromo) ? 'none' : '';
+      }
+      if (promoEl) {
+        promoEl.classList.toggle('ksa-link-hidden', hidePromo);
+        promoEl.style.display = (!isEditMode && hidePromo) ? 'none' : '';
+      }
+
       backdrop.style.display = 'none';
     };
   }
@@ -1837,27 +2023,27 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
 
     // Maak een schone kopie van de containers zonder contenteditable attributen
-    ['.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
+    ['#ksaTopbar', '.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
       const c = document.querySelector(sel);
       if (c) {
         const clone = c.cloneNode(true);
         clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
         clone.querySelectorAll('.ksa-editable-img').forEach(el => el.classList.remove('ksa-editable-img'));
-        clone.querySelectorAll('.ksa-card-edit-tools').forEach(el => el.remove());
+        clone.querySelectorAll('.ksa-card-edit-tools, .ksa-topbar-edit-pill, #ksaTopbarEditBtn').forEach(el => el.remove());
         pageData.containers[sel] = clone.innerHTML;
       }
     });
 
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
       // Sla geen teksten op die al in containers (.cal-grid, .paspoort-grid, ...) zitten
-      if (el.closest('.cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
+      if (el.closest('#ksaTopbar, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(el);
       if (sel && !isGroupManagedSelector(sel)) pageData.texts[sel] = el.innerHTML;
     });
 
     document.querySelectorAll('img.ksa-editable-img').forEach(img => {
       // Sla geen foto's op die al in containers (.paspoort-grid, .cal-grid, ...) zitten om index-conflicten bij toevoegen te vermijden
-      if (img.closest('.cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
+      if (img.closest('#ksaTopbar, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(img);
       if (isGroupManagedSelector(sel)) return;
       const srcVal = img.getAttribute('src') || '';
