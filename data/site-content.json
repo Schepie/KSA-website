@@ -181,7 +181,7 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > span:nth-of-type(2)": "Toekomst",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > span:nth-of-type(1)": "Wie is wie?",
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "KSA Lokalen",
-      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "ZAALVERHURING VZW 'T HEEM",
+      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > h2:nth-of-type(1)": "ZAALVERHURING VZW <br>'T HEEM",
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(1)": "\n              Voor het huren van onze lokalen en zalen in Zonhoven kan je alle informatie, prijzen en kalender vinden via de officiële website van ons lokaalbeheer:\n            ",
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(2)": "\n              <a href=\"https://www.google.com/maps/dir/?api=1&amp;destination=Dijkbeemdenweg+8,+3520+Zonhoven\" target=\"_blank\" rel=\"noopener\" style=\"color: var(--ksa-blue); text-decoration: none; display: inline-flex; align-items: center; gap: 8px;\" title=\"Navigeer naar KSA Lokaal Zonhoven via Google Maps\">\n                <span>📍 Dijkbeemdenweg 8, 3520 Zonhoven, België</span>\n                <span style=\"font-size: 0.82rem; background: var(--ksa-light-blue); padding: 3px 10px; border-radius: var(--radius-full); font-weight: 800;\">Navigeer →</span>\n              </a>\n            ",
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > p:nth-of-type(3)": "\n              ✉️ E-mail verhuur: <a href=\"mailto:heem.ksazonhoven@gmail.com\" style=\"color: var(--ksa-blue); text-decoration: underline;\">heem.ksazonhoven@gmail.com</a>\n            ",
@@ -264,7 +264,7 @@
     "hidden": false,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T12:40:36.851Z",
+  "updatedAt": "2026-11-04T12:42:25.502Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
