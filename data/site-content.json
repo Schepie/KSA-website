@@ -263,5 +263,81 @@
     "hidden": true,
     "targetIso": "2026-11-11T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-04T08:17:40.299Z"
+  "updatedAt": "2026-11-04T12:07:23.778Z",
+  "shortcutsHidden": true,
+  "mobile": {
+    "texts": {
+      "#tab-intro > div:nth-of-type(1) > h1:nth-of-type(1)": "\n          DÉ JEUGDBEWEGING VOOR <span>ALLE TOFFE MEISJES</span>!\n        ",
+      "#tab-intro > div:nth-of-type(1) > p:nth-of-type(1)": "\n          Zondagnamiddag vol pleinspelen, bosspelen, vriendschap en een onvergetelijk zomerkamp.\n        ",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "📅 Za 17 Okt 2026",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > h2:nth-of-type(1)": "HALLOKIEN BINGO NIGHT 🎃",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(1)": "📍 Evenementenhal Zonhoven (Polyvalente zaal)",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(1) > div:nth-of-type(2)": "⏰ Deuren 18u30 • Start 19u30 • Vol = Vol!",
+      "#tab-leiding > div:nth-of-type(2) > div:nth-of-type(2) > h3:nth-of-type(1)": "FIEN AERTS",
+      "#tab-leiding > div:nth-of-type(2) > div:nth-of-type(2) > p:nth-of-type(1)": "\n            Centraal aanspreekpunt voor ouders, leiding en KSA Nationaal.\n          ",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Cara",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)": "Kabouters",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Nore",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)": "Kabouters",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Lien",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)": "Sloebers",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lies",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)": "Sloebers",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Lotte",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)": "Jim",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Lina B.",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)": "Jim",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(1)": "Lina S.",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(3) > span:nth-of-type(2)": "Jim",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Kato",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)": "Sim",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(1)": "Fien",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(2) > span:nth-of-type(2)": "Sim",
+      "#leader-sec-kim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(1)": "Oonah",
+      "#leader-sec-kim > div:nth-of-type(1) > div:nth-of-type(1) > span:nth-of-type(2)": "Kim (+16)",
+      "#pwaInstallInfoCard > div:nth-of-type(1) > div:nth-of-type(1) > h3:nth-of-type(1)": "📲 KSA Zonhoven App",
+      "#pwaInstallStatusText": "\n          Gebruik KSA Zonhoven als een echte app op je smartphone: snel overal de agenda, leiding en foto's bij de hand!\n        ",
+      "#tab-info > div:nth-of-type(3) > h3:nth-of-type(1)": "⏰ Zondagnamiddagen",
+      "#tab-info > div:nth-of-type(3) > p:nth-of-type(1)": "\n          Iedere zondag van <strong>13u30 tot 17u00</strong> aan ons lokaal (Dijkbeemdenweg 8, Zonhoven). We ravotten, spelen in het groen en maken veel plezier.\n        ",
+      "#tab-info > div:nth-of-type(4) > h3:nth-of-type(1)": "👕 Ons KSA Uniform",
+      "#tab-info > div:nth-of-type(4) > p:nth-of-type(1)": "\n          Elke zondag dragen we hetzelfde! Een donkerblauwe trui of hemd en ons KSA sjaaltje. We dragen het met trots overal naartoe en op de Dag van de Jeugdbeweging kleuren we alle straten blauw!\n        ",
+      "#tab-info > div:nth-of-type(5) > h3:nth-of-type(1)": "📝 Inschrijven via Ravot (ksa.be)",
+      "#tab-info > div:nth-of-type(5) > p:nth-of-type(1)": "\n          Inschrijven voor het werkjaar gebeurt via het officiële KSA platform:\n        ",
+      "#tab-info > div:nth-of-type(6) > h3:nth-of-type(1)": "🏡 Zaalverhuur VZW 't Heem",
+      "#tab-info > div:nth-of-type(6) > p:nth-of-type(1)": "\n          Onze lokalen en polyvalente feestzalen zijn te huur voor jeugdverenigingen, weekends, kampen en familie- of verjaardagsfeestjes. Voorzien van een professionele keuken, sanitair en een grote buitenspeelweide.\n        ",
+      "#tab-info > div:nth-of-type(7) > h3:nth-of-type(1)": "📬 Contact &amp; Vragen"
+    },
+    "images": {
+      "header:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-official.svg?v=blue",
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/images/real_hallokien.jpg",
+      "#tab-intro > div:nth-of-type(5) > img:nth-of-type(1)": "images/ksakinderen.jpg",
+      "#mobileCalBoardHeader > img:nth-of-type(1)": "assets/icons/ksa-logo-official.svg?v=blue",
+      "#tab-leiding > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740657241_WhatsApp_Image_2026-11-03_at_17.46.16__3_.jpg",
+      "#leader-sec-kabouters > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740664541_WhatsApp_Image_2026-11-03_at_17.45.51.jpg",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740670485_WhatsApp_Image_2026-11-03_at_17.45.43__1_.jpg",
+      "#leader-sec-sloebers > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740675950_WhatsApp_Image_2026-11-03_at_17.46.16__5_.jpg",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738396382_WhatsApp_Image_2026-11-03_at_17.46.16__6_.jpg",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/WhatsApp Image 2026-11-03 at 17.46.17 (5).jpeg",
+      "#leader-sec-jim > div:nth-of-type(1) > div:nth-of-type(3) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/WhatsApp Image 2026-11-03 at 17.46.16 (2).jpeg",
+      "#leader-sec-sim > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
+      "#leader-sec-kim > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740682690_WhatsApp_Image_2026-11-03_at_17.46.16.jpg",
+      "#pwaInstallInfoCard > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/pwa-icon-192.png",
+      "#tab-info > div:nth-of-type(6) > div:nth-of-type(1) > img:nth-of-type(1)": "images/theem.jpg",
+      "#modalPaspoortImg": "images/uploads/1793738407058_WhatsApp_Image_2026-11-03_at_17.46.16__4_.jpg",
+      "#pwaInstallBanner > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/pwa-icon-192.png"
+    },
+    "links": {
+      "#tab-intro > div:nth-of-type(2) > div:nth-of-type(2) > div:nth-of-type(3) > a:nth-of-type(1)": {
+        "href": "https://ravotshop.ksa.be/hallokien",
+        "text": "🎟️ Bestel Tickets via Ravotshop →",
+        "hidden": false
+      }
+    },
+    "containers": {
+      ".shortcuts-grid": "\n        <div class=\"shortcut-tile\" data-switch-tab=\"agenda\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: var(--ksa-blue-soft); color: var(--ksa-blue); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            📅\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">Officiële Kalender</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Wanneer is het KSA?</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"groepen\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(254, 247, 230); color: rgb(217, 119, 6); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            🎒\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">5 Groepen</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Van 6 tot 17+ jaar</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"leiding\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(253, 232, 233); color: rgb(227, 0, 27); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            👑\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">De Leidingploeg</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Wie is wie? Paspoortjes</span>\n        </div>\n\n        <div class=\"shortcut-tile\" data-switch-tab=\"info\">\n          <div class=\"shortcut-icon-bubble\" style=\"background: rgb(236, 253, 245); color: rgb(5, 150, 105); cursor: pointer;\" spellcheck=\"false\" title=\"🎨 Klik om dit icoon of instellingen aan te passen\" data-ksa-bound=\"1\">\n            📝\n          </div>\n          <span class=\"shortcut-title\" spellcheck=\"false\">Inschrijven &amp; Info</span>\n          <span class=\"shortcut-desc\" spellcheck=\"false\">Uniform &amp; Ravot gids</span>\n        </div>\n      "
+    },
+    "shortcutsHidden": true
+  }
 }
