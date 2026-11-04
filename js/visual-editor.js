@@ -1254,12 +1254,75 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
-  // 5. WACHTWOORD / PINCODE CONTROLE
+  // 5. WACHTWOORD / PINCODE CONTROLE & MOBIELE BERICHTGEVING
   // --------------------------------------------------------------------------
+  function showMobileEditNoticeModal(onProceed) {
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    if (!modal || !backdrop) {
+      if (typeof onProceed === 'function') onProceed();
+      return;
+    }
+
+    modal.innerHTML = `
+      <h3>📱 Mobiele Bewerk-modus</h3>
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #2563eb; border-radius:10px; padding:14px; margin:12px 0 16px 0; font-size:13.5px; color:#1e3a8a; line-height:1.5; text-align:left;">
+        <strong>ℹ️ Belangrijke info voor leiding:</strong><br>
+        Hier kunnen enkel <strong>mobiel-specifieke zaken</strong> worden aangepast (zoals de snelle toegang blokken, mobiele teksten, actieknoppen en foto's).<br><br>
+        Grote updates zoals de <strong>officiële kalender</strong> en <strong>groepsinstellingen</strong> dienen op de <strong>desktop website</strong> (het grote scherm) te gebeuren. Die wijzigingen worden daarna automatisch gesynchroniseerd naar deze app!
+      </div>
+      <div class="ksa-editor-modal-actions" style="gap:10px; display:flex; flex-wrap:wrap; justify-content:flex-end;">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaMobileInfoCancelBtn">Annuleren</button>
+        <a href="index.html?edit=1" class="ksa-dock-btn ksa-dock-btn-sec" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+          💻 Naar Desktopversie
+        </a>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaMobileInfoProceedBtn">
+          Begrepen, start bewerken
+        </button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    const proceedBtn = document.getElementById('ksaMobileInfoProceedBtn');
+    if (proceedBtn) {
+      proceedBtn.onclick = () => {
+        backdrop.style.display = 'none';
+        if (typeof onProceed === 'function') onProceed();
+      };
+    }
+
+    const cancelBtn = document.getElementById('ksaMobileInfoCancelBtn');
+    if (cancelBtn) {
+      cancelBtn.onclick = () => {
+        backdrop.style.display = 'none';
+      };
+    }
+  }
+
+  function injectMobileCalendarEditNotice() {
+    const isMobilePage = window.location.pathname.includes('mobile.html') || !!document.getElementById('mobileEditTriggerBtn');
+    if (!isMobilePage) return;
+
+    const board = document.getElementById('mobile-kalender-board');
+    if (board && !document.getElementById('ksaMobileCalNotice')) {
+      const notice = document.createElement('div');
+      notice.id = 'ksaMobileCalNotice';
+      notice.style.cssText = 'background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #2563eb; border-radius:10px; padding:10px 14px; margin-bottom:12px; font-size:12.5px; color:#1e3a8a; display:flex; align-items:center; gap:10px; line-height:1.4;';
+      notice.innerHTML = '<span style="font-size:1.3rem;">📅</span><div><strong>Centrale kalender:</strong> De kalender wordt beheerd op de desktop website en wordt hier automatisch actueel gehouden.</div>';
+      board.parentElement.insertBefore(notice, board);
+    }
+  }
+
   function promptAndEnableEditMode() {
     if (isEditMode) return;
+    const isMobilePage = window.location.pathname.includes('mobile.html') || !!document.getElementById('mobileEditTriggerBtn');
+
     if (sessionStorage.getItem('ksa_edit_unlocked') === '1') {
-      enableEditMode();
+      if (isMobilePage) {
+        showMobileEditNoticeModal(() => enableEditMode());
+      } else {
+        enableEditMode();
+      }
       return;
     }
 
@@ -1267,7 +1330,15 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const backdrop = document.getElementById('ksaEditorModalBackdrop');
     modal.innerHTML = `
       <h3>🔐 Leiding Bewerk-modus</h3>
-      <p>Voer de KSA-leiding pincode in om teksten, foto's, kalender, groepen en de aftelbanner rechtstreeks op de website aan te passen.</p>
+      ${isMobilePage ? `
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-left:4px solid #2563eb; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#1e3a8a; line-height:1.45; text-align:left;">
+          <strong>ℹ️ Belangrijke info voor leiding:</strong><br>
+          Op deze mobiele weergave kunnen enkel <strong>mobiel-specifieke zaken</strong> worden aangepast (zoals de snelle toegang blokken, mobiele teksten en foto's).<br><br>
+          Grote updates zoals de <strong>officiële kalender</strong> en <strong>groepsinstellingen</strong> dienen op de <strong>desktop website</strong> (het grote scherm) te gebeuren en worden automatisch gesynchroniseerd!
+        </div>
+      ` : `
+        <p>Voer de KSA-leiding pincode in om teksten, foto's, kalender, groepen en de aftelbanner rechtstreeks op de website aan te passen.</p>
+      `}
       <label for="ksaPinInput">Leiding Wachtwoord / Pincode:</label>
       <input type="password" id="ksaPinInput" placeholder="Bv. ksa2026" autofocus>
       <div id="ksaPinError" style="color:#e3001b; font-size:12px; margin-top:6px; display:none;">❌ Ongeldige pincode. Standaard pincode is: <strong>ksa2026</strong></div>
@@ -1285,7 +1356,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (val === customPin || val === 'ksa2026') {
         sessionStorage.setItem('ksa_edit_unlocked', '1');
         backdrop.style.display = 'none';
-        enableEditMode();
+        if (isMobilePage) {
+          showMobileEditNoticeModal(() => enableEditMode());
+        } else {
+          enableEditMode();
+        }
       } else {
         document.getElementById('ksaPinError').style.display = 'block';
       }
@@ -1439,6 +1514,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       el.style.display = '';
     });
 
+    injectMobileCalendarEditNotice();
+
     const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
     if (mobHeaderBtn) {
       mobHeaderBtn.classList.add('active');
@@ -1512,6 +1589,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
       el.style.display = 'none';
     });
+    const calNotice = document.getElementById('ksaMobileCalNotice');
+    if (calNotice) calNotice.remove();
+
     const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
     if (mobHeaderBtn) {
       mobHeaderBtn.classList.remove('active');
