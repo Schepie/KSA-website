@@ -475,6 +475,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       Object.entries(pageData.links).forEach(([selector, info]) => {
         const a = querySmartSelector(selector);
         if (!a || !info) return;
+        // Als dit element in een container zit die al geladen is (.hero-cta-group, #ksaTopbar, .news-grid), sla over
+        if (a.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
         if (info.href !== undefined) a.setAttribute('href', info.href);
         if (info.text !== undefined) {
           const span = a.querySelector('span') || a;
@@ -712,9 +714,35 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
       body.ksa-edit-mode-active .ksa-group-hidden,
       body.ksa-edit-mode-active .ksa-link-hidden {
-        opacity: 0.45 !important;
+        display: inline-flex !important;
+        opacity: 0.55 !important;
         text-decoration: line-through !important;
         outline: 2px dashed #e3001b !important;
+        position: relative !important;
+      }
+      .ksa-btn-add-pill {
+        display: none;
+      }
+      body.ksa-edit-mode-active .ksa-btn-add-pill {
+        display: inline-flex !important;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 85, 165, 0.08);
+        color: #0055a5;
+        border: 2px dashed #0055a5;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        vertical-align: middle;
+      }
+      body.ksa-edit-mode-active .ksa-btn-add-pill:hover {
+        background: #0055a5;
+        color: #ffffff;
+        border-color: #0055a5;
+        transform: scale(1.04);
       }
       body.ksa-edit-mode-active .ksa-editable-btn {
         outline: 2px dashed #0055a5;
@@ -1177,6 +1205,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectGroupPillsControlBar();
     injectCardEditTools();
     injectTopbarEditTools();
+    injectButtonGroupTools();
+    document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
+      el.style.display = '';
+    });
   }
 
   function bindGroupLiveSync() {
@@ -1229,6 +1261,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
     const tbBtn = document.getElementById('ksaTopbarEditBtn');
     if (tbBtn) tbBtn.remove();
+    document.querySelectorAll('.ksa-btn-add-pill').forEach(el => el.remove());
+    document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
+      el.style.display = 'none';
+    });
   }
 
   // --------------------------------------------------------------------------
@@ -1324,37 +1360,161 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const currentHref = currentLinkTarget.getAttribute('href') || '';
     const isHidden = currentLinkTarget.classList.contains('ksa-link-hidden') || currentLinkTarget.style.display === 'none';
 
+    const isTopbarLink = !!currentLinkTarget.closest('#ksaTopbar');
+    const isBtn = currentLinkTarget.classList.contains('btn') || currentLinkTarget.classList.contains('read-more-link');
+
+    let curStyle = 'btn-primary';
+    if (currentLinkTarget.classList.contains('btn-blue')) curStyle = 'btn-blue';
+    else if (currentLinkTarget.classList.contains('btn-outline-blue')) curStyle = 'btn-outline-blue';
+    else if (currentLinkTarget.classList.contains('btn-ravot')) curStyle = 'btn-ravot';
+    else if (currentLinkTarget.classList.contains('read-more-link')) curStyle = 'read-more-link';
+    else if (currentLinkTarget.classList.contains('btn-primary')) curStyle = 'btn-primary';
+
     const modal = document.getElementById('ksaEditorModalContent');
     const backdrop = document.getElementById('ksaEditorModalBackdrop');
     modal.innerHTML = `
       <h3>🔗 Knop of Link aanpassen</h3>
       <label>Tekst op de knop:</label>
       <input type="text" id="ksaEditLinkText" value="${currentText.replace(/"/g, '&quot;')}">
-      <label>Link-adres (bv. #info, #nieuws, #agenda of https://...):</label>
+      <label style="margin-top:10px;">Link-adres (bv. #nieuws, #groepen, #kalender, #info of https://...):</label>
       <input type="text" id="ksaEditLinkHref" value="${currentHref.replace(/"/g, '&quot;')}">
+      
+      ${(!isTopbarLink && isBtn) ? `
+      <label style="margin-top:10px;">Knop-stijl / Kleur:</label>
+      <select id="ksaEditLinkStyle" style="width:100%; padding:9px 12px; border-radius:8px; border:1px solid #cbd5e1; font-weight:600; margin-top:4px;">
+        <option value="btn-primary" ${curStyle === 'btn-primary' ? 'selected' : ''}>🔴 KSA Rood (Standaard Actieknop)</option>
+        <option value="btn-blue" ${curStyle === 'btn-blue' ? 'selected' : ''}>🔵 KSA Marineblauw</option>
+        <option value="btn-outline-blue" ${curStyle === 'btn-outline-blue' ? 'selected' : ''}>⚪ Wit met blauwe rand</option>
+        <option value="btn-ravot" ${curStyle === 'btn-ravot' ? 'selected' : ''}>🟡 Ravot Geel</option>
+        <option value="read-more-link" ${curStyle === 'read-more-link' ? 'selected' : ''}>🔗 Subtiele Tekstlink (zonder knopachtergrond)</option>
+      </select>
+      ` : ''}
+
       <label style="display:flex; align-items:center; gap:8px; margin-top:14px; cursor:pointer;">
         <input type="checkbox" id="ksaEditLinkHide" ${isHidden ? 'checked' : ''}>
         <span>🙈 Verberg deze knop voor bezoekers op de website</span>
       </label>
-      <div class="ksa-editor-modal-actions">
-        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaLinkCancel">Annuleren</button>
-        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaLinkApply">✔️ Toepassen</button>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-top:1px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; gap:8px;">
+          ${!isTopbarLink ? `
+          <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" id="ksaLinkDelete" title="Verwijder deze knop definitief van de pagina">🗑️ Verwijderen</button>
+          <button type="button" class="ksa-mini-btn" id="ksaLinkDuplicate" title="Voeg een extra kopie van deze knop toe ernaast">➕ Knop Dupliceren</button>
+          ` : ''}
+        </div>
+        <div class="ksa-editor-modal-actions" style="margin:0;">
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaLinkCancel">Annuleren</button>
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaLinkApply">✔️ Toepassen</button>
+        </div>
       </div>
     `;
     backdrop.style.display = 'flex';
+
+    if (document.getElementById('ksaLinkDelete')) {
+      document.getElementById('ksaLinkDelete').onclick = () => {
+        if (confirm('Ben je zeker dat je deze knop wil verwijderen? Tip: je kan hem ook tijdelijk verbergen met het vinkje "Verberg".')) {
+          currentLinkTarget.remove();
+          backdrop.style.display = 'none';
+        }
+      };
+    }
+
+    if (document.getElementById('ksaLinkDuplicate')) {
+      document.getElementById('ksaLinkDuplicate').onclick = () => {
+        const clone = currentLinkTarget.cloneNode(true);
+        clone.classList.remove('ksa-link-hidden');
+        clone.style.display = '';
+        const cSpan = clone.querySelector('span') || clone;
+        cSpan.textContent = (span.textContent.trim() || 'Nieuwe Knop') + ' (Kopie)';
+        if (currentLinkTarget.nextSibling) {
+          currentLinkTarget.parentNode.insertBefore(clone, currentLinkTarget.nextSibling);
+        } else {
+          currentLinkTarget.parentNode.appendChild(clone);
+        }
+        clone.classList.add('ksa-editable-btn');
+        clone.title = '🔗 Klik om knoptekst, link of zichtbaarheid aan te passen';
+        clone.addEventListener('click', onEditableLinkClick, true);
+        backdrop.style.display = 'none';
+        setTimeout(() => {
+          onEditableLinkClick({
+            currentTarget: clone,
+            preventDefault: () => {},
+            stopPropagation: () => {}
+          });
+        }, 50);
+      };
+    }
 
     document.getElementById('ksaLinkCancel').onclick = () => { backdrop.style.display = 'none'; };
     document.getElementById('ksaLinkApply').onclick = () => {
       const newText = document.getElementById('ksaEditLinkText').value.trim();
       const newHref = document.getElementById('ksaEditLinkHref').value.trim();
       const hide = document.getElementById('ksaEditLinkHide').checked;
+      const styleSelect = document.getElementById('ksaEditLinkStyle');
 
       if (newText) span.textContent = newText;
       if (newHref) currentLinkTarget.setAttribute('href', newHref);
+
+      if (styleSelect) {
+        const sVal = styleSelect.value;
+        currentLinkTarget.classList.remove('btn-primary', 'btn-blue', 'btn-outline-blue', 'btn-ravot', 'read-more-link');
+        if (sVal === 'read-more-link') {
+          currentLinkTarget.classList.remove('btn', 'btn-lg', 'btn-sm');
+          currentLinkTarget.classList.add('read-more-link');
+        } else {
+          currentLinkTarget.classList.add('btn', sVal);
+          if (!currentLinkTarget.classList.contains('btn-lg') && !currentLinkTarget.classList.contains('btn-sm')) {
+            currentLinkTarget.classList.add('btn-lg');
+          }
+        }
+      }
+
       currentLinkTarget.classList.toggle('ksa-link-hidden', hide);
       currentLinkTarget.style.display = (!isEditMode && hide) ? 'none' : '';
       backdrop.style.display = 'none';
     };
+  }
+
+  function injectButtonGroupTools() {
+    document.querySelectorAll('.hero-cta-group').forEach(group => {
+      if (group.querySelector('.ksa-btn-add-pill')) return;
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'ksa-btn-add-pill';
+      addBtn.innerHTML = '➕ Knop Toevoegen';
+      addBtn.title = 'Voeg hier een extra knop toe aan deze rij';
+      addBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addNewButtonToGroup(group, addBtn);
+      };
+      group.appendChild(addBtn);
+    });
+  }
+
+  function addNewButtonToGroup(group, beforeEl) {
+    const newA = document.createElement('a');
+    newA.href = '#nieuws';
+    newA.className = 'btn btn-primary btn-lg';
+    newA.setAttribute('data-confetti', '');
+    newA.innerHTML = `<span>✨ Nieuwe Knop</span>`;
+    newA.classList.add('ksa-editable-btn');
+    newA.title = '🔗 Klik om knoptekst, link of zichtbaarheid aan te passen';
+    newA.addEventListener('click', onEditableLinkClick, true);
+
+    if (beforeEl && beforeEl.parentNode === group) {
+      group.insertBefore(newA, beforeEl);
+    } else {
+      group.appendChild(newA);
+    }
+
+    setTimeout(() => {
+      onEditableLinkClick({
+        currentTarget: newA,
+        preventDefault: () => {},
+        stopPropagation: () => {}
+      });
+    }, 50);
   }
 
   // --------------------------------------------------------------------------
@@ -2023,27 +2183,27 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
 
     // Maak een schone kopie van de containers zonder contenteditable attributen
-    ['#ksaTopbar', '.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
+    ['#ksaTopbar', '.hero-cta-group', '.cal-grid', '.news-grid', '.paspoort-grid', '.cal-list'].forEach(sel => {
       const c = document.querySelector(sel);
       if (c) {
         const clone = c.cloneNode(true);
         clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
         clone.querySelectorAll('.ksa-editable-img').forEach(el => el.classList.remove('ksa-editable-img'));
-        clone.querySelectorAll('.ksa-card-edit-tools, .ksa-topbar-edit-pill, #ksaTopbarEditBtn').forEach(el => el.remove());
+        clone.querySelectorAll('.ksa-card-edit-tools, .ksa-topbar-edit-pill, #ksaTopbarEditBtn, .ksa-btn-add-pill').forEach(el => el.remove());
         pageData.containers[sel] = clone.innerHTML;
       }
     });
 
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
       // Sla geen teksten op die al in containers (.cal-grid, .paspoort-grid, ...) zitten
-      if (el.closest('#ksaTopbar, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
+      if (el.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(el);
       if (sel && !isGroupManagedSelector(sel)) pageData.texts[sel] = el.innerHTML;
     });
 
     document.querySelectorAll('img.ksa-editable-img').forEach(img => {
       // Sla geen foto's op die al in containers (.paspoort-grid, .cal-grid, ...) zitten om index-conflicten bij toevoegen te vermijden
-      if (img.closest('#ksaTopbar, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
+      if (img.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(img);
       if (isGroupManagedSelector(sel)) return;
       const srcVal = img.getAttribute('src') || '';
@@ -2053,6 +2213,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     document.querySelectorAll(EDITABLE_LINK_SELECTOR).forEach(a => {
+      if (a.closest('#ksaTopbar, .hero-cta-group, .cal-grid, .news-grid, .paspoort-grid, .cal-list')) return;
       const sel = getUniqueSelector(a);
       if (sel) {
         const span = a.querySelector('span') || a;
