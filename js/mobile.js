@@ -110,6 +110,7 @@ registerServiceWorkerWithAutoUpdate();
 document.addEventListener('DOMContentLoaded', () => {
   initMobileNavigation();
   initGroupTabs();
+  initGroupSwipe();
   initMobileCountdown();
   initCalendarFilters();
   initMobileCalendarDownload();
@@ -337,14 +338,191 @@ function initGroupTabs() {
       btn.classList.add('active');
       const groupKey = btn.getAttribute('data-group');
       renderGroup(groupKey);
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
   });
 
   // Initialize with first group
   renderGroup('kabouters');
+  initGroupSwipe();
   window.mobileGroupData = mobileGroupData;
   window.renderMobileGroup = renderGroup;
   window.initPaspoortModal = initPaspoortModal;
+}
+
+/* ==========================================================================
+   2b. GROEPEN SWIPE / DRAG OP AFBEELDING
+   ========================================================================== */
+function initGroupSwipe() {
+  const wrap = document.querySelector('.group-image-wrap');
+  const imgEl = document.getElementById('mGroupImg');
+  if (!wrap || !imgEl) return;
+  if (wrap.dataset.swipeInitialized) return;
+  wrap.dataset.swipeInitialized = '1';
+
+  let startX = 0;
+  let startY = 0;
+  let currentX = 0;
+  let isDragging = false;
+  let isHorizontalSwipe = false;
+  let hasMoved = false;
+
+  function getVisibleButtons() {
+    return Array.from(document.querySelectorAll('.group-select-btn')).filter(b => {
+      return window.getComputedStyle(b).display !== 'none';
+    });
+  }
+
+  function switchToGroup(direction) {
+    const buttons = getVisibleButtons();
+    if (buttons.length <= 1) return;
+
+    const currentIdx = buttons.findIndex(b => b.classList.contains('active'));
+    let newIdx = 0;
+    if (direction === 'next') {
+      newIdx = (currentIdx + 1) % buttons.length;
+    } else {
+      newIdx = (currentIdx - 1 + buttons.length) % buttons.length;
+    }
+
+    const nextBtn = buttons[newIdx];
+    if (nextBtn) {
+      // Vloeiende overgangsanimatie
+      imgEl.style.transition = 'transform 0.18s ease, opacity 0.18s ease';
+      imgEl.style.transform = direction === 'next' ? 'translateX(-80px)' : 'translateX(80px)';
+      imgEl.style.opacity = '0.35';
+
+      setTimeout(() => {
+        nextBtn.click();
+        imgEl.style.transform = direction === 'next' ? 'translateX(80px)' : 'translateX(-80px)';
+
+        requestAnimationFrame(() => {
+          imgEl.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease';
+          imgEl.style.transform = 'translateX(0)';
+          imgEl.style.opacity = '1';
+        });
+      }, 150);
+    }
+  }
+
+  // Touch Events (Smartphones & Tablets)
+  wrap.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    currentX = startX;
+    isDragging = true;
+    isHorizontalSwipe = false;
+    hasMoved = false;
+    imgEl.style.transition = 'none';
+  }, { passive: true });
+
+  wrap.addEventListener('touchmove', (e) => {
+    if (!isDragging || e.touches.length !== 1) return;
+    currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - startX;
+    const diffY = currentY - startY;
+
+    if (!hasMoved) {
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 8) {
+        isHorizontalSwipe = true;
+        hasMoved = true;
+      } else if (Math.abs(diffY) > 8) {
+        isDragging = false;
+        return;
+      }
+    }
+
+    if (isHorizontalSwipe) {
+      if (e.cancelable) e.preventDefault();
+      const clampedX = Math.sign(diffX) * Math.min(Math.abs(diffX), 130);
+      imgEl.style.transform = `translateX(${clampedX}px)`;
+      imgEl.style.opacity = `${1 - Math.min(Math.abs(clampedX) / 250, 0.55)}`;
+    }
+  }, { passive: false });
+
+  const onTouchEnd = () => {
+    if (!isDragging) return;
+    isDragging = false;
+
+    const diffX = currentX - startX;
+    if (isHorizontalSwipe && Math.abs(diffX) > 40) {
+      switchToGroup(diffX < 0 ? 'next' : 'prev');
+    } else {
+      imgEl.style.transition = 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease';
+      imgEl.style.transform = 'translateX(0)';
+      imgEl.style.opacity = '1';
+    }
+  };
+
+  wrap.addEventListener('touchend', onTouchEnd, { passive: true });
+  wrap.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+  // Muis drag support (Desktop testen / laptop)
+  let mouseStartX = 0;
+  let isMouseDown = false;
+  let mouseMoved = false;
+
+  wrap.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    if (document.body.classList.contains('ksa-edit-mode-active')) return;
+
+    mouseStartX = e.clientX;
+    isMouseDown = true;
+    mouseMoved = false;
+    imgEl.style.transition = 'none';
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isMouseDown) return;
+    const diffX = e.clientX - mouseStartX;
+    if (Math.abs(diffX) > 6) mouseMoved = true;
+    const clampedX = Math.sign(diffX) * Math.min(Math.abs(diffX), 130);
+    imgEl.style.transform = `translateX(${clampedX}px)`;
+    imgEl.style.opacity = `${1 - Math.min(Math.abs(clampedX) / 250, 0.55)}`;
+  });
+
+  window.addEventListener('mouseup', (e) => {
+    if (!isMouseDown) return;
+    isMouseDown = false;
+    const diffX = e.clientX - mouseStartX;
+    if (mouseMoved && Math.abs(diffX) > 40) {
+      switchToGroup(diffX < 0 ? 'next' : 'prev');
+    } else {
+      imgEl.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+      imgEl.style.transform = 'translateX(0)';
+      imgEl.style.opacity = '1';
+    }
+  });
+
+  // Navigatie-pijlen over de afbeelding
+  if (!wrap.querySelector('.group-swipe-arrow')) {
+    const prevBtn = document.createElement('button');
+    prevBtn.type = 'button';
+    prevBtn.className = 'group-swipe-arrow group-swipe-prev';
+    prevBtn.setAttribute('aria-label', 'Vorige groep');
+    prevBtn.innerHTML = '‹';
+    prevBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      switchToGroup('prev');
+    };
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'group-swipe-arrow group-swipe-next';
+    nextBtn.setAttribute('aria-label', 'Volgende groep');
+    nextBtn.innerHTML = '›';
+    nextBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      switchToGroup('next');
+    };
+
+    wrap.appendChild(prevBtn);
+    wrap.appendChild(nextBtn);
+  }
 }
 
 /* ==========================================================================
