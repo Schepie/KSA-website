@@ -643,6 +643,65 @@ body.ksa-edit-mode-active .ksa-header-edit-btn {
   background: #eff6ff;
 }
 
+/* Volledig verbergen van Snelle Toegang voor gewone bezoekers */
+body:not(.ksa-edit-mode-active) #shortcutsSectionHead.ksa-section-hidden,
+body:not(.ksa-edit-mode-active) .shortcuts-grid.ksa-section-hidden {
+  display: none !important;
+}
+
+/* In edit mode: visuele indicatie dat de sectie verborgen is voor bezoekers */
+body.ksa-edit-mode-active #shortcutsSectionHead.ksa-section-hidden,
+body.ksa-edit-mode-active .shortcuts-grid.ksa-section-hidden {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+  transition: opacity 0.2s ease;
+}
+
+.shortcuts-hidden-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+body:not(.ksa-edit-mode-active) .shortcuts-hidden-badge {
+  display: none !important;
+}
+
+#ksaToggleShortcutsHeadBtn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  margin-left: auto;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+#ksaToggleShortcutsHeadBtn:hover {
+  transform: scale(1.04);
+}
+
+.ksa-mini-btn-success {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  border: 1px solid #86efac !important;
+}
+
+.ksa-mini-btn-danger {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border: 1px solid #fca5a5 !important;
+}
+
 body:not(.ksa-edit-mode-active) .shortcut-tile-add,
 body:not(.ksa-edit-mode-active) .ksa-shortcut-tools {
   display: none !important;

@@ -667,6 +667,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         }
       }
     }
+
+    // 7b. Snelle Toegang sectie zichtbaarheid op mobiel
+    const isShortcutsHidden = (state.shortcutsHidden !== undefined) ? state.shortcutsHidden : (state.mobile && state.mobile.shortcutsHidden);
+    if (isShortcutsHidden !== undefined) {
+      setShortcutsSectionHidden(isShortcutsHidden);
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -1247,6 +1253,15 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (hintEl) {
         hintEl.innerHTML = '📱 <strong>Mobiele bewerk-modus:</strong> Wijzigingen in groepen, foto\'s en mobiele teksten worden gesynchroniseerd. De <strong>kalender</strong> wordt automatisch overgenomen van de desktop!';
       }
+
+      const shortcutsBtn = document.createElement('button');
+      shortcutsBtn.type = 'button';
+      shortcutsBtn.className = 'ksa-dock-btn ksa-dock-btn-sec';
+      shortcutsBtn.id = 'ksaBtnToggleShortcuts';
+      shortcutsBtn.title = 'Toon of verberg de hele sectie Snelle Toegang';
+      shortcutsBtn.innerHTML = '⚡ Snelle Toegang Aan/Uit';
+      shortcutsBtn.onclick = toggleShortcutsSectionVisibility;
+      document.querySelector('.ksa-dock-actions')?.insertBefore(shortcutsBtn, document.getElementById('ksaBtnGithubConfig'));
     }
 
     if (window.location.search.includes('edit=1') || window.location.hash === '#edit') {
@@ -1596,6 +1611,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
     const calNotice = document.getElementById('ksaMobileCalNotice');
     if (calNotice) calNotice.remove();
+
+    const headBtn = document.getElementById('ksaToggleShortcutsHeadBtn');
+    if (headBtn) headBtn.remove();
+    const badge = document.getElementById('ksaShortcutsHiddenBadge');
+    if (badge) badge.remove();
 
     document.querySelectorAll('.ksa-shortcut-tools, .shortcut-tile-add').forEach(el => el.remove());
     updateShortcutsVisibility();
@@ -2280,20 +2300,97 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   function updateShortcutsVisibility() {
     const grid = document.querySelector('.shortcuts-grid');
     if (!grid) return;
-    const head = document.getElementById('shortcutsSectionHead') || grid.previousElementSibling;
+    const head = document.getElementById('shortcutsSectionHead') || (grid.previousElementSibling && grid.previousElementSibling.classList.contains('app-section-head') ? grid.previousElementSibling : null);
+
+    const isHidden = (head && head.classList.contains('ksa-section-hidden')) || grid.classList.contains('ksa-section-hidden');
     const tileCount = grid.querySelectorAll('.shortcut-tile:not(.shortcut-tile-add)').length;
-    if (!isEditMode && tileCount === 0) {
-      grid.style.display = 'none';
-      if (head && head.classList.contains('app-section-head')) head.style.display = 'none';
+
+    if (!isEditMode) {
+      if (isHidden || tileCount === 0) {
+        grid.style.display = 'none';
+        if (head) head.style.display = 'none';
+      } else {
+        grid.style.display = '';
+        if (head) head.style.display = '';
+      }
     } else {
+      // In edit mode: altijd zichtbaar zodat leiding de sectie kan bewerken en desgewenst weer tonen
       grid.style.display = '';
-      if (head && head.classList.contains('app-section-head')) head.style.display = '';
+      if (head) head.style.display = '';
+    }
+
+    updateShortcutsToggleBtnText();
+  }
+
+  function setShortcutsSectionHidden(hidden) {
+    const head = document.getElementById('shortcutsSectionHead');
+    const grid = document.querySelector('.shortcuts-grid');
+    if (head) head.classList.toggle('ksa-section-hidden', !!hidden);
+    if (grid) grid.classList.toggle('ksa-section-hidden', !!hidden);
+    updateShortcutsVisibility();
+  }
+
+  function toggleShortcutsSectionVisibility() {
+    const head = document.getElementById('shortcutsSectionHead');
+    const grid = document.querySelector('.shortcuts-grid');
+    const isHidden = (head && head.classList.contains('ksa-section-hidden')) || (grid && grid.classList.contains('ksa-section-hidden'));
+    setShortcutsSectionHidden(!isHidden);
+  }
+
+  function updateShortcutsToggleBtnText() {
+    const head = document.getElementById('shortcutsSectionHead');
+    const grid = document.querySelector('.shortcuts-grid');
+    const isHidden = (head && head.classList.contains('ksa-section-hidden')) || (grid && grid.classList.contains('ksa-section-hidden'));
+
+    const headBtn = document.getElementById('ksaToggleShortcutsHeadBtn');
+    if (headBtn) {
+      headBtn.innerHTML = isHidden ? '👁️ Sectie Tonen' : '🙈 Sectie Verbergen';
+      headBtn.title = isHidden ? 'Toon Snelle Toegang weer op de mobiele site' : 'Verberg Snelle Toegang volledig van de mobiele site';
+      headBtn.className = isHidden ? 'ksa-mini-btn ksa-mini-btn-success' : 'ksa-mini-btn ksa-mini-btn-danger';
+    }
+
+    const dockBtn = document.getElementById('ksaBtnToggleShortcuts');
+    if (dockBtn) {
+      dockBtn.innerHTML = isHidden ? '👁️ Snelle Toegang Tonen' : '🙈 Snelle Toegang Verbergen';
+      dockBtn.title = isHidden ? 'Toon Snelle Toegang weer op de mobiele site' : 'Verberg Snelle Toegang volledig van de mobiele site';
+    }
+
+    const badge = document.getElementById('ksaShortcutsHiddenBadge');
+    if (badge) {
+      badge.style.display = isHidden ? 'inline-block' : 'none';
     }
   }
 
   function injectShortcutTools() {
     const grid = document.querySelector('.shortcuts-grid');
     if (!grid) return;
+
+    // 0. Knop op de sectietitel zelf injecteren om met 1 klik te verbergen/tonen
+    const head = document.getElementById('shortcutsSectionHead');
+    if (head && !document.getElementById('ksaToggleShortcutsHeadBtn')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'ksaToggleShortcutsHeadBtn';
+      btn.className = 'ksa-mini-btn';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleShortcutsSectionVisibility();
+      };
+      head.appendChild(btn);
+
+      if (!document.getElementById('ksaShortcutsHiddenBadge')) {
+        const titleEl = head.querySelector('.app-section-title');
+        if (titleEl) {
+          const badge = document.createElement('span');
+          badge.id = 'ksaShortcutsHiddenBadge';
+          badge.className = 'shortcuts-hidden-badge';
+          badge.textContent = 'Verborgen';
+          badge.style.display = 'none';
+          titleEl.appendChild(badge);
+        }
+      }
+    }
 
     // 1. Voeg op elke bestaande tegel de bewerk-knoppen toe (als nog niet aanwezig)
     grid.querySelectorAll('.shortcut-tile:not(.shortcut-tile-add)').forEach(tile => {
@@ -2920,6 +3017,13 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const mobileCard = document.querySelector('.mobile-event-card');
     const bannerTargetEl = desktopWrap || mobileCard;
     const bannerDateInput = document.getElementById('ksaBannerDateInput');
+
+    const headEl = document.getElementById('shortcutsSectionHead');
+    const gridEl = document.querySelector('.shortcuts-grid');
+    const shortcutsAreHidden = (headEl && headEl.classList.contains('ksa-section-hidden')) || (gridEl && gridEl.classList.contains('ksa-section-hidden'));
+
+    fullState.shortcutsHidden = !!shortcutsAreHidden;
+    if (pageData) pageData.shortcutsHidden = !!shortcutsAreHidden;
 
     fullState[pageKey] = pageData;
     fullState.banner = {
