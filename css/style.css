@@ -139,6 +139,18 @@ img {
   justify-content: space-between;
 }
 
+/* Volledig verbergen van de topbalk voor gewone bezoekers */
+body:not(.ksa-edit-mode-active) .ksa-topbar.ksa-section-hidden {
+  display: none !important;
+}
+
+/* In edit-modus: subtiele aanduiding dat de topbalk verborgen is voor bezoekers */
+body.ksa-edit-mode-active .ksa-topbar.ksa-section-hidden {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+  border-bottom: 2px dashed #f59e0b;
+}
+
 .ksa-topbar a {
   color: var(--ksa-yellow);
   text-decoration: underline;

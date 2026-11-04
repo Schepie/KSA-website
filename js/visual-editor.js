@@ -673,6 +673,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     if (isShortcutsHidden !== undefined) {
       setShortcutsSectionHidden(isShortcutsHidden);
     }
+
+    // 7c. Topbar sectie zichtbaarheid op desktop
+    const isTopbarHidden = (state.topbarHidden !== undefined) ? state.topbarHidden : (state.desktop && state.desktop.topbarHidden);
+    if (isTopbarHidden !== undefined) {
+      setTopbarSectionHidden(isTopbarHidden);
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -798,6 +804,37 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       body.ksa-edit-mode-active .ksa-topbar-edit-pill:hover {
         background: #ffffff;
         transform: scale(1.05);
+      }
+      .ksa-topbar-pill-danger {
+        background: #fee2e2 !important;
+        color: #b91c1c !important;
+      }
+      .ksa-topbar-pill-success {
+        background: #dcfce7 !important;
+        color: #166534 !important;
+      }
+      .topbar-hidden-badge {
+        font-size: 10px;
+        font-weight: 800;
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fca5a5;
+        border-radius: 999px;
+        padding: 2px 8px;
+        margin-left: 8px;
+        vertical-align: middle;
+        text-transform: uppercase;
+      }
+      body:not(.ksa-edit-mode-active) .topbar-hidden-badge {
+        display: none !important;
+      }
+      body:not(.ksa-edit-mode-active) .ksa-topbar.ksa-section-hidden {
+        display: none !important;
+      }
+      body.ksa-edit-mode-active .ksa-topbar.ksa-section-hidden {
+        opacity: 0.55;
+        filter: grayscale(0.5);
+        border-bottom: 2px dashed #f59e0b;
       }
       body.ksa-edit-mode-active img.ksa-editable-img {
         outline: 2.5px dashed #0055a5;
@@ -1604,6 +1641,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
     const tbBtn = document.getElementById('ksaTopbarEditBtn');
     if (tbBtn) tbBtn.remove();
+    const tbToggleBtn = document.getElementById('ksaTopbarToggleHideBtn');
+    if (tbToggleBtn) tbToggleBtn.remove();
+    const tbBadge = document.getElementById('ksaTopbarHiddenBadge');
+    if (tbBadge) tbBadge.remove();
     document.querySelectorAll('.ksa-btn-add-pill').forEach(el => el.remove());
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
       el.style.display = 'none';
@@ -1880,27 +1921,91 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   // --------------------------------------------------------------------------
   // 8A. BOVENSTE KSA-BALK BEHEREN (TOPBAR)
   // --------------------------------------------------------------------------
+  function updateTopbarToggleBtnText() {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    const isHidden = topbar ? topbar.classList.contains('ksa-section-hidden') : false;
+
+    const toggleBtn = document.getElementById('ksaTopbarToggleHideBtn');
+    if (toggleBtn) {
+      toggleBtn.innerHTML = isHidden ? '👁️ Topbalk Tonen' : '🙈 Topbalk Verbergen';
+      toggleBtn.title = isHidden ? 'Toon de bovenste balk weer op de website' : 'Verberg de bovenste balk volledig op de website';
+      toggleBtn.className = isHidden ? 'ksa-topbar-edit-pill ksa-topbar-pill-success' : 'ksa-topbar-edit-pill ksa-topbar-pill-danger';
+    }
+
+    const badge = document.getElementById('ksaTopbarHiddenBadge');
+    if (badge) {
+      badge.style.display = isHidden ? 'inline-block' : 'none';
+    }
+  }
+
+  function setTopbarSectionHidden(hidden) {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    if (topbar) {
+      topbar.classList.toggle('ksa-section-hidden', !!hidden);
+      if (!isEditMode && hidden) {
+        topbar.style.display = 'none';
+      } else {
+        topbar.style.display = '';
+      }
+    }
+    updateTopbarToggleBtnText();
+  }
+
+  function toggleTopbarVisibility() {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    const isHidden = topbar ? topbar.classList.contains('ksa-section-hidden') : false;
+    setTopbarSectionHidden(!isHidden);
+  }
+
   function injectTopbarEditTools() {
     const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
     if (!topbar) return;
     const container = topbar.querySelector('.container') || topbar;
-    if (container.querySelector('#ksaTopbarEditBtn')) return;
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.id = 'ksaTopbarEditBtn';
-    btn.className = 'ksa-topbar-edit-pill';
-    btn.innerHTML = '✏️ Topbalk';
-    btn.title = 'Pas badge, tekst of links in de bovenste KSA-balk aan';
-    btn.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      openTopbarModal();
-    };
-    container.appendChild(btn);
+    if (!container.querySelector('#ksaTopbarEditBtn')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'ksaTopbarEditBtn';
+      btn.className = 'ksa-topbar-edit-pill';
+      btn.innerHTML = '✏️ Topbalk';
+      btn.title = 'Pas badge, tekst of links in de bovenste KSA-balk aan';
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openTopbarModal();
+      };
+      container.appendChild(btn);
+    }
+
+    if (!container.querySelector('#ksaTopbarToggleHideBtn')) {
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.id = 'ksaTopbarToggleHideBtn';
+      toggleBtn.className = 'ksa-topbar-edit-pill';
+      toggleBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTopbarVisibility();
+      };
+      container.appendChild(toggleBtn);
+    }
+
+    if (!container.querySelector('#ksaTopbarHiddenBadge')) {
+      const badge = document.createElement('span');
+      badge.id = 'ksaTopbarHiddenBadge';
+      badge.className = 'topbar-hidden-badge';
+      badge.textContent = 'Verborgen';
+      badge.style.display = 'none';
+      container.appendChild(badge);
+    }
+
+    updateTopbarToggleBtnText();
   }
 
   function openTopbarModal() {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    const isTopbarHidden = topbar ? topbar.classList.contains('ksa-section-hidden') : false;
+
     const badgeEl = document.getElementById('topbarBadge') || document.querySelector('.ksa-topbar-badge');
     const descEl = document.getElementById('topbarDesc') || document.querySelector('.ksa-topbar-desc');
     const linkLeftEl = document.getElementById('topbarLinkLeft') || document.querySelector('.ksa-topbar-left a, .ksa-topbar a');
@@ -1925,6 +2030,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       <p style="font-size:13px; color:#64748b; margin-top:-6px; margin-bottom:14px;">
         Pas hier de teksten en links aan van de donkerblauwe balk helemaal bovenaan de website. Je kunt ook direct op de teksten in de balk klikken om ze live te bewerken!
       </p>
+
+      <div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px 14px; border-radius:8px; margin-bottom:14px;">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13.5px; font-weight:700; color:#1e3a8a;">
+          <input type="checkbox" id="tbHideEntireTopbarInput" ${isTopbarHidden ? 'checked' : ''}>
+          <span>🙈 Verberg de volledige topbalk op de website</span>
+        </label>
+        <div style="font-size:12px; color:#64748b; margin-top:4px; margin-left:24px;">
+          Wanneer aangevinkt, is deze hele bovenste donkerblauwe balk onzichtbaar voor gewone bezoekers van de website.
+        </div>
+      </div>
 
       <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:12px;">
         <h4 style="margin:0 0 8px 0; font-size:14px; color:#0055a5;">Linkerkant (KSA Nationaal)</h4>
@@ -1973,6 +2088,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     document.getElementById('tbCancelBtn').onclick = () => { backdrop.style.display = 'none'; };
     document.getElementById('tbApplyBtn').onclick = () => {
+      const hideEntireTopbar = document.getElementById('tbHideEntireTopbarInput').checked;
+      setTopbarSectionHidden(hideEntireTopbar);
+
       const newBadge = document.getElementById('tbBadgeInput').value.trim();
       const newDesc = document.getElementById('tbDescInput').value.trim();
       const newLeftText = document.getElementById('tbLeftTextInput').value.trim();
@@ -3023,6 +3141,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     fullState.shortcutsHidden = !!shortcutsAreHidden;
     if (pageData) pageData.shortcutsHidden = !!shortcutsAreHidden;
+
+    const topbarEl = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    const isTopbarHidden = topbarEl ? topbarEl.classList.contains('ksa-section-hidden') : false;
+    fullState.topbarHidden = isTopbarHidden;
+    if (pageData) pageData.topbarHidden = isTopbarHidden;
 
     fullState[pageKey] = pageData;
     fullState.banner = {
