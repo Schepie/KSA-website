@@ -1414,7 +1414,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const submit = () => {
       const val = (input.value || '').trim().toLowerCase();
       const customPin = (localStorage.getItem('ksa_custom_pin') || KSA_GITHUB_EDITOR_CONFIG.defaultPin).toLowerCase();
-      if (val === customPin || val === 'ksa2026') {
+      if (val === customPin || val === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase()) {
         sessionStorage.setItem('ksa_edit_unlocked', '1');
         backdrop.style.display = 'none';
         if (isMobilePage) {
