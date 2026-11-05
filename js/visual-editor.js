@@ -1111,6 +1111,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
       }
       .ksa-dock-btn-save:hover { background: #16a34a; transform: translateY(-1px); }
+      .ksa-dock-btn-push {
+        background: #0284c7;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+      }
+      .ksa-dock-btn-push:hover { background: #0369a1; transform: translateY(-1px); }
       .ksa-dock-btn-sec {
         background: #334155;
         color: #f8fafc;
@@ -1259,6 +1265,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <span class="ksa-dock-hint">Klik op eender welke <strong>tekst</strong> om te typen, op een <strong>foto</strong> om een nieuwe te kiezen, of op een <strong>knop</strong> om de link te wijzigen.</span>
       </div>
       <div class="ksa-dock-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-push" id="ksaBtnSendPush" title="Stuur direct een pushbericht naar alle smartphones via OneSignal">📢 Pushbericht</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnEditTopbar" title="Pas de bovenste blauwe KSA-balk aan">📢 Topbalk</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnToggleBanner" title="Toon of verberg de Event Aftelbanner">🎯 Banner Aan/Uit</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnGithubConfig" title="Stel GitHub toegangstoken in voor live publicatie">⚙️ GitHub Koppeling</button>
@@ -1275,6 +1282,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     modalBackdrop.innerHTML = `<div class="ksa-editor-modal" id="ksaEditorModalContent"></div>`;
     document.body.appendChild(modalBackdrop);
 
+    document.getElementById('ksaBtnSendPush').onclick = openPushNotificationModal;
     document.getElementById('ksaBtnEditTopbar').onclick = openTopbarModal;
     document.getElementById('ksaBtnSaveEdits').onclick = saveAllEditsToGithub;
     document.getElementById('ksaBtnExitEdit').onclick = disableEditMode;
@@ -3247,6 +3255,179 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       backdrop.style.display = 'none';
       if (fromSave && document.getElementById('ksaGhTokenInput').value.trim()) {
         saveAllEditsToGithub();
+      }
+    };
+  }
+
+  // --------------------------------------------------------------------------
+  // ONESIGNAL PUSH BERICHT VERZENDEN DIRECT VANUIT DE SITE/APP
+  // --------------------------------------------------------------------------
+  function openPushNotificationModal() {
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    const modal = document.getElementById('ksaEditorModalContent');
+    if (!backdrop || !modal) return;
+
+    const savedKey = localStorage.getItem('ksa_onesignal_rest_key') || '';
+    const defaultUrl = window.location.origin + window.location.pathname.replace(/[^\/]+$/, 'mobile.html');
+
+    modal.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <span style="font-size:28px;">🔔</span>
+        <div>
+          <h3 style="margin:0; color:#0055a5; font-size:18px;">Stuur Pushbericht naar Smartphones</h3>
+          <p style="margin:2px 0 0; font-size:12.5px; color:#64748b;">
+            Verstuur direct een melding naar alle telefoons van ouders en leden die geabonneerd zijn!
+          </p>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:16px;">
+        <label style="display:block; font-weight:700; font-size:13px; color:#1e293b; margin-bottom:4px;">
+          Titel van de melding:
+        </label>
+        <input type="text" id="ksaPushTitleInput" value="KSA Zonhoven" placeholder="Bv. KSA Zonhoven Meisjes" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; margin-bottom:12px;">
+
+        <label style="display:block; font-weight:700; font-size:13px; color:#1e293b; margin-bottom:4px;">
+          Berichttekst (wat verschijnt op het scherm van de telefoon):
+        </label>
+        <textarea id="ksaPushMessageInput" rows="3" placeholder="Bv. Vergeet komende zondag je laarzen en een regenjas niet voor het grote bosspel! 🌲" style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; resize:vertical; font-family:inherit; margin-bottom:12px;"></textarea>
+
+        <label style="display:block; font-weight:700; font-size:13px; color:#1e293b; margin-bottom:4px;">
+          Doorkliklink bij aantikken (optioneel):
+        </label>
+        <input type="url" id="ksaPushUrlInput" value="${defaultUrl}" placeholder="https://..." style="width:100%; box-sizing:border-box; padding:9px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:13.5px; margin-bottom:14px;">
+
+        <!-- Live Smartphone Voorbeeld -->
+        <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:10px 14px; display:flex; align-items:flex-start; gap:10px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+          <img src="assets/icons/pwa-icon-192.png" alt="Logo" style="width:36px; height:36px; border-radius:8px; flex-shrink:0;">
+          <div style="flex:1; min-width:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong id="ksaPushPreviewTitle" style="font-size:13px; color:#0f172a;">KSA Zonhoven</strong>
+              <span style="font-size:11px; color:#94a3b8;">Nu</span>
+            </div>
+            <div id="ksaPushPreviewText" style="font-size:12.5px; color:#475569; margin-top:2px; word-break:break-word;">
+              Typ hierboven een bericht...
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OneSignal REST API Sleutel instelling -->
+      <details ${savedKey ? '' : 'open'} style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 12px; margin-bottom:16px;">
+        <summary style="cursor:pointer; font-size:12.5px; font-weight:700; color:#1d4ed8;">
+          🔑 OneSignal REST API Key instellen ${savedKey ? '✓ (Reeds ingesteld in deze browser)' : '(Eenmalig vereist)'}
+        </summary>
+        <p style="font-size:11.5px; color:#475569; margin:6px 0 8px;">
+          Te vinden in je OneSignal dashboard onder <strong>Settings ➔ Keys &amp; IDs ➔ REST API Key</strong>. Wordt eenmalig veilig bewaard in jouw browser.
+        </p>
+        <input type="password" id="ksaPushApiKeyInput" value="${savedKey}" placeholder="Plak hier je REST API Key uit OneSignal" style="width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #93c5fd; border-radius:6px; font-size:12.5px; font-family:monospace;">
+      </details>
+
+      <div id="ksaPushStatusMsg" style="display:none; padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+      <div class="ksa-editor-modal-actions" style="display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaPushCancelBtn">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-push" id="ksaPushSendSubmitBtn" style="background:#0284c7; color:#fff; padding:10px 20px; font-size:14px;">
+          🚀 Nu Versturen
+        </button>
+      </div>
+    `;
+
+    backdrop.style.display = 'flex';
+
+    // Live preview updating
+    const titleInput = document.getElementById('ksaPushTitleInput');
+    const msgInput = document.getElementById('ksaPushMessageInput');
+    const prevTitle = document.getElementById('ksaPushPreviewTitle');
+    const prevText = document.getElementById('ksaPushPreviewText');
+
+    titleInput.oninput = () => { prevTitle.textContent = titleInput.value.trim() || 'KSA Zonhoven'; };
+    msgInput.oninput = () => { prevText.textContent = msgInput.value.trim() || 'Typ hierboven een bericht...'; };
+
+    document.getElementById('ksaPushCancelBtn').onclick = () => { backdrop.style.display = 'none'; };
+
+    document.getElementById('ksaPushSendSubmitBtn').onclick = async () => {
+      const title = titleInput.value.trim() || 'KSA Zonhoven';
+      const message = msgInput.value.trim();
+      const targetUrl = document.getElementById('ksaPushUrlInput').value.trim();
+      const apiKey = document.getElementById('ksaPushApiKeyInput').value.trim();
+      const statusMsg = document.getElementById('ksaPushStatusMsg');
+      const submitBtn = document.getElementById('ksaPushSendSubmitBtn');
+
+      if (!message) {
+        alert('Vul eerst een berichttekst in die je wilt versturen!');
+        msgInput.focus();
+        return;
+      }
+
+      if (!apiKey) {
+        alert('Vul je OneSignal REST API Key in onder "OneSignal REST API Key instellen" om toestemming te geven voor verzending!');
+        return;
+      }
+
+      // Sla de API key veilig op in browser voor volgende keren
+      localStorage.setItem('ksa_onesignal_rest_key', apiKey);
+
+      if (!confirm(`Wil je dit pushbericht nu echt verzenden naar alle geabonneerde smartphones?\n\nTitel: ${title}\nBericht: ${message}`)) {
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Bezig met versturen...';
+      statusMsg.style.display = 'block';
+      statusMsg.style.background = '#e0f2fe';
+      statusMsg.style.color = '#0369a1';
+      statusMsg.textContent = '📡 Verbinding maken met Apple en Google push servers via OneSignal...';
+
+      try {
+        const cleanKey = apiKey.replace(/^(Key|Basic)\s+/i, '');
+        const payload = {
+          app_id: "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+          included_segments: ["Total Subscriptions"],
+          headings: { en: title, nl: title },
+          contents: { en: message, nl: message },
+          url: targetUrl || defaultUrl,
+          chrome_web_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+          chrome_web_badge: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+          firefox_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
+        };
+
+        const response = await fetch('https://onesignal.com/api/v1/notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Authorization': 'Key ' + cleanKey
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && !data.errors) {
+          const recipients = data.recipients !== undefined ? data.recipients : 'alle actieve';
+          statusMsg.style.background = '#dcfce7';
+          statusMsg.style.color = '#15803d';
+          statusMsg.textContent = `✅ Bericht succesvol verzonden naar ${recipients} smartphone(s)!`;
+          setTimeout(() => {
+            alert(`🎉 Gelukt!\n\nHet pushbericht is succesvol verstuurd naar ${recipients} smartphone(s).`);
+            backdrop.style.display = 'none';
+          }, 1200);
+        } else {
+          const errDetail = (data.errors && (Array.isArray(data.errors) ? data.errors.join(', ') : JSON.stringify(data.errors))) || data.message || 'Onbekende fout';
+          statusMsg.style.background = '#fee2e2';
+          statusMsg.style.color = '#b91c1c';
+          statusMsg.textContent = '❌ Fout: ' + errDetail;
+          submitBtn.disabled = false;
+          submitBtn.textContent = '🚀 Nu Versturen';
+          alert('Er trad een fout op bij het verzenden:\n' + errDetail + '\n\nControleer of je OneSignal REST API Key juist is.');
+        }
+      } catch (err) {
+        statusMsg.style.background = '#fee2e2';
+        statusMsg.style.color = '#b91c1c';
+        statusMsg.textContent = '❌ Netwerkfout: ' + err.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Nu Versturen';
+        alert('Netwerkfout bij aanroepen van OneSignal: ' + err.message);
       }
     };
   }
