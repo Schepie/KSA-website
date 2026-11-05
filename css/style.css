@@ -301,6 +301,37 @@ body.ksa-edit-mode-active .ksa-topbar.ksa-section-hidden {
   gap: 12px;
 }
 
+/* Leiding Edit Mode Header Shortcut */
+.desktop-header-edit-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  font-size: 1.15rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+  flex-shrink: 0;
+}
+
+.desktop-header-edit-btn:hover {
+  background: #fde68a;
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+
+.desktop-header-edit-btn.active {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
 /* KSA.BE Buttons */
 .btn {
   display: inline-flex;

@@ -1249,6 +1249,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       };
     }
 
+    const deskHeaderBtn = document.getElementById('desktopEditTriggerBtn');
+    if (deskHeaderBtn) {
+      deskHeaderBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isEditMode) disableEditMode();
+        else promptAndEnableEditMode();
+      };
+    }
+
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
@@ -1587,6 +1597,13 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       mobHeaderBtn.innerHTML = '✖';
     }
 
+    const deskHeaderBtn = document.getElementById('desktopEditTriggerBtn');
+    if (deskHeaderBtn) {
+      deskHeaderBtn.classList.add('active');
+      deskHeaderBtn.title = 'Sluit bewerk-modus';
+      deskHeaderBtn.innerHTML = '✖';
+    }
+
     document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(item => {
       if (!item.dataset.ksaTabBound) {
         item.dataset.ksaTabBound = '1';
@@ -1673,6 +1690,13 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       mobHeaderBtn.classList.remove('active');
       mobHeaderBtn.title = 'Bewerk website (Leiding Edit Mode)';
       mobHeaderBtn.innerHTML = '✏️';
+    }
+
+    const deskHeaderBtn = document.getElementById('desktopEditTriggerBtn');
+    if (deskHeaderBtn) {
+      deskHeaderBtn.classList.remove('active');
+      deskHeaderBtn.title = 'Bewerk website (Leiding Edit Mode)';
+      deskHeaderBtn.innerHTML = '✏️';
     }
   }
 
