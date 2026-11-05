@@ -26,14 +26,31 @@
   <script>
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
+      const isGhPages = window.location.pathname.includes('/KSA-website');
+      const swPath = isGhPages ? 'KSA-website/OneSignalSDKWorker.js' : 'OneSignalSDKWorker.js';
+      const swScope = isGhPages ? '/KSA-website/' : '/';
+
       await OneSignal.init({
         appId: "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+        serviceWorkerPath: swPath,
+        serviceWorkerParam: {
+          scope: swScope
+        },
         safari_web_id: "web.onesignal.auto.1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
         notifyButton: {
           enable: false,
         },
         allowLocalhostAsSecureOrigin: true,
       });
+
+      // Vraag na 2.5 seconden vriendelijk om meldingen in te schakelen
+      setTimeout(async function() {
+        try {
+          if (!OneSignal.User.PushSubscription.optedIn) {
+            OneSignal.Slidedown.promptPush();
+          }
+        } catch (err) {}
+      }, 2500);
     });
   </script>
 </head>
