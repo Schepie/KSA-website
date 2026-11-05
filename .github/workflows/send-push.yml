@@ -18,45 +18,73 @@ on:
       rest_key:
         description: 'OneSignal REST API Key'
         required: false
+  push:
+    paths:
+      - 'data/push-trigger.json'
 
 jobs:
   send-push:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Verstuur pushbericht naar OneSignal
         run: |
+          TITLE="KSA Zonhoven"
+          MESSAGE=""
+          URL="https://schepie.github.io/KSA-website/mobile.html"
           API_KEY="${{ inputs.rest_key }}"
-          if [ -z "$API_KEY" ]; then
+
+          # 1. Check of het via handmatige workflow_dispatch kwam
+          if [ -n "${{ inputs.message }}" ]; then
+            TITLE="${{ inputs.title }}"
+            MESSAGE="${{ inputs.message }}"
+            URL="${{ inputs.url }}"
+          # 2. Of via data/push-trigger.json commit vanuit de bewerkmodus
+          elif [ -f "data/push-trigger.json" ]; then
+            TITLE=$(jq -r '.title // "KSA Zonhoven"' data/push-trigger.json)
+            MESSAGE=$(jq -r '.message // ""' data/push-trigger.json)
+            URL=$(jq -r '.url // "https://schepie.github.io/KSA-website/mobile.html"' data/push-trigger.json)
+            TRIGGER_KEY=$(jq -r '.rest_key // ""' data/push-trigger.json)
+            if [ -n "$TRIGGER_KEY" ] && [ "$TRIGGER_KEY" != "null" ]; then
+              API_KEY="$TRIGGER_KEY"
+            fi
+          fi
+
+          if [ -z "$MESSAGE" ] || [ "$MESSAGE" = "null" ]; then
+            echo "Geen bericht om te versturen."
+            exit 0
+          fi
+
+          if [ -z "$API_KEY" ] || [ "$API_KEY" = "null" ]; then
             API_KEY="${{ secrets.ONESIGNAL_REST_KEY }}"
           fi
 
-          if [ -z "$API_KEY" ]; then
-            echo "❌ Fout: Geen OneSignal REST API Key opgegeven!"
+          if [ -z "$API_KEY" ] || [ "$API_KEY" = "null" ]; then
+            echo "❌ Fout: Geen OneSignal REST API Key gevonden in inputs, trigger bestand of repository secrets!"
             exit 1
           fi
 
           CLEAN_KEY=$(echo "$API_KEY" | sed -E 's/^(Key|Basic)[[:space:]]+//I')
 
-          PAYLOAD=$(cat << 'EOF'
-          {
-            "app_id": "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
-            "included_segments": ["Total Subscriptions"],
-            "headings": {
-              "en": "${{ inputs.title }}",
-              "nl": "${{ inputs.title }}"
-            },
-            "contents": {
-              "en": "${{ inputs.message }}",
-              "nl": "${{ inputs.message }}"
-            },
-            "url": "${{ inputs.url }}",
-            "chrome_web_icon": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
-            "chrome_web_badge": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
-            "firefox_icon": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
-          }
-          EOF
-          )
+          PAYLOAD=$(jq -n \
+            --arg app_id "1d99a44c-9fef-470b-b8c9-9256adc1f7ee" \
+            --arg title "$TITLE" \
+            --arg message "$MESSAGE" \
+            --arg url "$URL" \
+            '{
+              app_id: $app_id,
+              included_segments: ["Total Subscriptions"],
+              headings: { en: $title, nl: $title },
+              contents: { en: $message, nl: $message },
+              url: $url,
+              chrome_web_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+              chrome_web_badge: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+              firefox_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
+            }')
 
+          echo "Pushbericht versturen voor: $TITLE - $MESSAGE"
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://onesignal.com/api/v1/notifications" \
             -H "Content-Type: application/json; charset=utf-8" \
             -H "Authorization: Key $CLEAN_KEY" \
@@ -74,4 +102,3 @@ jobs:
             echo "❌ Fout bij OneSignal: $HTTP_BODY"
             exit 1
           fi
-

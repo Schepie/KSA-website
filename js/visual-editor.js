@@ -3373,11 +3373,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ GitHub Action starten...';
+      submitBtn.textContent = '⏳ Pushbericht versturen via GitHub...';
       statusMsg.style.display = 'block';
       statusMsg.style.background = '#e0f2fe';
       statusMsg.style.color = '#0369a1';
-      statusMsg.textContent = '📡 GitHub Action workflow starten via GitHub API...';
+      statusMsg.textContent = '📡 Push-opdracht verzenden naar GitHub...';
 
       const ghToken = localStorage.getItem('ksa_github_token');
       const ghOwner = localStorage.getItem('ksa_github_owner') || 'Schepie';
@@ -3386,64 +3386,45 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
       if (!ghToken) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
+        submitBtn.textContent = '🚀 Nu Versturen';
         statusMsg.style.background = '#fee2e2';
         statusMsg.style.color = '#b91c1c';
         statusMsg.textContent = '❌ Geen GitHub token ingesteld.';
-        alert('Je hebt eerst je GitHub toegangstoken nodig om de GitHub Action server te kunnen aanroepen.\n\nKlik op "⚙️ GitHub Koppeling" in de bewerkbalk om je token in te vullen.');
+        alert('Je hebt eerst je GitHub toegangstoken nodig om het bericht te kunnen versturen.\n\nKlik op "⚙️ GitHub Koppeling" in de bewerkbalk om je token in te vullen.');
         return;
       }
 
       try {
-        const dispatchUrl = `https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/workflows/send-push.yml/dispatches`;
-        const dispatchPayload = {
-          ref: ghBranch,
-          inputs: {
-            title: title,
-            message: message,
-            url: targetUrl || defaultUrl,
-            rest_key: apiKey || ''
-          }
+        // We schrijven de push-opdracht weg naar data/push-trigger.json.
+        // Omdat je token al bestanden mag opslaan, werkt dit altijd direct zonder speciale "workflow" token-rechten!
+        const triggerPayload = {
+          updated_at: new Date().toISOString(),
+          title: title,
+          message: message,
+          url: targetUrl || defaultUrl,
+          rest_key: apiKey || ''
         };
 
-        const response = await fetch(dispatchUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': 'token ' + ghToken,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(dispatchPayload)
-        });
+        const jsonStr = JSON.stringify(triggerPayload, null, 2);
+        const base64Content = utf8ToBase64(jsonStr);
+        const commitMsg = `🔔 Verstuur pushbericht: ${title} - ${message.slice(0, 35)}...`;
 
-        if (response.status === 204 || response.ok) {
-          statusMsg.style.background = '#dcfce7';
-          statusMsg.style.color = '#15803d';
-          statusMsg.textContent = '✅ GitHub Action is gestart! Het pushbericht wordt binnen enkele seconden server-to-server verzonden naar alle smartphones.';
-          setTimeout(() => {
-            alert(`🎉 Gelukt!\n\nDe GitHub Action workflow is succesvol geactiveerd.\nGitHub verstuurt het pushbericht nu server-to-server naar alle smartphones.`);
-            backdrop.style.display = 'none';
-          }, 1500);
-        } else {
-          let errDetail = 'HTTP ' + response.status;
-          try {
-            const errData = await response.json();
-            errDetail = errData.message || JSON.stringify(errData);
-          } catch (e) {}
-          statusMsg.style.background = '#fee2e2';
-          statusMsg.style.color = '#b91c1c';
-          statusMsg.textContent = '❌ Fout bij starten van GitHub Action: ' + errDetail;
-          submitBtn.disabled = false;
-          submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
-          alert('Fout bij starten van GitHub Action:\n' + errDetail + '\n\nTip: Zorg dat je GitHub Personal Access Token (PAT) de optie "workflow" of "actions" aangevinkt heeft.');
-        }
+        await commitFileToGithub(ghToken, ghOwner, ghRepo, ghBranch, 'data/push-trigger.json', base64Content, commitMsg);
+
+        statusMsg.style.background = '#dcfce7';
+        statusMsg.style.color = '#15803d';
+        statusMsg.textContent = '✅ Push-opdracht ontvangen door GitHub! De GitHub Action verstuurt het bericht direct server-to-server naar alle smartphones.';
+        setTimeout(() => {
+          alert(`🎉 Gelukt!\n\nHet pushbericht is succesvol doorgegeven aan GitHub!\nDe server verstuurt het bericht nu binnen enkele seconden naar alle smartphones.`);
+          backdrop.style.display = 'none';
+        }, 1500);
       } catch (err) {
         statusMsg.style.background = '#fee2e2';
         statusMsg.style.color = '#b91c1c';
-        statusMsg.textContent = '❌ Netwerkfout: ' + err.message;
+        statusMsg.textContent = '❌ Fout bij versturen: ' + err.message;
         submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
-        alert('Netwerkfout: ' + err.message);
+        submitBtn.textContent = '🚀 Nu Versturen';
+        alert('Fout bij versturen via GitHub:\n' + err.message);
       }
     };
   }
