@@ -29,6 +29,9 @@
   const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const isSmallScreen = window.innerWidth <= MOBILE_BREAKPOINT || 
     (window.matchMedia && window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches);
+  const isStandalone = (window.navigator.standalone === true) || 
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    (localStorage.getItem('ksa_app_installed') === '1');
 
   const pathname = window.location.pathname.toLowerCase();
   const isMobilePage = pathname.endsWith('mobile.html') || pathname.includes('/mobile');
@@ -40,16 +43,19 @@
 
   // Route: If on desktop page and is mobile screen
   if (!isMobilePage) {
-    if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA)) {
+    if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA || isStandalone)) {
       const targetHash = window.location.hash || '';
       window.location.replace('mobile.html' + targetHash);
     }
   } 
   // Route: If on mobile page, only send to desktop if explicitly requested or on large non-touch screen without mobile preference
   else {
-    if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
-      const targetHash = window.location.hash || '';
-      window.location.replace('index.html' + targetHash);
+    // If running as standalone installed app, NEVER redirect to desktop
+    if (!isStandalone) {
+      if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
+        const targetHash = window.location.hash || '';
+        window.location.replace('index.html' + targetHash);
+      }
     }
   }
 
