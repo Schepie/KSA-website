@@ -36,12 +36,12 @@ jobs:
           URL="https://schepie.github.io/KSA-website/mobile.html"
           API_KEY="${{ inputs.rest_key }}"
 
-          # 1. Check of het via handmatige workflow_dispatch kwam
+          # 1. Handmatige workflow_dispatch input
           if [ -n "${{ inputs.message }}" ]; then
             TITLE="${{ inputs.title }}"
             MESSAGE="${{ inputs.message }}"
             URL="${{ inputs.url }}"
-          # 2. Of via data/push-trigger.json commit vanuit de bewerkmodus
+          # 2. Of via data/push-trigger.json commit
           elif [ -f "data/push-trigger.json" ]; then
             TITLE=$(jq -r '.title // "KSA Zonhoven"' data/push-trigger.json)
             MESSAGE=$(jq -r '.message // ""' data/push-trigger.json)
@@ -66,7 +66,13 @@ jobs:
             exit 1
           fi
 
-          CLEAN_KEY=$(echo "$API_KEY" | sed -E 's/^(Key|Basic)[[:space:]]+//I')
+          CLEAN_KEY=$(echo "$API_KEY" | sed -E 's/^(Key|Basic)[[:space:]]+//I' | tr -d '\r\n ')
+
+          # Waarschuwing als de sleutel een UUID is (App ID ipv REST API Key)
+          if echo "$CLEAN_KEY" | grep -E -q '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; then
+            echo "⚠️ Opgelet: De ingevoerde sleutel lijkt op een OneSignal App ID en NIET op een REST API Key!"
+            echo "Controleer in OneSignal: Settings -> Keys & IDs -> REST API Key."
+          fi
 
           PAYLOAD=$(jq -n \
             --arg app_id "1d99a44c-9fef-470b-b8c9-9256adc1f7ee" \
@@ -84,14 +90,37 @@ jobs:
               firefox_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
             }')
 
-          echo "Pushbericht versturen voor: $TITLE - $MESSAGE"
+          # Bepaal het type header (nieuwe v2 keys gebruiken 'Key', klassieke keys gebruiken 'Basic')
+          if echo "$CLEAN_KEY" | grep -q "^os_v2_"; then
+            AUTH_PREFIX="Key"
+          else
+            AUTH_PREFIX="Basic"
+          fi
+
+          echo "Pushbericht versturen voor: $TITLE - $MESSAGE (met prefix $AUTH_PREFIX)..."
           RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://onesignal.com/api/v1/notifications" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -H "Authorization: Key $CLEAN_KEY" \
+            -H "Authorization: $AUTH_PREFIX $CLEAN_KEY" \
             -d "$PAYLOAD")
 
           HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
           HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+          # Als 401, probeer automatisch de alternatieve prefix (Basic <-> Key)
+          if [ "$HTTP_STATUS" -eq 401 ]; then
+            if [ "$AUTH_PREFIX" = "Basic" ]; then
+              ALT_PREFIX="Key"
+            else
+              ALT_PREFIX="Basic"
+            fi
+            echo "Probeer alternatieve authenticatie header: $ALT_PREFIX..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://onesignal.com/api/v1/notifications" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -H "Authorization: $ALT_PREFIX $CLEAN_KEY" \
+              -d "$PAYLOAD")
+            HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+            HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          fi
 
           echo "HTTP Status: $HTTP_STATUS"
           echo "Response: $HTTP_BODY"
