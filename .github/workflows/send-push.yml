@@ -1,0 +1,76 @@
+name: Stuur KSA Pushbericht
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Titel van de melding'
+        required: true
+        default: 'KSA Zonhoven'
+      message:
+        description: 'Berichttekst voor smartphones'
+        required: true
+        default: 'Vergeet komende zondag je laarzen niet!'
+      url:
+        description: 'Doorklik link'
+        required: false
+        default: 'https://schepie.github.io/KSA-website/mobile.html'
+      rest_key:
+        description: 'OneSignal REST API Key'
+        required: false
+
+jobs:
+  send-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verstuur pushbericht naar OneSignal
+        run: |
+          API_KEY="${{ inputs.rest_key }}"
+          if [ -z "$API_KEY" ]; then
+            API_KEY="${{ secrets.ONESIGNAL_REST_KEY }}"
+          fi
+
+          if [ -z "$API_KEY" ]; then
+            echo "❌ Fout: Geen OneSignal REST API Key opgegeven!"
+            exit 1
+          fi
+
+          CLEAN_KEY=$(echo "$API_KEY" | sed -E 's/^(Key|Basic)[[:space:]]+//I')
+
+          PAYLOAD=$(cat << 'EOF'
+          {
+            "app_id": "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+            "included_segments": ["Total Subscriptions"],
+            "headings": {
+              "en": "${{ inputs.title }}",
+              "nl": "${{ inputs.title }}"
+            },
+            "contents": {
+              "en": "${{ inputs.message }}",
+              "nl": "${{ inputs.message }}"
+            },
+            "url": "${{ inputs.url }}",
+            "chrome_web_icon": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+            "chrome_web_badge": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
+            "firefox_icon": "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
+          }
+          EOF
+          )
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://onesignal.com/api/v1/notifications" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -H "Authorization: Key $CLEAN_KEY" \
+            -d "$PAYLOAD")
+
+          HTTP_BODY=$(echo "$RESPONSE" | sed '$d')
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+
+          echo "HTTP Status: $HTTP_STATUS"
+          echo "Response: $HTTP_BODY"
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "✅ Pushbericht succesvol afgeleverd bij OneSignal!"
+          else
+            echo "❌ Fout bij OneSignal: $HTTP_BODY"
+            exit 1
+          fi

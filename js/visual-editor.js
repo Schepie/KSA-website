@@ -3373,61 +3373,77 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ Bezig met versturen...';
+      submitBtn.textContent = '⏳ GitHub Action starten...';
       statusMsg.style.display = 'block';
       statusMsg.style.background = '#e0f2fe';
       statusMsg.style.color = '#0369a1';
-      statusMsg.textContent = '📡 Verbinding maken met Apple en Google push servers via OneSignal...';
+      statusMsg.textContent = '📡 GitHub Action workflow starten via GitHub API...';
+
+      const ghToken = localStorage.getItem('ksa_github_token');
+      const ghOwner = localStorage.getItem('ksa_github_owner') || 'Schepie';
+      const ghRepo = localStorage.getItem('ksa_github_repo') || 'KSA-website';
+      const ghBranch = localStorage.getItem('ksa_github_branch') || 'main';
+
+      if (!ghToken) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
+        statusMsg.style.background = '#fee2e2';
+        statusMsg.style.color = '#b91c1c';
+        statusMsg.textContent = '❌ Geen GitHub token ingesteld.';
+        alert('Je hebt eerst je GitHub toegangstoken nodig om de GitHub Action server te kunnen aanroepen.\n\nKlik op "⚙️ GitHub Koppeling" in de bewerkbalk om je token in te vullen.');
+        return;
+      }
 
       try {
-        const cleanKey = apiKey.replace(/^(Key|Basic)\s+/i, '');
-        const payload = {
-          app_id: "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
-          included_segments: ["Total Subscriptions"],
-          headings: { en: title, nl: title },
-          contents: { en: message, nl: message },
-          url: targetUrl || defaultUrl,
-          chrome_web_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
-          chrome_web_badge: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png",
-          firefox_icon: "https://schepie.github.io/KSA-website/assets/icons/pwa-icon-192.png"
+        const dispatchUrl = `https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/workflows/send-push.yml/dispatches`;
+        const dispatchPayload = {
+          ref: ghBranch,
+          inputs: {
+            title: title,
+            message: message,
+            url: targetUrl || defaultUrl,
+            rest_key: apiKey || ''
+          }
         };
 
-        const response = await fetch('https://onesignal.com/api/v1/notifications', {
+        const response = await fetch(dispatchUrl, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-            'Authorization': 'Key ' + cleanKey
+            'Authorization': 'token ' + ghToken,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(dispatchPayload)
         });
 
-        const data = await response.json();
-
-        if (response.ok && !data.errors) {
-          const recipients = data.recipients !== undefined ? data.recipients : 'alle actieve';
+        if (response.status === 204 || response.ok) {
           statusMsg.style.background = '#dcfce7';
           statusMsg.style.color = '#15803d';
-          statusMsg.textContent = `✅ Bericht succesvol verzonden naar ${recipients} smartphone(s)!`;
+          statusMsg.textContent = '✅ GitHub Action is gestart! Het pushbericht wordt binnen enkele seconden server-to-server verzonden naar alle smartphones.';
           setTimeout(() => {
-            alert(`🎉 Gelukt!\n\nHet pushbericht is succesvol verstuurd naar ${recipients} smartphone(s).`);
+            alert(`🎉 Gelukt!\n\nDe GitHub Action workflow is succesvol geactiveerd.\nGitHub verstuurt het pushbericht nu server-to-server naar alle smartphones.`);
             backdrop.style.display = 'none';
-          }, 1200);
+          }, 1500);
         } else {
-          const errDetail = (data.errors && (Array.isArray(data.errors) ? data.errors.join(', ') : JSON.stringify(data.errors))) || data.message || 'Onbekende fout';
+          let errDetail = 'HTTP ' + response.status;
+          try {
+            const errData = await response.json();
+            errDetail = errData.message || JSON.stringify(errData);
+          } catch (e) {}
           statusMsg.style.background = '#fee2e2';
           statusMsg.style.color = '#b91c1c';
-          statusMsg.textContent = '❌ Fout: ' + errDetail;
+          statusMsg.textContent = '❌ Fout bij starten van GitHub Action: ' + errDetail;
           submitBtn.disabled = false;
-          submitBtn.textContent = '🚀 Nu Versturen';
-          alert('Er trad een fout op bij het verzenden:\n' + errDetail + '\n\nControleer of je OneSignal REST API Key juist is.');
+          submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
+          alert('Fout bij starten van GitHub Action:\n' + errDetail + '\n\nTip: Zorg dat je GitHub Personal Access Token (PAT) de optie "workflow" of "actions" aangevinkt heeft.');
         }
       } catch (err) {
         statusMsg.style.background = '#fee2e2';
         statusMsg.style.color = '#b91c1c';
         statusMsg.textContent = '❌ Netwerkfout: ' + err.message;
         submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 Nu Versturen';
-        alert('Netwerkfout bij aanroepen van OneSignal: ' + err.message);
+        submitBtn.textContent = '🚀 Nu Versturen via GitHub Action';
+        alert('Netwerkfout: ' + err.message);
       }
     };
   }
