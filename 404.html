@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSA Zonhoven | Doorsturen...</title>
+  <script>
+    // GitHub Pages 404 Fallback Router
+    (function() {
+      const pathname = window.location.pathname.toLowerCase();
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+
+      // Als de gebruiker op een mobiel toestel zit of van de mobiele app kwam
+      if (isMobileUA || isSmallScreen || pathname.includes('mobile') || pathname.includes('app')) {
+        window.location.replace('/KSA-website/mobile.html');
+      } else {
+        window.location.replace('/KSA-website/index.html');
+      }
+    })();
+  </script>
+  <meta http-equiv="refresh" content="0; url=mobile.html">
+</head>
+<body style="font-family:sans-serif; text-align:center; padding:40px 20px; background:#0067b1; color:#fff;">
+  <h2>KSA Zonhoven</h2>
+  <p>Je wordt automatisch doorgestuurd...</p>
+  <p><a href="mobile.html" style="color:#ffe600; font-weight:bold;">Klik hier als je niet direct wordt doorgestuurd</a></p>
+</body>
+</html>
