@@ -37,11 +37,6 @@
     const pathname = window.location.pathname.toLowerCase();
     const isMobilePage = pathname.endsWith('mobile.html') || pathname.includes('/mobile');
 
-    // If already on mobile page without explicit desktop preference, set mobile preference
-    if (isMobilePage && preferredView !== 'desktop') {
-      try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
-    }
-
     // Route: If on desktop page and is mobile screen
     if (!isMobilePage) {
       if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA || isStandalone)) {
