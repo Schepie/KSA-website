@@ -1,3 +1,10 @@
+// OneSignal Web Push SDK Integratie
+try {
+  importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+} catch (e) {
+  console.warn('[SW] OneSignal import mislukt:', e);
+}
+
 const CACHE_NAME = 'ksa-app-v3';
 const STATIC_ASSETS = [
   './mobile.html',

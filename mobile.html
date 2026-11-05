@@ -23,7 +23,7 @@
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/pwa-icon-512.png">
 
   <!-- Mobile App Stylesheet -->
-  <link rel="stylesheet" href="css/mobile.css?v=gh26">
+  <link rel="stylesheet" href="css/mobile.css?v=gh28">
 
   <!-- Instant Standalone App Detection -->
   <script>
@@ -34,6 +34,52 @@
 
   <!-- Automatic Device & Screen Detection -->
   <script src="js/device-detect.js?v=gh27"></script>
+
+  <!-- OneSignal Web Push SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+        safari_web_id: "web.onesignal.auto.1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+        notifyButton: {
+          enable: false,
+        },
+        allowLocalhostAsSecureOrigin: true,
+      });
+
+      // Update notificatiebel knop
+      try {
+        const bellBtn = document.getElementById('pushNotificationBtn');
+        if (bellBtn) {
+          bellBtn.style.display = 'inline-flex';
+          const isOptedIn = OneSignal.User.PushSubscription.optedIn;
+          if (isOptedIn) {
+            bellBtn.classList.add('notifications-active');
+            bellBtn.title = 'Meldingen zijn ingeschakeld';
+          }
+          bellBtn.onclick = function() {
+            if (OneSignal.User.PushSubscription.optedIn) {
+              alert('Je bent al aangemeld voor meldingen van KSA Zonhoven! 🔔');
+            } else {
+              OneSignal.Slidedown.promptPush();
+            }
+          };
+        }
+
+        OneSignal.User.PushSubscription.addEventListener("change", function(event) {
+          const btn = document.getElementById('pushNotificationBtn');
+          if (btn && event.current.optedIn) {
+            btn.classList.add('notifications-active');
+            btn.title = 'Meldingen zijn ingeschakeld';
+          }
+        });
+      } catch (e) {
+        console.warn('OneSignal UI init error:', e);
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -50,6 +96,10 @@
     </div>
 
     <div class="header-actions">
+      <!-- Push Meldingen Bel Knop -->
+      <button type="button" class="header-action-btn" id="pushNotificationBtn" title="Belangrijke meldingen ontvangen" style="display:none; font-size:16px;">
+        🔔
+      </button>
       <!-- Leiding Edit Mode shortcut -->
       <button type="button" class="header-action-btn ksa-header-edit-btn" id="mobileEditTriggerBtn" title="Bewerk website (Leiding Edit Mode)">
         ✏️

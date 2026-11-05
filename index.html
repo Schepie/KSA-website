@@ -20,6 +20,22 @@
 
   <!-- Automatic Device & Screen Detection (Mobile vs Desktop) -->
   <script src="js/device-detect.js?v=gh27"></script>
+
+  <!-- OneSignal Web Push SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+        safari_web_id: "web.onesignal.auto.1d99a44c-9fef-470b-b8c9-9256adc1f7ee",
+        notifyButton: {
+          enable: false,
+        },
+        allowLocalhostAsSecureOrigin: true,
+      });
+    });
+  </script>
 </head>
 <body>
 
