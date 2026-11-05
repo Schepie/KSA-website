@@ -19,45 +19,60 @@
     try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
   }
 
-  // Get current stored preference
-  let preferredView = null;
-  try {
-    preferredView = sessionStorage.getItem(STORAGE_KEY);
-  } catch (e) {}
+  function evaluateAndRoute() {
+    // Get current stored preference
+    let preferredView = null;
+    try {
+      preferredView = sessionStorage.getItem(STORAGE_KEY);
+    } catch (e) {}
 
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const isSmallScreen = window.innerWidth <= MOBILE_BREAKPOINT || 
-    (window.matchMedia && window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches);
-  const isStandalone = (window.navigator.standalone === true) || 
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    (localStorage.getItem('ksa_app_installed') === '1');
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isSmallScreen = window.innerWidth <= MOBILE_BREAKPOINT || 
+      (window.matchMedia && window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)').matches);
+    const isStandalone = (window.navigator.standalone === true) || 
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      (localStorage.getItem('ksa_app_installed') === '1');
 
-  const pathname = window.location.pathname.toLowerCase();
-  const isMobilePage = pathname.endsWith('mobile.html') || pathname.includes('/mobile');
+    const pathname = window.location.pathname.toLowerCase();
+    const isMobilePage = pathname.endsWith('mobile.html') || pathname.includes('/mobile');
 
-  // If already on mobile page, remember mobile preference
-  if (isMobilePage && preferredView !== 'desktop') {
-    try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
-  }
-
-  // Route: If on desktop page and is mobile screen
-  if (!isMobilePage) {
-    if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA || isStandalone)) {
-      const targetHash = window.location.hash || '';
-      window.location.replace('mobile.html' + targetHash);
+    // If already on mobile page without explicit desktop preference, set mobile preference
+    if (isMobilePage && preferredView !== 'desktop') {
+      try { sessionStorage.setItem(STORAGE_KEY, 'mobile'); } catch (e) {}
     }
-  } 
-  // Route: If on mobile page, only send to desktop if explicitly requested or on large non-touch screen without mobile preference
-  else {
-    // If running as standalone installed app, NEVER redirect to desktop
-    if (!isStandalone) {
-      if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
+
+    // Route: If on desktop page and is mobile screen
+    if (!isMobilePage) {
+      if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA || isStandalone)) {
         const targetHash = window.location.hash || '';
-        window.location.replace('index.html' + targetHash);
+        window.location.replace('mobile.html' + targetHash);
+      }
+    } 
+    // Route: If on mobile page, only send to desktop if explicitly requested or on large non-touch screen without mobile preference
+    else {
+      // If running as standalone installed app, NEVER redirect to desktop
+      if (!isStandalone) {
+        if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
+          const targetHash = window.location.hash || '';
+          window.location.replace('index.html' + targetHash);
+        }
       }
     }
   }
+
+  // 1. Run immediately on load
+  evaluateAndRoute();
+
+  // 2. Also listen for dynamic resize / DevTools device mode toggle
+  let resizeTimeout = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(evaluateAndRoute, 250);
+  });
+  window.addEventListener('orientationchange', function() {
+    setTimeout(evaluateAndRoute, 250);
+  });
 
   // Helper function accessible to UI buttons
   window.switchKsaView = function(targetView) {
