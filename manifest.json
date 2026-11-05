@@ -1,10 +1,12 @@
 {
+  "id": "ksa-zonhoven-app",
   "name": "KSA Zonhoven Meisjes",
   "short_name": "KSA Zonhoven",
   "description": "Officiële mobiele app van KSA Zonhoven Meisjes met live agenda, groepen, leiding en praktische info.",
   "start_url": "./mobile.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#0067b1",
   "theme_color": "#0067b1",
   "orientation": "portrait",
@@ -27,7 +29,7 @@
       "src": "assets/icons/pwa-icon-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     }
   ]
 }
