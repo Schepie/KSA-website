@@ -282,10 +282,10 @@
     "topbarHidden": false
   },
   "banner": {
-    "hidden": true,
+    "hidden": false,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T20:01:50.122Z",
+  "updatedAt": "2026-11-06T20:02:24.873Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
