@@ -2639,6 +2639,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const presets = [
       { emoji: '', label: 'Geen icoon' },
       { emoji: 'img:assets/icons/ksa-logo-square.png', iconHtml: '<img src="assets/icons/ksa-logo-square.png" alt="KSA Logo" style="width:26px; height:26px; object-fit:contain; border-radius:4px; vertical-align:middle;">', label: 'KSA Logo' },
+      { emoji: 'img:assets/icons/ksa-logo-geen.png', iconHtml: '<img src="assets/icons/ksa-logo-geen.png" alt="Geen KSA" style="width:26px; height:26px; object-fit:contain; border-radius:4px; vertical-align:middle;">', label: 'Geen KSA' },
       { emoji: '🎅', label: 'Kerstman' },
       { emoji: '🎄', label: 'Kerstboom' },
       { emoji: '👑', label: 'Sinterklaas' },
@@ -2687,10 +2688,25 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (clean) {
         const span = document.createElement('span');
         span.className = 'cal-sticker';
-        if (clean.startsWith('img:') || clean.includes('ksa-logo-square.png') || clean.includes('assets/icons/')) {
+        if (clean.startsWith('img:') || clean.includes('ksa-logo') || clean.includes('assets/icons/')) {
           const imgSrc = clean.startsWith('img:') ? clean.substring(4) : (clean.startsWith('<img') ? (clean.match(/src="([^"]+)"/) || [])[1] : clean);
-          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Logo" width="22" height="22" style="width:22px !important; height:22px !important; max-width:22px !important; max-height:22px !important; object-fit:contain; border-radius:3px; display:block; pointer-events:none;">`;
+          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Sticker" width="22" height="22" style="width:22px !important; height:22px !important; max-width:22px !important; max-height:22px !important; object-fit:contain; border-radius:3px; display:block; pointer-events:none;">`;
           span.setAttribute('data-img-src', imgSrc || 'assets/icons/ksa-logo-square.png');
+
+          // Slimme tekstkoppeling: als 'Geen KSA' gekozen wordt en de tekst is 'KSA', zet op 'GEEN KSA'
+          if (clean.includes('ksa-logo-geen.png')) {
+            const evtText = card.querySelector('.cal-event-text');
+            if (evtText && evtText.textContent.trim().toUpperCase() === 'KSA') {
+              evtText.textContent = 'GEEN KSA';
+              evtText.classList.add('cal-text-underline');
+            }
+          } else if (clean.includes('ksa-logo-square.png')) {
+            const evtText = card.querySelector('.cal-event-text');
+            if (evtText && evtText.textContent.trim().toUpperCase() === 'GEEN KSA') {
+              evtText.textContent = 'KSA';
+              evtText.classList.remove('cal-text-underline');
+            }
+          }
         } else if (clean.startsWith('<img')) {
           span.innerHTML = clean;
         } else {
