@@ -2659,7 +2659,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           </button>
         `).join('')}
       </div>
-      <label>Of typ zelf een emoji / icoon (maak leeg om te verwijderen):</label>
+      <label style="display:block; margin-top:10px; font-weight:600; color:#1e293b;">Of typ zelf een emoji / icoon (maak leeg om te verwijderen):</label>
+      <div style="font-size:0.8rem; color:#475569; background:#f8fafc; padding:7px 10px; border-radius:6px; margin:4px 0 8px 0; border:1px solid #e2e8f0; line-height:1.4;">
+        💡 <strong>Tip:</strong> Open het Windows emoji-toetsenbord met de sneltoets: 👉 <strong>Windows-toets + . (punt)</strong> <em>(of Windows-toets + ;)</em>
+      </div>
       <input type="text" id="ksaCustomStickerInput" value="${curVal}" placeholder="Bv. 🎅 of laat leeg">
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaStickerCancel">Annuleren</button>
@@ -2742,7 +2745,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           </button>
         `).join('')}
       </div>
-      <label>Of typ een eigen emoji / icoon:</label>
+      <label style="display:block; margin-top:10px; font-weight:600; color:#1e293b;">Of typ een eigen emoji / icoon:</label>
+      <div style="font-size:0.8rem; color:#475569; background:#f8fafc; padding:7px 10px; border-radius:6px; margin:4px 0 8px 0; border:1px solid #e2e8f0; line-height:1.4;">
+        💡 <strong>Tip:</strong> Open het Windows emoji-toetsenbord met de sneltoets: 👉 <strong>Windows-toets + . (punt)</strong> <em>(of Windows-toets + ;)</em>
+      </div>
       <input type="text" id="ksaCustomShortcutEmoji" value="${curVal}" placeholder="Bv. 🚀 of 🎯" style="font-size:1.6rem; text-align:center;">
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaShortcutCancel">Annuleren</button>
