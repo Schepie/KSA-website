@@ -843,6 +843,13 @@
         </div>
       </div>
 
+      <!-- Privacy & Cookies Link -->
+      <div class="info-card-box" style="text-align:center; padding:12px; background:transparent; border:1px dashed var(--border-subtle); box-shadow:none;">
+        <a href="javascript:void(0)" class="ksa-privacy-trigger" style="color:var(--text-muted); font-size:0.85rem; text-decoration:underline; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
+          <span>🛡️</span> <span>[Privacy &amp; Cookies]</span>
+        </a>
+      </div>
+
     </div>
 
   </main>
@@ -940,11 +947,89 @@
     </a>
   </nav>
 
+  <!-- ==========================================================================
+       PRIVACY & COOKIES BANNER & MODAL
+       ========================================================================== -->
+  <div id="ksaPrivacyConsentBanner" class="ksa-privacy-consent-banner" style="display: none;">
+    <div style="max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div style="display:flex; align-items:center; gap:8px; flex:1 1 260px;">
+        <span style="font-size:1.15rem;">🍪</span>
+        <span style="line-height:1.35; font-size:0.86rem;">
+          Wij gebruiken uitsluitend <strong>functionele cookies</strong> om je surfervaring te verbeteren. Geen advertentietrackers.
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+        <button type="button" id="ksaOpenPrivacyModalBtn" class="topbar-privacy-trigger" style="background:transparent; border:none; padding:4px 6px; font-size:0.84rem;">
+          [Privacy &amp; Cookies]
+        </button>
+        <button type="button" id="ksaAcceptPrivacyConsentBtn" class="btn btn-primary" style="padding:5px 14px; font-size:0.84rem; background:var(--ksa-red); border-color:var(--ksa-red);">
+          Begrepen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy & Cookies Modal -->
+  <div id="ksaPrivacyModalBackdrop" class="ksa-privacy-modal-backdrop" style="display: none;">
+    <div class="ksa-privacy-modal-card" role="dialog" aria-modal="true" aria-labelledby="ksaPrivacyModalTitle">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; border-bottom:2px solid #f1f5f9; padding-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:26px;">🛡️</span>
+          <div>
+            <h3 id="ksaPrivacyModalTitle" style="margin:0; font-size:1.15rem; color:var(--ksa-blue, #002b7f);">Privacy &amp; Cookiebeleid</h3>
+            <span style="font-size:0.75rem; color:#64748b; font-weight:600;">KSA Zonhoven Meisjes • VZW 't Heem</span>
+          </div>
+        </div>
+        <button type="button" id="ksaClosePrivacyModalBtn" style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer; color:#475569; display:flex; align-items:center; justify-content:center;" aria-label="Sluiten">✕</button>
+      </div>
+
+      <div style="font-size:0.86rem; line-height:1.55; color:#334155; display:flex; flex-direction:column; gap:12px;">
+        <p style="margin:0;">
+          KSA Zonhoven Meisjes (Dijkbeemdenweg 8, 3520 Zonhoven) hecht veel waarde aan de bescherming van jouw persoonsgegevens en de privacy van onze leden en leiding conform de Europese <strong>Algemene Verordening Gegevensbescherming (GDPR/AVG)</strong>.
+        </p>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.9rem;">1. Verwerking van Persoonsgegevens</h4>
+          <p style="margin:0; font-size:0.82rem; color:#475569;">
+            Lidinschrijvingen, medische fiches en verzekeringen verlopen via het centrale platform <strong>RAVOT van KSA Nationaal</strong>. Wij verkopen of delen nooit gegevens aan commerciële derden.
+          </p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.9rem;">2. Beeldmateriaal &amp; Foto's</h4>
+          <p style="margin:0; font-size:0.82rem; color:#475569;">
+            Tijdens zondagen en kampen maken we sfeerfoto's voor onze leden en ouders (toestemming via RAVOT). Wil je een foto laten verwijderen? Mail naar <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline; font-weight:600;">hoofdleiding.ksazonhoven@gmail.com</a>.
+          </p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.9rem;">3. Cookies &amp; Lokale Opslag</h4>
+          <p style="margin:0; font-size:0.82rem; color:#475569;">
+            Deze website gebruikt <strong>uitsluitend functionele cookies</strong> voor voorkeuren en het leiding-systeem. OneSignal Push is enkel actief als je zelf meldingen toestaat. Geen advertentietrackers.
+          </p>
+        </div>
+
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:10px 12px;">
+          <h4 style="margin:0 0 4px 0; color:#1e40af; font-size:0.9rem;">4. Officiële KSA Privacyverklaring</h4>
+          <p style="margin:0; font-size:0.82rem; color:#1e3a8a;">
+            Lees de volledige privacyverklaring van KSA Nationaal op <a href="https://www.ksa.be/privacy" target="_blank" rel="noopener" style="color:#2563eb; font-weight:700; text-decoration:underline;">www.ksa.be/privacy &rarr;</a>.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; display:flex; justify-content:flex-end;">
+        <button type="button" id="ksaAcceptPrivacyModalBtn" class="btn btn-primary" style="padding:7px 18px; font-size:0.88rem;">
+          Begrepen &amp; Sluiten
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Html2Canvas voor Live Kalender Download -->
   <script src="js/html2canvas.min.js"></script>
   <!-- Mobile App Controller Script -->
-  <script src="js/mobile.js?v=gh27"></script>
+  <script src="js/mobile.js?v=gh28"></script>
   <!-- Rechtstreekse Visuele Website Editor (via GitHub) -->
-  <script src="js/visual-editor.js?v=gh42"></script>
+  <script src="js/visual-editor.js?v=gh43"></script>
 </body>
 </html>

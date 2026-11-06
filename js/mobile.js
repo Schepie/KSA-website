@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileCalendarDownload();
   initPaspoortModal();
   initPwaInstall();
+  initPrivacyConsent();
 });
 
 /* ==========================================================================
@@ -810,5 +811,83 @@ function initPwaInstall() {
   window.addEventListener('appinstalled', () => {
     localStorage.setItem('ksa_app_installed', '1');
     hideAllInstallPrompts();
+  });
+}
+
+/* --------------------------------------------------------------------------
+   8. Privacy & Cookies Banner & Modal
+   -------------------------------------------------------------------------- */
+function initPrivacyConsent() {
+  const banner = document.getElementById('ksaPrivacyConsentBanner');
+  const modal = document.getElementById('ksaPrivacyModalBackdrop');
+  const acceptBtn = document.getElementById('ksaAcceptPrivacyConsentBtn');
+  const openModalBtn = document.getElementById('ksaOpenPrivacyModalBtn');
+  const closeModalBtn = document.getElementById('ksaClosePrivacyModalBtn');
+  const acceptModalBtn = document.getElementById('ksaAcceptPrivacyModalBtn');
+
+  // Check consent status
+  const hasConsented = localStorage.getItem('ksa_privacy_consent_accepted');
+  if (banner && !hasConsented) {
+    setTimeout(() => {
+      banner.style.display = 'block';
+    }, 600);
+  }
+
+  function hideBanner() {
+    if (banner) {
+      banner.style.animation = 'none';
+      banner.style.opacity = '0';
+      banner.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 300);
+    }
+    localStorage.setItem('ksa_privacy_consent_accepted', 'true');
+  }
+
+  function openPrivacyModal(e) {
+    if (e) e.preventDefault();
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closePrivacyModal() {
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  }
+
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', hideBanner);
+  }
+
+  if (openModalBtn) {
+    openModalBtn.addEventListener('click', openPrivacyModal);
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closePrivacyModal);
+  }
+
+  if (acceptModalBtn) {
+    acceptModalBtn.addEventListener('click', () => {
+      hideBanner();
+      closePrivacyModal();
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closePrivacyModal();
+      }
+    });
+  }
+
+  document.querySelectorAll('.topbar-privacy-trigger, .footer-privacy-trigger, .ksa-privacy-trigger').forEach((el) => {
+    el.addEventListener('click', openPrivacyModal);
   });
 }

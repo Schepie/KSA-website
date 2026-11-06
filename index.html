@@ -63,6 +63,8 @@
         <span class="ksa-topbar-badge" id="topbarBadge">KSA LIMBURG</span>
         <span class="ksa-topbar-desc" id="topbarDesc">Aangesloten bij <strong>KSA Nationaal</strong> &bull;</span>
         <a href="https://www.ksa.be" target="_blank" rel="noopener" id="topbarLinkLeft" class="topbar-link">www.ksa.be</a>
+        <span style="opacity:0.6; margin:0 2px;">&bull;</span>
+        <a href="javascript:void(0)" class="topbar-link topbar-privacy-trigger" title="Bekijk privacybeleid en cookieverklaring">[Privacy &amp; Cookies]</a>
       </div>
       <div class="ksa-topbar-right" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
         <span class="ksa-topbar-promo" id="topbarPromo">🎃 <strong>HalloKien 2026:</strong></span>
@@ -986,7 +988,7 @@
       <!-- Footer Bottom Bar -->
       <div class="footer-bottom-bar">
         <div id="footerCopyright" class="footer-copyright">
-          &copy; 2026 KSA Zonhoven &bull; VZW 't Heem &bull; Aangesloten bij KSA Nationaal
+          &copy; 2026 KSA Zonhoven &bull; VZW 't Heem &bull; Aangesloten bij KSA Nationaal &bull; <a href="javascript:void(0)" class="footer-privacy-trigger" style="color:inherit; text-decoration:underline;">[Privacy &amp; Cookies]</a>
         </div>
         <div class="footer-support-tags">
           <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" class="footer-admin-link" title="Open Google Sheets om de kalender en website aan te passen">
@@ -997,9 +999,92 @@
     </div>
   </footer>
 
+  <!-- ==========================================================================
+       PRIVACY & COOKIES BANNER & MODAL
+       ========================================================================== -->
+  <div id="ksaPrivacyConsentBanner" class="ksa-privacy-consent-banner" style="display: none;">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px; font-size:0.86rem; color:#fff; line-height:1.4;">
+        <span style="font-size:1.35rem;">🍪</span>
+        <span>
+          <strong>Privacy &amp; Cookies:</strong> KSA Zonhoven respecteert je privacy. Wij gebruiken uitsluitend functionele cookies en veilige browseropslag voor een optimale werking van de website en kalender. Geen advertentietracking.
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+        <button type="button" class="btn btn-outline-white btn-sm topbar-privacy-trigger" style="padding:6px 14px; font-size:0.82rem; border-color:rgba(255,255,255,0.6); color:#fff; background:transparent;">
+          [Privacy &amp; Cookies]
+        </button>
+        <button type="button" id="ksaAcceptPrivacyBtn" class="btn btn-primary btn-sm" style="padding:6px 16px; font-size:0.82rem; background:var(--ksa-red); border-color:var(--ksa-red);">
+          Begrepen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy & Cookies Modal -->
+  <div id="ksaPrivacyModalBackdrop" class="ksa-privacy-modal-backdrop" style="display: none;">
+    <div class="ksa-privacy-modal-card" role="dialog" aria-modal="true" aria-labelledby="ksaPrivacyModalTitle">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; border-bottom:2px solid #f1f5f9; padding-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:26px;">🛡️</span>
+          <div>
+            <h3 id="ksaPrivacyModalTitle" style="margin:0; font-size:1.25rem; color:var(--ksa-blue, #002b7f);">Privacy &amp; Cookiebeleid</h3>
+            <span style="font-size:0.75rem; color:#64748b; font-weight:600;">KSA Zonhoven Meisjes • VZW 't Heem</span>
+          </div>
+        </div>
+        <button type="button" id="ksaClosePrivacyModalBtn" style="background:#f1f5f9; border:none; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer; color:#475569; display:flex; align-items:center; justify-content:center;" aria-label="Sluiten">✕</button>
+      </div>
+
+      <div style="font-size:0.9rem; line-height:1.6; color:#334155; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0;">
+          KSA Zonhoven Meisjes (Dijkbeemdenweg 8, 3520 Zonhoven) hecht veel waarde aan de bescherming van jouw persoonsgegevens en de privacy van onze leden en leiding conform de Europese <strong>Algemene Verordening Gegevensbescherming (GDPR/AVG)</strong>.
+        </p>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.95rem;">1. Verwerking van Persoonsgegevens</h4>
+          <p style="margin:0; font-size:0.86rem; color:#475569;">
+            Lidinschrijvingen, medische fiches en verzekeringen verlopen via het centrale en beveiligde platform <strong>RAVOT van KSA Nationaal</strong>. Wij delen of verkopen nooit persoonlijke gegevens aan commerciële derden.
+          </p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.95rem;">2. Beeldmateriaal &amp; Foto's</h4>
+          <p style="margin:0; font-size:0.86rem; color:#475569;">
+            Tijdens zondagnamiddagen, evenementen en kampen maken we sfeerfoto's om onze werking te tonen aan leden en ouders. Toestemming hiervoor wordt gevraagd bij inschrijving op RAVOT. Wil je een specifieke foto liever niet op de website zien? Stuur gerust een mailtje naar <a href="mailto:hoofdleiding.ksazonhoven@gmail.com" style="color:var(--ksa-blue); text-decoration:underline; font-weight:600;">hoofdleiding.ksazonhoven@gmail.com</a> en we halen deze meteen offline.
+          </p>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+          <h4 style="margin:0 0 4px 0; color:#0f172a; font-size:0.95rem;">3. Cookies &amp; Lokale Opslag</h4>
+          <p style="margin:0; font-size:0.86rem; color:#475569;">
+            Deze website gebruikt <strong>uitsluitend functionele cookies en veilige browseropslag</strong>:
+          </p>
+          <ul style="margin:6px 0 0 16px; padding:0; font-size:0.84rem; color:#64748b;">
+            <li>Onthouden van websitevoorkeuren en het leiding-bewerkingssysteem.</li>
+            <li>OneSignal Web Push: enkel indien je zelf expliciet meldingen inschakelt om KSA-berichten te ontvangen.</li>
+            <li>Geen advertentietrackers of marketingcookies.</li>
+          </ul>
+        </div>
+
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px;">
+          <h4 style="margin:0 0 4px 0; color:#1e40af; font-size:0.95rem;">4. Officiële KSA Nationaal Privacyverklaring</h4>
+          <p style="margin:0; font-size:0.86rem; color:#1e3a8a;">
+            Aangezien KSA Zonhoven aangesloten is bij KSA Nationaal vzw, is tevens de algemene nationale privacyverklaring van toepassing. Lees meer op <a href="https://www.ksa.be/privacy" target="_blank" rel="noopener" style="color:#2563eb; font-weight:700; text-decoration:underline;">www.ksa.be/privacy &rarr;</a>.
+          </p>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" id="ksaAcceptPrivacyModalBtn" class="btn btn-primary" style="padding:8px 22px; font-size:0.9rem;">
+          Begrepen &amp; Sluiten
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/html2canvas.min.js"></script>
-  <script src="js/main.js?v=gh17"></script>
-  <script src="js/visual-editor.js?v=gh42"></script>
+  <script src="js/main.js?v=gh18"></script>
+  <script src="js/visual-editor.js?v=gh43"></script>
 </body>
 </html>
