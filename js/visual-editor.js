@@ -3897,7 +3897,19 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         Hiermee wijzig je het bewerkwachtwoord voor <strong>de hele leidingsploeg</strong>. Zodra je dit opslaat, wordt de nieuwe cryptografische sleutel (SHA-256) live geactiveerd op GitHub en geldt de nieuwe code op elk apparaat.
       </p>
 
-      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:14px; font-size:12.5px;">
+      <!-- Compacte actieve banner (zichtbaar indien sleutel gekoppeld is) -->
+      <div id="ksaAdminMailActiveBanner" style="${existingKey ? 'display:flex;' : 'display:none;'} background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:9px 12px; margin-bottom:14px; font-size:12px; align-items:center; justify-content:space-between; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px; color:#166534; font-weight:600;">
+          <span style="font-size:14px;">✅</span>
+          <span>Admin e-mailnotificaties actief (<code>geert.schepers@gmail.com</code>)</span>
+        </div>
+        <button type="button" id="ksaBtnToggleEmailConfig" style="background:transparent; border:none; color:#15803d; font-size:11.5px; text-decoration:underline; cursor:pointer; font-weight:600; padding:2px 6px;">
+          Sleutel wijzigen / Testen
+        </button>
+      </div>
+
+      <!-- Volledig configuratiepaneel (standaard verborgen indien sleutel al gekoppeld is) -->
+      <div id="ksaAdminEmailConfigPanel" style="${existingKey ? 'display:none;' : 'display:block;'} background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:14px; font-size:12.5px;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
           <span style="font-weight:700; color:#1e293b;">📧 Admin Notificatie (geert.schepers@gmail.com)</span>
           <span id="ksaAdminMailStatusBadge" style="padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; ${existingKey ? 'background:#dcfce7; color:#15803d;' : 'background:#fee2e2; color:#991b1b;'}">
@@ -3946,8 +3958,19 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const saveKeyBtn = document.getElementById('ksaBtnSaveAdminMailKey');
     const keyInput = document.getElementById('ksaAdminEmailKeyInput');
     const statusBadge = document.getElementById('ksaAdminMailStatusBadge');
+    const toggleConfigBtn = document.getElementById('ksaBtnToggleEmailConfig');
+    const activeBanner = document.getElementById('ksaAdminMailActiveBanner');
+    const configPanel = document.getElementById('ksaAdminEmailConfigPanel');
 
     cancelBtn.onclick = () => { backdrop.style.display = 'none'; };
+
+    if (toggleConfigBtn) {
+      toggleConfigBtn.onclick = () => {
+        const isHidden = configPanel.style.display === 'none';
+        configPanel.style.display = isHidden ? 'block' : 'none';
+        toggleConfigBtn.textContent = isHidden ? 'Configuratie verbergen' : 'Sleutel wijzigen / Testen';
+      };
+    }
 
     const showMsg = (txt, isErr) => {
       msgEl.style.display = 'block';
@@ -3987,7 +4010,12 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           statusBadge.textContent = '✅ Sleutel Opgeslagen';
           statusBadge.style.background = '#dcfce7';
           statusBadge.style.color = '#15803d';
-          showMsg('✅ Sleutel succesvol opgeslagen! Klik nu op <strong>"✉️ Test"</strong> om te verifiëren.', false);
+          if (val) {
+            if (activeBanner) activeBanner.style.display = 'flex';
+            if (configPanel) configPanel.style.display = 'none';
+            if (toggleConfigBtn) toggleConfigBtn.textContent = 'Sleutel wijzigen / Testen';
+          }
+          showMsg('✅ Sleutel succesvol opgeslagen en geactiveerd! Het configuratiepaneel is verborgen.', false);
         } catch (e) {
           showMsg('✅ Sleutel lokaal bewaard. Klik op <strong>"✉️ Test"</strong> om te proberen.', false);
         } finally {
@@ -4017,6 +4045,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           statusBadge.textContent = '✅ Actief & Geverifieerd';
           statusBadge.style.background = '#dcfce7';
           statusBadge.style.color = '#15803d';
+          if (activeBanner) activeBanner.style.display = 'flex';
+          setTimeout(() => {
+            if (configPanel) configPanel.style.display = 'none';
+            if (toggleConfigBtn) toggleConfigBtn.textContent = 'Sleutel wijzigen / Testen';
+          }, 2200);
           showMsg(`🎉 <strong>Test-mail succesvol verzonden via ${res.method}!</strong><br>Kijk nu in je Gmail inbox (en eventueel spambox) van <code>geert.schepers@gmail.com</code>.`, false);
         } else {
           statusBadge.textContent = '⚠️ Mislukt';
