@@ -1,4 +1,8 @@
 {
+  "_auth": {
+    "pinHash": "1b76a9af19078b491475a25e77a874cd60a79dd7f8ff4ec8c2bde91d7a542de7",
+    "updatedAt": "2026-11-06T08:30:00Z"
+  },
   "groups": {
     "kabouters": {
       "name": "KABOUTERS",

@@ -19,6 +19,8 @@
 
 const KSA_GITHUB_EDITOR_CONFIG = {
   defaultPin: 'ksa2026',
+  defaultPinHash: '1b76a9af19078b491475a25e77a874cd60a79dd7f8ff4ec8c2bde91d7a542de7',
+  hashSalt: 'ksa_zonhoven_editor_v1:',
   repoOwner: 'Schepie',
   repoName: 'KSA-website',
   defaultBranch: 'main',
@@ -31,6 +33,43 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   let currentLinkTarget = null;
   let currentImageTarget = null;
   let pendingImageUploads = {}; // { key: { selector, origSrc, groupKey, base64, fileName, dataUrl } }
+
+  // --------------------------------------------------------------------------
+  // CRYPTOGRAFISCHE WACHTWOORD HASHING (SHA-256)
+  // --------------------------------------------------------------------------
+  async function hashPin(pin) {
+    const raw = (pin || '').trim().toLowerCase();
+    const salted = KSA_GITHUB_EDITOR_CONFIG.hashSalt + raw;
+    try {
+      if (window.crypto && crypto.subtle) {
+        const msgBuffer = new TextEncoder().encode(salted);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (e) {
+      console.warn('[KSA Auth] Web Crypto niet beschikbaar, fallback actief:', e);
+    }
+    let h = 0;
+    for (let i = 0; i < salted.length; i++) {
+      h = Math.imul(31, h) + salted.charCodeAt(i) | 0;
+    }
+    return 'fallback_' + Math.abs(h).toString(16);
+  }
+
+  async function getActivePinHash() {
+    try {
+      const s = await fetchLatestGithubState();
+      if (s && s._auth && s._auth.pinHash) {
+        localStorage.setItem('ksa_active_pin_hash', s._auth.pinHash);
+        return s._auth.pinHash;
+      }
+    } catch (e) {}
+
+    const cached = localStorage.getItem('ksa_active_pin_hash');
+    if (cached) return cached;
+
+    return KSA_GITHUB_EDITOR_CONFIG.defaultPinHash;
+  }
 
   // Bewaar bij het opstarten van de pagina op elke <img> de originele src (bv. "images/cara.jpg")
   // zodat we bij het vervangen van een foto ook dezelfde foto in het paspoort-overzicht en op mobiel kunnen vervangen!
@@ -1278,6 +1317,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <button type="button" class="ksa-dock-btn ksa-dock-btn-push" id="ksaBtnSendPush" title="Stuur direct een pushbericht naar alle smartphones via OneSignal">📢 Pushbericht</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnEditTopbar" title="Pas de bovenste blauwe KSA-balk aan">📢 Topbalk</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnToggleBanner" title="Toon of verberg de Event Aftelbanner">🎯 Banner Aan/Uit</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnChangePin" title="Wijzig het bewerkwachtwoord voor de hele leidingsploeg">🔑 Wachtwoord</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnGithubConfig" title="Stel GitHub toegangstoken in voor live publicatie">⚙️ GitHub Koppeling</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnResetEdits" title="Herstel standaard waarden">↩️ Reset</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaBtnSaveEdits">💾 Opslaan naar GitHub</button>
@@ -1297,6 +1337,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     document.getElementById('ksaBtnSaveEdits').onclick = saveAllEditsToGithub;
     document.getElementById('ksaBtnExitEdit').onclick = disableEditMode;
     document.getElementById('ksaBtnToggleBanner').onclick = toggleBannerVisibility;
+    document.getElementById('ksaBtnChangePin').onclick = openChangePasswordModal;
     document.getElementById('ksaBtnGithubConfig').onclick = openGithubConfigModal;
     document.getElementById('ksaBtnResetEdits').onclick = resetAllEdits;
 
@@ -1411,8 +1452,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <p>Voer de KSA-leiding pincode in om teksten, foto's, kalender, groepen en de aftelbanner rechtstreeks op de website aan te passen.</p>
       `}
       <label for="ksaPinInput">Leiding Wachtwoord / Pincode:</label>
-      <input type="password" id="ksaPinInput" placeholder="Bv. ksa2026" autofocus>
-      <div id="ksaPinError" style="color:#e3001b; font-size:12px; margin-top:6px; display:none;">❌ Ongeldige pincode. Standaard pincode is: <strong>ksa2026</strong></div>
+      <input type="password" id="ksaPinInput" placeholder="Voer leiding wachtwoord in..." autofocus>
+      <div id="ksaPinError" style="color:#e3001b; font-size:12px; margin-top:6px; display:none;">❌ Ongeldig wachtwoord / pincode. Probeer het opnieuw of vraag de code aan de hoofdleiding.</div>
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaPinCancel">Annuleren</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaPinSubmit">🔓 Ontgrendel Website</button>
@@ -1421,10 +1462,36 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     backdrop.style.display = 'flex';
 
     const input = document.getElementById('ksaPinInput');
-    const submit = () => {
-      const val = (input.value || '').trim().toLowerCase();
-      const customPin = (localStorage.getItem('ksa_custom_pin') || KSA_GITHUB_EDITOR_CONFIG.defaultPin).toLowerCase();
-      if (val === customPin || val === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase()) {
+    const submit = async () => {
+      const val = (input.value || '').trim();
+      if (!val) {
+        input.focus();
+        return;
+      }
+      const submitBtn = document.getElementById('ksaPinSubmit');
+      const origText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '⏳ Verifiëren...';
+      }
+
+      let isMatch = false;
+      try {
+        const enteredHash = await hashPin(val);
+        const activeHash = await getActivePinHash();
+
+        if (enteredHash === activeHash) {
+          isMatch = true;
+        } else if (val.toLowerCase() === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase() && activeHash === KSA_GITHUB_EDITOR_CONFIG.defaultPinHash) {
+          isMatch = true;
+        }
+      } catch (err) {
+        if (val.toLowerCase() === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase()) {
+          isMatch = true;
+        }
+      }
+
+      if (isMatch) {
         sessionStorage.setItem('ksa_edit_unlocked', '1');
         backdrop.style.display = 'none';
         if (isMobilePage) {
@@ -1433,7 +1500,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           enableEditMode();
         }
       } else {
-        document.getElementById('ksaPinError').style.display = 'block';
+        const errEl = document.getElementById('ksaPinError');
+        if (errEl) {
+          errEl.style.display = 'block';
+        }
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = origText;
+        }
+        input.focus();
+        input.select();
       }
     };
 
@@ -3186,6 +3262,14 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         ? new Date(bannerDateInput.value).toISOString()
         : (window.ksaCountdownTargetDate ? window.ksaCountdownTargetDate.toISOString() : null)
     };
+    if (!fullState._auth || !fullState._auth.pinHash) {
+      const activeHash = localStorage.getItem('ksa_active_pin_hash') || KSA_GITHUB_EDITOR_CONFIG.defaultPinHash;
+      fullState._auth = {
+        pinHash: activeHash,
+        updatedAt: new Date().toISOString()
+      };
+    }
+
     fullState.updatedAt = new Date().toISOString();
 
     const jsonString = JSON.stringify(fullState, null, 2);
@@ -3259,8 +3343,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           <input type="text" id="ksaGhBranchInput" value="${curBranch}">
         </div>
       </div>
-      <label>Leiding Pincode voor Edit Mode:</label>
-      <input type="text" id="ksaNewPinInput" value="${curPin}">
+      <div style="margin-top:14px; padding:12px 14px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px;">
+        <label style="margin-bottom:4px; display:block; font-weight:700; color:#0369a1;">🔐 Wachtwoord voor de hele leidingsploeg:</label>
+        <p style="font-size:12px; color:#475569; margin-bottom:8px;">Het bewerkwachtwoord wordt veilig cryptografisch versleuteld (SHA-256) opgeslagen op GitHub en is direct actief voor alle leiding op elk apparaat.</p>
+        <button type="button" class="btn btn-outline" id="ksaBtnOpenPinChangeFromGh" style="padding:7px 14px; font-size:13px; color:#0284c7; border:1px solid #0284c7; background:#fff; cursor:pointer; border-radius:6px; font-weight:700;">🔑 Wachtwoord Wijzigen &rarr;</button>
+      </div>
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaGhCancel">Sluiten</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaGhSave">💾 Bewaar &amp; Koppel</button>
@@ -3268,19 +3355,160 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     `;
     backdrop.style.display = 'flex';
 
+    const pinChangeBtn = document.getElementById('ksaBtnOpenPinChangeFromGh');
+    if (pinChangeBtn) {
+      pinChangeBtn.onclick = () => openChangePasswordModal();
+    }
+
     document.getElementById('ksaGhCancel').onclick = () => { backdrop.style.display = 'none'; };
     document.getElementById('ksaGhSave').onclick = () => {
       localStorage.setItem('ksa_github_token', document.getElementById('ksaGhTokenInput').value.trim());
       localStorage.setItem('ksa_github_owner', document.getElementById('ksaGhOwnerInput').value.trim() || 'Schepie');
       localStorage.setItem('ksa_github_repo', document.getElementById('ksaGhRepoInput').value.trim() || 'KSA-website');
       localStorage.setItem('ksa_github_branch', document.getElementById('ksaGhBranchInput').value.trim() || 'main');
-      const pinVal = document.getElementById('ksaNewPinInput').value.trim();
-      if (pinVal) localStorage.setItem('ksa_custom_pin', pinVal);
       backdrop.style.display = 'none';
       if (fromSave && document.getElementById('ksaGhTokenInput').value.trim()) {
         saveAllEditsToGithub();
       }
     };
+  }
+
+  // --------------------------------------------------------------------------
+  // 14. VEILIG WACHTWOORD WIJZIGEN VOOR DE HELE LEIDINGSPLOEG (SHA-256)
+  // --------------------------------------------------------------------------
+  function openChangePasswordModal() {
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+    if (!modal || !backdrop) return;
+
+    modal.innerHTML = `
+      <h3>🔑 Leiding Wachtwoord Wijzigen</h3>
+      <p style="font-size:13px; color:#475569; line-height:1.45; margin-bottom:12px;">
+        Hiermee wijzig je het bewerkwachtwoord voor <strong>de hele leidingsploeg</strong>. Zodra je dit opslaat, wordt de nieuwe cryptografische sleutel (SHA-256) live geactiveerd op GitHub en geldt de nieuwe code op elk apparaat.
+      </p>
+      <div id="ksaChangePinMsg" style="display:none; padding:8px 12px; border-radius:6px; font-size:13px; margin-bottom:10px;"></div>
+
+      <label for="ksaCurPinInput">Huidig wachtwoord:</label>
+      <input type="password" id="ksaCurPinInput" placeholder="Voer huidig wachtwoord in..." autofocus>
+
+      <label for="ksaNewPinInput1">Nieuw wachtwoord:</label>
+      <input type="password" id="ksaNewPinInput1" placeholder="Bv. nieuw geheim wachtwoord (min. 4 tekens)">
+
+      <label for="ksaNewPinInput2">Bevestig nieuw wachtwoord:</label>
+      <input type="password" id="ksaNewPinInput2" placeholder="Typ nieuw wachtwoord nogmaals">
+
+      <div class="ksa-editor-modal-actions">
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaCancelPinChange">Annuleren</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaSavePinChange">💾 Opslaan &amp; Live Activeren</button>
+      </div>
+    `;
+    backdrop.style.display = 'flex';
+
+    const curInput = document.getElementById('ksaCurPinInput');
+    const new1Input = document.getElementById('ksaNewPinInput1');
+    const new2Input = document.getElementById('ksaNewPinInput2');
+    const saveBtn = document.getElementById('ksaSavePinChange');
+    const cancelBtn = document.getElementById('ksaCancelPinChange');
+    const msgEl = document.getElementById('ksaChangePinMsg');
+
+    cancelBtn.onclick = () => { backdrop.style.display = 'none'; };
+
+    const showMsg = (txt, isErr) => {
+      msgEl.style.display = 'block';
+      msgEl.style.background = isErr ? '#fee2e2' : '#dcfce7';
+      msgEl.style.color = isErr ? '#b91c1c' : '#166534';
+      msgEl.style.border = `1px solid ${isErr ? '#f87171' : '#86efac'}`;
+      msgEl.innerHTML = txt;
+    };
+
+    saveBtn.onclick = async () => {
+      const curVal = (curInput.value || '').trim();
+      const newVal1 = (new1Input.value || '').trim();
+      const newVal2 = (new2Input.value || '').trim();
+
+      if (!curVal) return showMsg('❌ Voer eerst het huidige wachtwoord in.', true);
+      if (!newVal1) return showMsg('❌ Voer een nieuw wachtwoord in.', true);
+      if (newVal1.length < 4) return showMsg('❌ Het nieuwe wachtwoord moet minstens 4 tekens lang zijn.', true);
+      if (newVal1 !== newVal2) return showMsg('❌ Het nieuwe wachtwoord en de herhaling komen niet overeen.', true);
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '⏳ Verifiëren...';
+
+      let curMatches = false;
+      try {
+        const enteredCurHash = await hashPin(curVal);
+        const activeHash = await getActivePinHash();
+        if (enteredCurHash === activeHash) {
+          curMatches = true;
+        } else if (curVal.toLowerCase() === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase() && activeHash === KSA_GITHUB_EDITOR_CONFIG.defaultPinHash) {
+          curMatches = true;
+        }
+      } catch (e) {
+        if (curVal.toLowerCase() === KSA_GITHUB_EDITOR_CONFIG.defaultPin.toLowerCase()) {
+          curMatches = true;
+        }
+      }
+
+      if (!curMatches) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 Opslaan &amp; Live Activeren';
+        curInput.focus();
+        curInput.select();
+        return showMsg('❌ Het huidige wachtwoord is niet correct.', true);
+      }
+
+      saveBtn.innerHTML = '⏳ Bezig met beveiligen &amp; opslaan...';
+
+      // 1. Bereken salted hash
+      const newHash = await hashPin(newVal1);
+
+      // 2. Werk actuele state bij
+      let fullState = (await fetchLatestGithubState()) || {};
+      fullState._auth = fullState._auth || {};
+      fullState._auth.pinHash = newHash;
+      fullState._auth.updatedAt = new Date().toISOString();
+      fullState.updatedAt = new Date().toISOString();
+
+      // 3. Sla lokaal op
+      localStorage.setItem('ksa_active_pin_hash', newHash);
+      localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(fullState));
+
+      // 4. Commit rechtstreeks naar GitHub
+      const ghToken = (localStorage.getItem('ksa_github_token') || '').trim();
+      const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
+      const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
+      const ghBranch = (localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch).trim();
+
+      if (ghToken) {
+        try {
+          const jsonString = JSON.stringify(fullState, null, 2);
+          await commitFileToGithub(
+            ghToken,
+            ghOwner,
+            ghRepo,
+            ghBranch,
+            KSA_GITHUB_EDITOR_CONFIG.contentFilePath,
+            utf8ToBase64(jsonString),
+            `🔐 Leiding bewerkwachtwoord gewijzigd (${new Date().toLocaleDateString('nl-BE')})`
+          );
+          showMsg('✅ <strong>Wachtwoord succesvol gewijzigd!</strong> De nieuwe cryptografische sleutel is live geactiveerd op GitHub voor de hele leidingsploeg.', false);
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '✅ Live Geactiveerd';
+          setTimeout(() => { backdrop.style.display = 'none'; }, 2400);
+        } catch (err) {
+          showMsg(`⚠️ Lokaal bijgewerkt, maar GitHub gaf een fout:<br>${err.message}<br><br>Controleer je GitHub Token via "⚙️ GitHub Koppeling".`, true);
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '💾 Opnieuw proberen';
+        }
+      } else {
+        showMsg('✅ Het nieuwe wachtwoord is klaargezet in je browser! Klik straks op <strong>"💾 Opslaan naar GitHub"</strong> in de werkbalk om het live te publiceren voor iedereen.', false);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '✅ Lokaal Opgeslagen';
+        setTimeout(() => { backdrop.style.display = 'none'; }, 2600);
+      }
+    };
+
+    setTimeout(() => curInput.focus(), 50);
   }
 
   // --------------------------------------------------------------------------
