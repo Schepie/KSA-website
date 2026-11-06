@@ -12,14 +12,26 @@
   <meta property="og:image" content="assets/images/real_hero_banner.jpg">
   <meta property="og:type" content="website">
 
-  <!-- Favicon -->
+  <!-- Web App Manifest & PWA Configuration -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0067b1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="KSA Zonhoven">
+
+  <!-- Favicon & App Icons -->
   <link rel="icon" type="image/svg+xml" href="assets/icons/ksa-logo-official.svg?v=blue">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/pwa-icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/pwa-icon-512.png">
 
   <!-- Stylesheet in KSA.BE Style -->
-  <link rel="stylesheet" href="css/style.css?v=gh36">
+  <link rel="stylesheet" href="css/style.css?v=gh37">
 
   <!-- Automatic Device & Screen Detection (Mobile vs Desktop) -->
-  <script src="js/device-detect.js?v=gh27"></script>
+  <script src="js/device-detect.js?v=gh28"></script>
 
   <!-- OneSignal Web Push SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -131,6 +143,12 @@
 
       <!-- Action Items -->
       <div class="nav-actions">
+        <!-- Desktop PWA Install Button -->
+        <button type="button" class="pwa-desktop-install-btn" id="pwaDesktopInstallBtn" style="display:none;" title="Installeer KSA Zonhoven als app op je computer">
+          <span style="font-size:1rem; line-height:1;">📲</span>
+          <span>App Installeren</span>
+        </button>
+
         <!-- Mobile Hamburger Menu Button -->
         <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu openen">
           ☰
@@ -985,6 +1003,9 @@
           &copy; 2026 KSA Zonhoven &bull; VZW 't Heem &bull; Aangesloten bij KSA Nationaal &bull; <a href="javascript:void(0)" class="footer-privacy-trigger" style="color:inherit; text-decoration:underline;">[Privacy &amp; Cookies]</a>
         </div>
         <div class="footer-support-tags">
+          <button type="button" class="footer-admin-link pwa-footer-install-btn" id="pwaFooterInstallBtn" style="display:none;" title="Installeer KSA Zonhoven als web app">
+            <span>📲 Web App Installeren</span>
+          </button>
           <a href="https://docs.google.com/spreadsheets/d/1yNw0GTkWEvEtJ9beIVNfT-pSE5rVDy1sILdIHAQUhX4/edit" target="_blank" rel="noopener" class="footer-admin-link" title="Open Google Sheets om de kalender en website aan te passen">
             <span>📊 Website Beheer (Google Sheets) &rarr;</span>
           </a>
@@ -1057,9 +1078,70 @@
     </div>
   </div>
 
+  <!-- Desktop PWA Install Notification Banner -->
+  <div id="pwaDesktopBanner" class="pwa-desktop-banner" style="display:none;">
+    <img src="assets/icons/pwa-icon-192.png" alt="KSA App" class="pwa-desktop-banner-icon">
+    <div class="pwa-desktop-banner-text">
+      <strong>KSA Zonhoven App</strong>
+      <span>Installeer als snelle app op je computer of tablet</span>
+    </div>
+    <button type="button" class="pwa-desktop-banner-btn-install" id="pwaDesktopBannerInstallBtn">Installeer</button>
+    <button type="button" class="pwa-desktop-banner-btn-close" id="pwaDesktopBannerCloseBtn" aria-label="Sluiten">✕</button>
+  </div>
+
+  <!-- Desktop PWA Install Instructions Modal -->
+  <div id="pwaDesktopModal" class="pwa-desktop-modal" style="display:none;">
+    <div class="pwa-desktop-modal-card" role="dialog" aria-modal="true" aria-labelledby="pwaDesktopModalTitle">
+      <div class="pwa-desktop-modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img src="assets/icons/pwa-icon-192.png" alt="KSA Logo" style="width:36px; height:36px; border-radius:8px;">
+          <div>
+            <h3 id="pwaDesktopModalTitle" style="margin:0; font-size:1.15rem; color:var(--ksa-blue, #002b7f);">KSA Zonhoven Installeren</h3>
+            <span style="font-size:0.75rem; color:#64748b; font-weight:600;">Officiële Progressive Web App</span>
+          </div>
+        </div>
+        <button type="button" id="pwaDesktopModalClose" class="pwa-modal-close-btn" aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="pwa-desktop-modal-body">
+        <p style="margin:0 0 4px 0; font-size:0.88rem; color:#334155;">Je kunt de KSA Zonhoven website eenvoudig als app installeren op je computer:</p>
+        
+        <div class="pwa-step-box">
+          <div class="pwa-step-badge">1</div>
+          <div>
+            <strong style="color:#0f172a; font-size:0.9rem;">In Google Chrome of Microsoft Edge:</strong>
+            <p style="margin:2px 0 0 0; font-size:0.84rem; color:#475569;">Klik rechts in de adresbalk van je browser op het icoontje <strong>'App installeren'</strong> (⊕ of het computerschermpje met een pijl naar beneden).</p>
+          </div>
+        </div>
+
+        <div class="pwa-step-box">
+          <div class="pwa-step-badge">2</div>
+          <div>
+            <strong style="color:#0f172a; font-size:0.9rem;">In Safari (Mac of iPad):</strong>
+            <p style="margin:2px 0 0 0; font-size:0.84rem; color:#475569;">Klik in de menubalk op <strong>Archief (of het Deel-icoon)</strong> ➔ kies <strong>'Voeg toe aan Dock'</strong> (of 'Zet op beginscherm').</p>
+          </div>
+        </div>
+
+        <div class="pwa-step-box">
+          <div class="pwa-step-badge">3</div>
+          <div>
+            <strong style="color:#0f172a; font-size:0.9rem;">Directe toegang:</strong>
+            <p style="margin:2px 0 0 0; font-size:0.84rem; color:#475569;">De website opent voortaan direct in een eigen snel venster vanaf je bureaublad of taakbalk!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pwa-desktop-modal-footer">
+        <button type="button" id="pwaDesktopModalOkBtn" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px;">
+          Begrepen
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/html2canvas.min.js"></script>
-  <script src="js/main.js?v=gh19"></script>
+  <script src="js/main.js?v=gh20"></script>
   <script src="js/visual-editor.js?v=gh51"></script>
 </body>
 </html>

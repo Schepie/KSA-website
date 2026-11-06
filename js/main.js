@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollSpy();
   initCalendarDownload();
   initPrivacyModal();
+  initPwaInstallDesktop();
 });
 
 /* --------------------------------------------------------------------------
@@ -715,5 +716,115 @@ function initPrivacyModal() {
     if (e.key === 'Escape' && modal.style.display === 'flex') {
       closeModal();
     }
+  });
+}
+
+/* --------------------------------------------------------------------------
+   12. PWA Desktop App Installation & Service Worker
+   -------------------------------------------------------------------------- */
+function initPwaInstallDesktop() {
+  // 1. Service Worker Registratie
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        // console.log('[PWA] Service Worker geregistreerd voor website:', reg.scope);
+      }).catch((err) => {
+        console.warn('[PWA] Service Worker registratie mislukt:', err);
+      });
+    });
+  }
+
+  let deferredPrompt = null;
+  const desktopBtn = document.getElementById('pwaDesktopInstallBtn');
+  const footerBtn = document.getElementById('pwaFooterInstallBtn');
+  const banner = document.getElementById('pwaDesktopBanner');
+  const bannerInstallBtn = document.getElementById('pwaDesktopBannerInstallBtn');
+  const bannerCloseBtn = document.getElementById('pwaDesktopBannerCloseBtn');
+  const modal = document.getElementById('pwaDesktopModal');
+  const modalClose = document.getElementById('pwaDesktopModalClose');
+  const modalOkBtn = document.getElementById('pwaDesktopModalOkBtn');
+
+  function isStandaloneApp() {
+    return (window.navigator.standalone === true) || 
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      (localStorage.getItem('ksa_app_installed') === '1');
+  }
+
+  // Als app reeds als standalone draait, verberg alle installatie-knoppen
+  if (isStandaloneApp()) {
+    if (desktopBtn) desktopBtn.style.display = 'none';
+    if (footerBtn) footerBtn.style.display = 'none';
+    if (banner) banner.style.display = 'none';
+    return;
+  }
+
+  // Toon footer knop standaard voor desktop bezoekers
+  if (footerBtn) footerBtn.style.display = 'inline-flex';
+
+  // Luister naar het officiële Chrome/Edge install-event
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    if (desktopBtn) desktopBtn.style.display = 'inline-flex';
+    if (footerBtn) footerBtn.style.display = 'inline-flex';
+
+    // Toon subtiele banner na 3 seconden indien niet recent weggeduwd
+    const dismissedUntil = localStorage.getItem('ksa_pwa_desktop_dismissed');
+    if (!dismissedUntil || Date.now() > parseInt(dismissedUntil, 10)) {
+      setTimeout(() => {
+        if (banner && !isStandaloneApp()) {
+          banner.style.display = 'flex';
+        }
+      }, 3000);
+    }
+  });
+
+  async function triggerInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        localStorage.setItem('ksa_app_installed', '1');
+        if (desktopBtn) desktopBtn.style.display = 'none';
+        if (footerBtn) footerBtn.style.display = 'none';
+        if (banner) banner.style.display = 'none';
+      }
+      deferredPrompt = null;
+    } else {
+      // Toon instructies modal
+      if (modal) modal.style.display = 'flex';
+    }
+  }
+
+  if (desktopBtn) desktopBtn.addEventListener('click', triggerInstall);
+  if (footerBtn) footerBtn.addEventListener('click', triggerInstall);
+  if (bannerInstallBtn) bannerInstallBtn.addEventListener('click', triggerInstall);
+
+  if (bannerCloseBtn) {
+    bannerCloseBtn.addEventListener('click', () => {
+      if (banner) banner.style.display = 'none';
+      // 7 dagen niet meer automatisch tonen
+      localStorage.setItem('ksa_pwa_desktop_dismissed', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+    });
+  }
+
+  function closeModal() {
+    if (modal) modal.style.display = 'none';
+  }
+
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (modalOkBtn) modalOkBtn.addEventListener('click', closeModal);
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+  }
+
+  window.addEventListener('appinstalled', () => {
+    localStorage.setItem('ksa_app_installed', '1');
+    if (desktopBtn) desktopBtn.style.display = 'none';
+    if (footerBtn) footerBtn.style.display = 'none';
+    if (banner) banner.style.display = 'none';
   });
 }
