@@ -775,6 +775,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (b.hidden !== undefined) {
         if (desktopWrap) desktopWrap.style.display = b.hidden ? 'none' : '';
         if (mobileCard) mobileCard.style.display = b.hidden ? 'none' : '';
+        updateBannerButtonState();
       }
       if (b.targetIso) {
         const d = new Date(b.targetIso);
@@ -1749,6 +1750,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     injectBannerControlBar();
+    updateBannerButtonState();
     injectGroupPillsControlBar();
     injectCardEditTools();
     injectShortcutTools();
@@ -2460,6 +2462,47 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     });
 
     document.getElementById('ksaHideBannerInline').onclick = toggleBannerVisibility;
+    updateBannerButtonState();
+  }
+
+  function updateBannerButtonState() {
+    const desktopWrap = document.querySelector('.countdown-banner-wrap');
+    const mobileCard = document.querySelector('.mobile-event-card');
+    const target = desktopWrap || mobileCard;
+    if (!target) return;
+
+    const isHidden = target.style.display === 'none';
+    const btn = document.getElementById('ksaBtnToggleBanner');
+    if (btn) {
+      if (isHidden) {
+        btn.innerHTML = '🎯 Banner: UIT (Verborgen)';
+        btn.title = 'De aftelbanner staat momenteel UIT. Klik om hem weer AAN te zetten.';
+        btn.style.background = '#fee2e2';
+        btn.style.color = '#991b1b';
+        btn.style.borderColor = '#fca5a5';
+      } else {
+        btn.innerHTML = '🎯 Banner: AAN (Zichtbaar)';
+        btn.title = 'De aftelbanner staat momenteel AAN. Klik om hem UIT te zetten.';
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.borderColor = '#86efac';
+      }
+    }
+
+    const inlineBtn = document.getElementById('ksaHideBannerInline');
+    if (inlineBtn) {
+      if (isHidden) {
+        inlineBtn.innerHTML = '👁️ Banner AAN zetten';
+        inlineBtn.className = 'ksa-mini-btn';
+        inlineBtn.style.background = '#16a34a';
+        inlineBtn.style.color = '#fff';
+      } else {
+        inlineBtn.innerHTML = '🙈 Banner UIT zetten';
+        inlineBtn.className = 'ksa-mini-btn ksa-mini-btn-danger';
+        inlineBtn.style.background = '';
+        inlineBtn.style.color = '';
+      }
+    }
   }
 
   function toggleBannerVisibility() {
@@ -2471,6 +2514,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const isHidden = target.style.display === 'none';
     if (desktopWrap) desktopWrap.style.display = isHidden ? '' : 'none';
     if (mobileCard) mobileCard.style.display = isHidden ? '' : 'none';
+
+    updateBannerButtonState();
   }
 
   // --------------------------------------------------------------------------
