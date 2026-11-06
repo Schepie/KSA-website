@@ -3761,26 +3761,86 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     const summaryText = isTest
       ? `Dit is een testbericht om te verifiëren dat admin-notificaties correct toekomen op ${adminEmail}.`
-      : `Het leiding bewerkwachtwoord van de KSA website is zojuist gewijzigd.`;
+      : `Het leiding bewerkwachtwoord van de KSA website is zojuist gewijzigd naar: ${newPassword}`;
 
-    const payload = {
-      _subject: emailSubject,
-      _template: 'table',
-      _captcha: 'false',
-      _replyto: adminEmail,
-      ontvanger: adminEmail,
-      status: isTest ? 'TEST VERIFICATIE' : 'WACHTWOORD GEWIJZIGD',
-      nieuw_wachtwoord: newPassword,
-      vorig_wachtwoord: oldPassword || '(niet opgegeven)',
-      tijdstip: nowStr,
-      apparaat: `${deviceType} (${navigator.userAgent})`,
-      pagina: pageUrl,
-      bericht: summaryText
-    };
+    // Haal de geconfigureerde sleutel of webhook op (localStorage of uit GitHub state)
+    let configuredKey = localStorage.getItem('ksa_admin_email_key') || localStorage.getItem('ksa_admin_email_webhook') || '';
+    if (!configuredKey) {
+      try {
+        const s = await fetchLatestGithubState();
+        if (s && s._auth && s._auth.emailNotificationKey) {
+          configuredKey = s._auth.emailNotificationKey;
+          localStorage.setItem('ksa_admin_email_key', configuredKey);
+        }
+      } catch (e) {}
+    }
 
-    let sent = false;
+    let result = { success: false, method: '', message: '' };
 
-    // 1. Verzend via FormSubmit (CORS geactiveerd, gratis, directe aflevering in Gmail)
+    // 1. Probeer Web3Forms Access Key of Webhook URL
+    if (configuredKey) {
+      const keyVal = configuredKey.trim();
+      if (keyVal.startsWith('http://') || keyVal.startsWith('https://')) {
+        try {
+          await fetch(keyVal, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: adminEmail,
+              subject: emailSubject,
+              nieuw_wachtwoord: newPassword,
+              vorig_wachtwoord: oldPassword || '(onbekend)',
+              datum: nowStr,
+              apparaat: deviceType,
+              url: pageUrl,
+              bericht: summaryText
+            }),
+            mode: 'no-cors'
+          });
+          return { success: true, method: 'webhook', message: 'E-mail verzonden via webhook!' };
+        } catch (errHook) {
+          console.warn('[KSA Auth] Webhook mislukt:', errHook);
+          result.message = 'Webhook verbinding mislukt';
+        }
+      } else {
+        // Web3Forms Access Key
+        try {
+          const res = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              access_key: keyVal,
+              subject: emailSubject,
+              from_name: 'KSA Zonhoven Beheersysteem',
+              to: adminEmail,
+              email: adminEmail,
+              'Nieuw Wachtwoord': newPassword,
+              'Vorig Wachtwoord': oldPassword || '(niet opgegeven)',
+              'Datum en Tijd': nowStr,
+              'Toestel': deviceType,
+              'Website URL': pageUrl,
+              message: summaryText
+            })
+          });
+          const json = await res.json().catch(() => ({}));
+          if (res.ok && json.success) {
+            console.log('[KSA Auth] E-mail succesvol verzonden via Web3Forms:', json);
+            return { success: true, method: 'web3forms', message: 'E-mail direct verzonden via Web3Forms!' };
+          } else {
+            console.warn('[KSA Auth] Web3Forms fout:', json);
+            result.message = json.message || 'Web3Forms sleutel niet geaccepteerd';
+          }
+        } catch (errW3) {
+          console.warn('[KSA Auth] Web3Forms fetch mislukt:', errW3);
+          result.message = 'Web3Forms verbinding mislukt';
+        }
+      }
+    }
+
+    // 2. Fallback FormSubmit (als FormSubmit weer online komt)
     try {
       const endpoint = `https://formsubmit.co/ajax/${encodeURIComponent(adminEmail)}`;
       const res = await fetch(endpoint, {
@@ -3789,43 +3849,47 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          _subject: emailSubject,
+          _template: 'table',
+          _captcha: 'false',
+          'Admin E-mail': adminEmail,
+          'Nieuw Wachtwoord': newPassword,
+          'Vorig Wachtwoord': oldPassword || '(niet opgegeven)',
+          'Datum en Tijd': nowStr,
+          'Toestel': deviceType,
+          'Pagina': pageUrl,
+          'Bericht': summaryText
+        }),
+        signal: AbortSignal.timeout(4000)
       });
       if (res.ok) {
-        const json = await res.json().catch(() => ({}));
-        console.log('[KSA Auth] Admin e-mailnotificatie verzonden via FormSubmit:', json);
-        sent = true;
+        return { success: true, method: 'formsubmit', message: 'Verzonden via FormSubmit' };
       }
-    } catch (errFormSubmit) {
-      console.warn('[KSA Auth] FormSubmit poging mislukt:', errFormSubmit);
+    } catch (errFs) {
+      console.warn('[KSA Auth] FormSubmit poging mislukt:', errFs);
     }
 
-    // 2. Extra fallback: controleer of er een custom webhook is ingesteld (bijv. Google Apps Script / Formspree)
-    const customWebhook = localStorage.getItem('ksa_admin_email_webhook');
-    if (customWebhook && !sent) {
-      try {
-        await fetch(customWebhook, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          mode: 'no-cors'
-        });
-        sent = true;
-      } catch (errWebhook) {
-        console.warn('[KSA Auth] Custom webhook mislukt:', errWebhook);
-      }
+    // 3. Maak mailto link als handmatige fallback
+    const mailtoBody = encodeURIComponent(`Beste Admin,\n\nHet bewerkwachtwoord van de KSA website is gewijzigd:\n\n🔑 Nieuw wachtwoord: ${newPassword}\n🔒 Vorig wachtwoord: ${oldPassword || '(onbekend)'}\n📅 Datum: ${nowStr}\n📱 Toestel: ${deviceType}\n🌐 Pagina: ${pageUrl}`);
+    result.mailtoUrl = `mailto:${encodeURIComponent(adminEmail)}?subject=${encodeURIComponent(emailSubject)}&body=${mailtoBody}`;
+    if (!result.message) {
+      result.message = 'Geen actieve e-mailservice geconfigureerd (FormSubmit tijdelijk offline)';
     }
 
-    return { success: sent };
+    return result;
   }
 
   // --------------------------------------------------------------------------
   // 14. VEILIG WACHTWOORD WIJZIGEN VOOR DE HELE LEIDINGSPLOEG (SHA-256)
   // --------------------------------------------------------------------------
-  function openChangePasswordModal() {
+  async function openChangePasswordModal() {
     const modal = document.getElementById('ksaEditorModalContent');
     const backdrop = document.getElementById('ksaEditorModalBackdrop');
     if (!modal || !backdrop) return;
+
+    let fullState = (await fetchLatestGithubState()) || {};
+    const existingKey = (fullState && fullState._auth && fullState._auth.emailNotificationKey) || localStorage.getItem('ksa_admin_email_key') || '';
 
     modal.innerHTML = `
       <h3>🔑 Leiding Wachtwoord Wijzigen</h3>
@@ -3833,13 +3897,25 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         Hiermee wijzig je het bewerkwachtwoord voor <strong>de hele leidingsploeg</strong>. Zodra je dit opslaat, wordt de nieuwe cryptografische sleutel (SHA-256) live geactiveerd op GitHub en geldt de nieuwe code op elk apparaat.
       </p>
 
-      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:12.5px; color:#166534; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-        <div style="line-height:1.4;">
-          📧 <strong>Admin e-mail:</strong> Bij elke wachtwoordwijziging wordt het nieuwe wachtwoord automatisch gemaild naar <code>geert.schepers@gmail.com</code>.
+      <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:10px; padding:12px; margin-bottom:14px; font-size:12.5px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+          <span style="font-weight:700; color:#1e293b;">📧 Admin Notificatie (geert.schepers@gmail.com)</span>
+          <span id="ksaAdminMailStatusBadge" style="padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; ${existingKey ? 'background:#dcfce7; color:#15803d;' : 'background:#fee2e2; color:#991b1b;'}">
+            ${existingKey ? '✅ Sleutel actief' : '⚠️ Nog geen sleutel'}
+          </span>
         </div>
-        <button type="button" id="ksaBtnTestAdminMail" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;" title="Verstuur nu een test-mail naar geert.schepers@gmail.com">
-          ✉️ Test Mail
-        </button>
+        <p style="margin:0 0 8px 0; color:#64748b; line-height:1.4;">
+          Vul hier een gratis <strong>Web3Forms Access Key</strong> of <strong>Webhook URL</strong> in voor directe bezorging in je inbox:
+        </p>
+        <div style="display:flex; gap:6px; margin-bottom:6px;">
+          <input type="text" id="ksaAdminEmailKeyInput" value="${existingKey}" placeholder="Plak Web3Forms Access Key of Webhook URL..." style="flex:1; padding:7px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:12px;">
+          <button type="button" id="ksaBtnSaveAdminMailKey" style="background:#0284c7; color:#fff; border:none; border-radius:6px; padding:7px 12px; font-weight:700; cursor:pointer;" title="Sla sleutel op en synchroniseer naar GitHub">Opslaan</button>
+          <button type="button" id="ksaBtnTestAdminMail" style="background:#16a34a; color:#fff; border:none; border-radius:6px; padding:7px 12px; font-weight:700; cursor:pointer;" title="Verstuur direct een test e-mail">✉️ Test</button>
+        </div>
+        <div style="font-size:11px; color:#64748b; display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+          <a href="https://web3forms.com" target="_blank" rel="noopener" style="color:#0284c7; text-decoration:underline; font-weight:600;">👉 Klik hier om direct gratis een Web3Forms sleutel aan te maken</a>
+          <span id="ksaMailtoQuickArea"></span>
+        </div>
       </div>
 
       <div id="ksaChangePinMsg" style="display:none; padding:8px 12px; border-radius:6px; font-size:13px; margin-bottom:10px;"></div>
@@ -3867,6 +3943,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const cancelBtn = document.getElementById('ksaCancelPinChange');
     const msgEl = document.getElementById('ksaChangePinMsg');
     const testMailBtn = document.getElementById('ksaBtnTestAdminMail');
+    const saveKeyBtn = document.getElementById('ksaBtnSaveAdminMailKey');
+    const keyInput = document.getElementById('ksaAdminEmailKeyInput');
+    const statusBadge = document.getElementById('ksaAdminMailStatusBadge');
 
     cancelBtn.onclick = () => { backdrop.style.display = 'none'; };
 
@@ -3878,25 +3957,72 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       msgEl.innerHTML = txt;
     };
 
+    if (saveKeyBtn) {
+      saveKeyBtn.onclick = async () => {
+        const val = (keyInput.value || '').trim();
+        saveKeyBtn.disabled = true;
+        saveKeyBtn.textContent = '⏳ Opslaan...';
+        localStorage.setItem('ksa_admin_email_key', val);
+
+        try {
+          let s = (await fetchLatestGithubState()) || {};
+          s._auth = s._auth || {};
+          s._auth.emailNotificationKey = val;
+          s._auth.updatedAt = new Date().toISOString();
+          s.updatedAt = new Date().toISOString();
+          localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(s));
+
+          const ghToken = getEffectiveGithubToken();
+          if (ghToken) {
+            const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
+            const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
+            const ghBranch = (localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch).trim();
+            await commitFileToGithub(
+              ghToken, ghOwner, ghRepo, ghBranch,
+              KSA_GITHUB_EDITOR_CONFIG.contentFilePath,
+              utf8ToBase64(JSON.stringify(s, null, 2)),
+              `⚙️ Admin e-mailnotificatiesleutel ingesteld`
+            );
+          }
+          statusBadge.textContent = '✅ Sleutel Opgeslagen';
+          statusBadge.style.background = '#dcfce7';
+          statusBadge.style.color = '#15803d';
+          showMsg('✅ Sleutel succesvol opgeslagen! Klik nu op <strong>"✉️ Test"</strong> om te verifiëren.', false);
+        } catch (e) {
+          showMsg('✅ Sleutel lokaal bewaard. Klik op <strong>"✉️ Test"</strong> om te proberen.', false);
+        } finally {
+          saveKeyBtn.disabled = false;
+          saveKeyBtn.textContent = 'Opslaan';
+        }
+      };
+    }
+
     if (testMailBtn) {
       testMailBtn.onclick = async () => {
+        const tempKey = (keyInput.value || '').trim();
+        if (tempKey) localStorage.setItem('ksa_admin_email_key', tempKey);
+
         testMailBtn.disabled = true;
         testMailBtn.textContent = '⏳ Verzenden...';
         const res = await sendAdminPasswordNotification({
-          newPassword: '(Test-notificatie vanuit bewerkingsscherm)',
-          oldPassword: '(Geen wijziging - verificatie)',
+          newPassword: '(Testbericht vanuit bewerkingsscherm)',
+          oldPassword: '(Verificatietest)',
           isTest: true
         });
+
+        testMailBtn.disabled = false;
+        testMailBtn.textContent = '✉️ Test';
+
         if (res && res.success) {
-          testMailBtn.textContent = '✅ Verzonden!';
-          showMsg('📧 <strong>Test-mail succesvol verzonden</strong> naar <code>geert.schepers@gmail.com</code>!<br>Controleer je inbox (en eventueel spambox). <em>(Bij de allereerste keer stuurt FormSubmit een eenmalige activatiemail met een knop "Activate Form" om het e-mailadres te bevestigen.)</em>', false);
+          statusBadge.textContent = '✅ Actief & Geverifieerd';
+          statusBadge.style.background = '#dcfce7';
+          statusBadge.style.color = '#15803d';
+          showMsg(`🎉 <strong>Test-mail succesvol verzonden via ${res.method}!</strong><br>Kijk nu in je Gmail inbox (en eventueel spambox) van <code>geert.schepers@gmail.com</code>.`, false);
         } else {
-          testMailBtn.textContent = '✉️ Verzonden!';
-          showMsg('📧 <strong>Test-notificatie verstuurd</strong> naar <code>geert.schepers@gmail.com</code>.<br>Controleer je inbox (en eventueel spamfolder) om de eenmalige activatielink te bevestigen.', false);
-          setTimeout(() => {
-            testMailBtn.disabled = false;
-            testMailBtn.textContent = '✉️ Test Mail';
-          }, 3500);
+          statusBadge.textContent = '⚠️ Mislukt';
+          statusBadge.style.background = '#fee2e2';
+          statusBadge.style.color = '#b91c1c';
+          showMsg(`⚠️ <strong>E-mail kon niet automatisch verzonden worden:</strong> ${res.message || 'Geen verbinding'}.<br><br>💡 <a href="https://web3forms.com" target="_blank" style="color:#0284c7; font-weight:700; text-decoration:underline;">Klik hier om binnen 5 seconden een gratis Web3Forms sleutel aan te maken</a> (vul je e-mail in op die site, kopieer de ontvangen sleutel en plak hem in het vakje hierboven).<br><br><a href="${res.mailtoUrl}" target="_blank" style="display:inline-block; background:#0284c7; color:#fff; padding:6px 12px; border-radius:6px; font-weight:700; text-decoration:none; margin-top:4px;">✉️ Of open je mail-app om nu handmatig te sturen</a>`, true);
         }
       };
     }
@@ -3973,8 +4099,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
       // 5. Stuur e-mailnotificatie naar admin (geert.schepers@gmail.com)
       saveBtn.innerHTML = '⏳ E-mail naar admin versturen...';
+      let emailNotifRes = { success: false, message: '' };
       try {
-        await sendAdminPasswordNotification({
+        emailNotifRes = await sendAdminPasswordNotification({
           newPassword: newVal1,
           oldPassword: curVal
         });
@@ -4000,17 +4127,25 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             utf8ToBase64(jsonString),
             `🔐 Leiding bewerkwachtwoord gewijzigd (${new Date().toLocaleDateString('nl-BE')})`
           );
-          showMsg(`✅ <strong>Wachtwoord succesvol gewijzigd!</strong><br>De nieuwe cryptografische sleutel is live geactiveerd op GitHub voor de hele leidingsploeg.<br><br>📧 <em>Er is tevens automatisch een e-mail gestuurd naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong> met het nieuwe wachtwoord.</em>`, false);
+          
+          let emailNote = '';
+          if (emailNotifRes && emailNotifRes.success) {
+            emailNote = `<br><br>📧 <em>E-mailbevestiging succesvol verzonden naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong>!</em>`;
+          } else {
+            emailNote = `<br><br>⚠️ <em>E-mail niet automatisch verzonden (${emailNotifRes.message || 'geen sleutel'}).</em><br><a href="${emailNotifRes.mailtoUrl || '#'}" target="_blank" style="display:inline-block; background:#0284c7; color:#fff; padding:6px 12px; border-radius:6px; font-weight:700; text-decoration:none; margin-top:6px;">✉️ Open Mail-app om handmatig te verzenden</a>`;
+          }
+
+          showMsg(`✅ <strong>Wachtwoord succesvol gewijzigd!</strong><br>De nieuwe cryptografische sleutel is live geactiveerd op GitHub voor de hele leidingsploeg.${emailNote}`, false);
           saveBtn.disabled = false;
           saveBtn.innerHTML = '✅ Live Geactiveerd';
-          setTimeout(() => { backdrop.style.display = 'none'; }, 3200);
+          setTimeout(() => { backdrop.style.display = 'none'; }, emailNotifRes.success ? 3200 : 7000);
         } catch (err) {
           showMsg(`⚠️ Lokaal bijgewerkt, maar GitHub gaf een fout:<br>${err.message}<br><br>Controleer je GitHub Token via "⚙️ GitHub Koppeling".`, true);
           saveBtn.disabled = false;
           saveBtn.innerHTML = '💾 Opnieuw proberen';
         }
       } else {
-        showMsg(`✅ Het nieuwe wachtwoord is klaargezet in je browser!<br>📧 <em>Er is een e-mail gestuurd naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong>.</em><br><br>Klik straks op <strong>"💾 Opslaan naar GitHub"</strong> in de werkbalk om het live te publiceren voor iedereen.`, false);
+        showMsg(`✅ Het nieuwe wachtwoord is klaargezet in je browser!<br>Klik straks op <strong>"💾 Opslaan naar GitHub"</strong> in de werkbalk om het live te publiceren voor iedereen.`, false);
         saveBtn.disabled = false;
         saveBtn.innerHTML = '✅ Lokaal Opgeslagen';
         setTimeout(() => { backdrop.style.display = 'none'; }, 3200);
