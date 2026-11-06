@@ -148,6 +148,69 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     return (sessionStorage.getItem('ksa_github_token') || localStorage.getItem('ksa_github_token') || '').trim();
   }
 
+  async function verifyGithubToken(token, owner, repo) {
+    if (!token) return false;
+    const cleanToken = token.replace(/^Bearer\s+/i, '').replace(/[\r\n\t ]+/g, '').trim();
+    if (!cleanToken) return false;
+
+    const url = `https://api.github.com/repos/${owner}/${repo}`;
+    try {
+      let res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${cleanToken}`,
+          'Accept': 'application/vnd.github+json'
+        }
+      });
+      if (!res.ok && res.status === 401) {
+        res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `token ${cleanToken}`,
+            'Accept': 'application/vnd.github+json'
+          }
+        });
+      }
+      return res.status === 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function checkAndSyncGithubConnectionStatus() {
+    const ghBtn = document.getElementById('ksaBtnGithubConfig');
+    const owner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
+    const repo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
+
+    let token = getEffectiveGithubToken();
+    if (!token) {
+      try {
+        const s = await fetchLatestGithubState();
+        if (s && s._auth && s._auth.vault) {
+          const pass = sessionStorage.getItem('ksa_session_pass');
+          if (pass) {
+            token = await decryptFromVault(s._auth.vault, pass);
+            if (token) {
+              sessionStorage.setItem('ksa_github_token', token);
+              localStorage.setItem('ksa_github_token', token);
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    const isValid = await verifyGithubToken(token, owner, repo);
+
+    if (isValid) {
+      // ✅ Geldige koppeling aanwezig: verberg de knop in het bewerkmenu!
+      if (ghBtn) ghBtn.style.display = 'none';
+    } else {
+      // ⚠️ Geen geldige koppeling, corrupt of vervallen token:
+      if (ghBtn) ghBtn.style.display = '';
+      openGithubConfigModal(false, true);
+    }
+  }
+
   // Bewaar bij het opstarten van de pagina op elke <img> de originele src (bv. "images/cara.jpg")
   // zodat we bij het vervangen van een foto ook dezelfde foto in het paspoort-overzicht en op mobiel kunnen vervangen!
   function tagOriginalImageSources() {
@@ -1622,6 +1685,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     isEditMode = true;
     document.body.classList.add('ksa-edit-mode-active');
     tagOriginalImageSources();
+    checkAndSyncGithubConnectionStatus();
 
     const textSelectors = [
       '#topbarBadge',
@@ -3473,7 +3537,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   // --------------------------------------------------------------------------
   // 13. GITHUB INSTELLINGEN & AUTOMATISCHE KLUIS MODAL
   // --------------------------------------------------------------------------
-  async function openGithubConfigModal(fromSave = false) {
+  async function openGithubConfigModal(fromSave = false, isCorruptOrExpired = false) {
     const curToken = getEffectiveGithubToken();
     const curOwner = localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner;
     const curRepo = localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName;
@@ -3488,30 +3552,44 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       hasVault = !!(s && s._auth && s._auth.vault);
     } catch (e) {}
 
-    modal.innerHTML = `
-      <h3>⚙️ Automatische GitHub Kluis &amp; Koppeling</h3>
-      ${hasVault ? `
+    let noticeHtml = '';
+    if (isCorruptOrExpired) {
+      noticeHtml = `
+        <div style="background:#fee2e2; border:1px solid #f87171; border-left:4px solid #ef4444; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#991b1b; line-height:1.45;">
+          <strong>⚠️ GitHub Koppeling is Vervallen of Niet Ingesteld:</strong><br>
+          Het huidige GitHub-toegangstoken ontbreekt, is verlopen of niet geldig. Voer hieronder een geldig GitHub Personal Access Token in. Zodra je dit opslaat, wordt de knop in het menu automatisch verborgen en kan iedereen weer direct opslaan!
+        </div>
+      `;
+    } else if (hasVault) {
+      noticeHtml = `
         <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#166534; line-height:1.45;">
           ✅ <strong>Automatische Kluis is Actief!</strong><br>
-          Jouw GitHub Token is veilig versleuteld (AES-256-GCM) gekoppeld aan het leiding-wachtwoord. <strong>Andere leiding hoeft nooit een token aan te maken of in te vullen</strong>; door simpelweg het leiding-wachtwoord in te typen kan iedereen direct opslaan en foto's uploaden!
+          Jouw GitHub Token is veilig versleuteld (AES-256-GCM) gekoppeld aan het leiding-wachtwoord. Zolang deze geldig is, is de instellingenknop automatisch verborgen in het bewerkmenu.
         </div>
-      ` : `
+      `;
+    } else {
+      noticeHtml = `
         <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#1e3a8a; line-height:1.45;">
           🔐 <strong>Eénmalige instelling voor de hele leidingsploeg:</strong><br>
-          Vul hieronder éénmalig jouw GitHub Token in. Het systeem versleutelt dit met het leidingwachtwoord en bewaart het in een beveiligde kluis op GitHub. Daarna kan <strong>elke leidster op elk toestel automatisch opslaan met enkel het wachtwoord!</strong>
+          Vul hieronder éénmalig jouw GitHub Token in. Het systeem versleutelt dit met het leidingwachtwoord en bewaart het in een beveiligde kluis op GitHub. Daarna is deze knop automatisch verborgen en kan <strong>elke leidster direct bewerken en opslaan met enkel het wachtwoord!</strong>
         </div>
-      `}
+      `;
+    }
+
+    modal.innerHTML = `
+      <h3>⚙️ Automatische GitHub Kluis &amp; Koppeling</h3>
+      ${noticeHtml}
       <div id="ksaGhModalMsg" style="display:none; padding:8px 12px; border-radius:6px; font-size:13px; margin-bottom:10px;"></div>
 
       <p style="font-size:0.78rem; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 10px; border-radius:8px; margin-bottom:10px;">
         <strong>Hoe maak je een gratis GitHub Token aan (slechts 1x nodig)?</strong><br>
-        1. Ga op GitHub naar <em>Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Fine-grained tokens &rarr; Generate new token</em>.<br>
-        2. Kies repository <strong>${curOwner}/${curRepo}</strong> en geef onder <em>Repository permissions</em> bij <strong>Contents</strong> de rechten <strong>Read and write</strong>.<br>
-        3. Plak de token hieronder:
+        1. Ga op GitHub naar <em>Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Tokens (classic) &rarr; Generate new token</em>.<br>
+        2. Geef een naam in (bv. <em>KSA Website</em>) en vink <strong>repo</strong> aan.<br>
+        3. Plak de gegenereerde token (<code>ghp_...</code>) hieronder:
       </p>
 
       <label for="ksaGhTokenInput">GitHub Personal Access Token (beheerder):</label>
-      <input type="password" id="ksaGhTokenInput" placeholder="github_pat_... of ghp_..." value="${curToken}">
+      <input type="password" id="ksaGhTokenInput" placeholder="ghp_... of github_pat_..." value="${curToken}">
 
       <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px;">
         <div>
@@ -3615,6 +3693,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         showMsg('✅ <strong>Kluis succesvol geactiveerd op GitHub!</strong><br>Vanaf nu kan elke leidster op elk toestel direct opslaan door enkel het leiding-wachtwoord in te typen.', false);
         saveBtn.disabled = false;
         saveBtn.innerHTML = '✅ Kluis Geactiveerd';
+
+        const ghBtn = document.getElementById('ksaBtnGithubConfig');
+        if (ghBtn) ghBtn.style.display = 'none';
+
         setTimeout(() => {
           backdrop.style.display = 'none';
           if (fromSave) saveAllEditsToGithub();
