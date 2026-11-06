@@ -39,19 +39,17 @@
 
     // Route: If on desktop page and is mobile screen
     if (!isMobilePage) {
-      if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA || isStandalone)) {
+      if (preferredView !== 'desktop' && (isSmallScreen || isMobileUA)) {
         const targetHash = window.location.hash || '';
         window.location.replace('mobile.html' + targetHash);
       }
     } 
     // Route: If on mobile page, only send to desktop if explicitly requested or on large non-touch screen without mobile preference
     else {
-      // If running as standalone installed app, NEVER redirect to desktop
-      if (!isStandalone) {
-        if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
-          const targetHash = window.location.hash || '';
-          window.location.replace('index.html' + targetHash);
-        }
+      // If running on mobile phone / touch screen, stay on mobile app
+      if (preferredView === 'desktop' || (preferredView !== 'mobile' && !isTouchDevice && !isMobileUA && window.innerWidth > 1024)) {
+        const targetHash = window.location.hash || '';
+        window.location.replace('index.html' + targetHash);
       }
     }
   }

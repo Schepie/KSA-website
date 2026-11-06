@@ -5,12 +5,17 @@ try {
   console.warn('[SW] OneSignal import mislukt:', e);
 }
 
-const CACHE_NAME = 'ksa-app-v3';
+const CACHE_NAME = 'ksa-app-v4';
 const STATIC_ASSETS = [
+  './',
+  './index.html',
   './mobile.html',
   './manifest.json',
+  './css/style.css',
   './css/mobile.css',
+  './js/main.js',
   './js/mobile.js',
+  './js/device-detect.js',
   './js/html2canvas.min.js',
   './assets/icons/pwa-icon-192.png',
   './assets/icons/pwa-icon-512.png',
@@ -85,7 +90,8 @@ self.addEventListener('fetch', (event) => {
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) return cachedResponse;
           if (event.request.headers.get('accept')?.includes('text/html')) {
-            return caches.match('./mobile.html');
+            const isMobile = url.pathname.includes('mobile');
+            return caches.match(isMobile ? './mobile.html' : './index.html').then(res => res || caches.match('./index.html') || caches.match('./mobile.html'));
           }
         });
       })

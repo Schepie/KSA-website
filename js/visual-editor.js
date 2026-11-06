@@ -64,7 +64,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         localStorage.setItem('ksa_active_pin_hash', s._auth.pinHash);
         return s._auth.pinHash;
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const cached = localStorage.getItem('ksa_active_pin_hash');
     if (cached) return cached;
@@ -197,7 +197,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     const isValid = await verifyGithubToken(token, owner, repo);
@@ -405,7 +405,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const s = await resRaw.json();
         if (s && s.updatedAt) candidates.push(s);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Probeer het lokale pad op de server (data/site-content.json)
     try {
@@ -414,7 +414,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const s = await resLocal.json();
         if (s && s.updatedAt) candidates.push(s);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 3. Check localStorage (alleen als deze nieuwer is dan GitHub!)
     try {
@@ -423,7 +423,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const s = JSON.parse(localRaw);
         if (s && s.updatedAt) candidates.push(s);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     if (candidates.length === 0) return null;
 
@@ -460,7 +460,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
 
     if (src.startsWith('images/uploads/')) {
-      img.onerror = function() {
+      img.onerror = function () {
         this.onerror = null;
         this.src = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${src}`;
       };
@@ -1735,7 +1735,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         timer = setTimeout(() => {
           endHold();
           if (navigator.vibrate) {
-            try { navigator.vibrate(60); } catch (_) {}
+            try { navigator.vibrate(60); } catch (_) { }
           }
           if (isEditMode) {
             disableEditMode();
@@ -2190,9 +2190,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const origSrc = isGroupImg ? '' : (currentImageTarget.getAttribute('data-orig-src') || currentImageTarget.getAttribute('src') || '');
 
     const reader = new FileReader();
-    reader.onload = function(ev) {
+    reader.onload = function (ev) {
       const imgObj = new Image();
-      imgObj.onload = function() {
+      imgObj.onload = function () {
         const maxDim = 1400;
         let w = imgObj.width;
         let h = imgObj.height;
@@ -2340,8 +2340,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         setTimeout(() => {
           onEditableLinkClick({
             currentTarget: clone,
-            preventDefault: () => {},
-            stopPropagation: () => {}
+            preventDefault: () => { },
+            stopPropagation: () => { }
           });
         }, 50);
       };
@@ -2413,8 +2413,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     setTimeout(() => {
       onEditableLinkClick({
         currentTarget: newA,
-        preventDefault: () => {},
-        stopPropagation: () => {}
+        preventDefault: () => { },
+        stopPropagation: () => { }
       });
     }, 50);
   }
@@ -2792,11 +2792,11 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       </div>
       <div style="display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
         ${groupKeys.map(k => {
-          const g = window.groupData[k] || {};
-          const lbl = isMob ? (g.mobileButtonLabel || g.name || k) : (g.buttonLabel || g.name || k);
-          const isAvailable = !g.hidden;
-          const isFocus = k === focusGroupKey;
-          return `
+      const g = window.groupData[k] || {};
+      const lbl = isMob ? (g.mobileButtonLabel || g.name || k) : (g.buttonLabel || g.name || k);
+      const isAvailable = !g.hidden;
+      const isFocus = k === focusGroupKey;
+      return `
             <div style="background:${isFocus ? '#eff6ff' : '#f8fafc'}; border:1.5px solid ${isFocus ? '#3b82f6' : '#cbd5e1'}; border-radius:10px; padding:10px 12px;">
               <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px;">
                 <strong style="font-size:0.85rem; color:#0f172a;">${(g.name || k).toUpperCase()}</strong>
@@ -2808,7 +2808,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
               <input type="text" class="ksa-grp-lbl-input" data-group="${k}" value="${lbl.replace(/"/g, '&quot;')}" placeholder="Tekst op de knop">
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaGrpModalCancel">Annuleren</button>
@@ -3997,7 +3997,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     try {
       const s = await fetchLatestGithubState();
       hasVault = !!(s && s._auth && s._auth.vault);
-    } catch (e) {}
+    } catch (e) { }
 
     let noticeHtml = '';
     if (isCorruptOrExpired) {
@@ -4147,7 +4147,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             newPassword: pass,
             oldPassword: '(GitHub kluis ingesteld/bijgewerkt)'
           });
-        } catch (eM) {}
+        } catch (eM) { }
 
         const ghBtn = document.getElementById('ksaBtnGithubConfig');
         if (ghBtn) ghBtn.style.display = 'none';
@@ -4194,7 +4194,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           configuredKey = s._auth.emailNotificationKey;
           localStorage.setItem('ksa_admin_email_key', configuredKey);
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     let result = { success: false, method: '', message: '' };
@@ -4582,7 +4582,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             utf8ToBase64(jsonString),
             `🔐 Leiding bewerkwachtwoord gewijzigd (${new Date().toLocaleDateString('nl-BE')})`
           );
-          
+
           let emailNote = '';
           if (emailNotifRes && emailNotifRes.success) {
             emailNote = `<br><br>📧 <em>E-mailbevestiging succesvol verzonden naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong>!</em>`;

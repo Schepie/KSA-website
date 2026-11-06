@@ -1,15 +1,16 @@
 {
+  "id": "ksa-zonhoven-app",
   "name": "KSA Zonhoven Meisjes",
   "short_name": "KSA Zonhoven",
-  "description": "Officiële mobiele app van KSA Zonhoven Meisjes met live agenda, groepen, leiding en praktische info.",
-  "start_url": "./mobile.html",
+  "description": "Officiële web app van KSA Zonhoven Meisjes met live agenda, groepen, leiding en praktische info.",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0067b1",
   "theme_color": "#0067b1",
-  "orientation": "portrait",
+  "orientation": "any",
   "lang": "nl-BE",
-  "categories": ["lifestyle", "social"],
+  "categories": ["lifestyle", "social", "education"],
   "icons": [
     {
       "src": "assets/icons/pwa-icon-192.png",
@@ -29,6 +30,35 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kalender & Activiteiten",
+      "short_name": "Kalender",
+      "description": "Bekijk de KSA jaarkalender en komende activiteiten",
+      "url": "./index.html#agenda",
+      "icons": [{ "src": "assets/icons/pwa-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Nieuws & Updates",
+      "short_name": "Nieuws",
+      "description": "Laatste KSA nieuwtjes en evenementen",
+      "url": "./index.html#nieuws",
+      "icons": [{ "src": "assets/icons/pwa-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Groepen & Info",
+      "short_name": "Groepen",
+      "description": "Ontdek de leeftijdsgroepen",
+      "url": "./index.html#groepen",
+      "icons": [{ "src": "assets/icons/pwa-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Contact & Info",
+      "short_name": "Contact",
+      "description": "Contacteer de leiding of bekijk info",
+      "url": "./index.html#contact",
+      "icons": [{ "src": "assets/icons/pwa-icon-192.png", "sizes": "192x192" }]
+    }
   ]
 }
-
