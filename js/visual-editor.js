@@ -1888,7 +1888,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     isEditMode = false;
     document.body.classList.remove('ksa-edit-mode-active');
     document.querySelectorAll('.cal-sticker').forEach(el => {
-      if (!el.textContent.trim()) el.remove();
+      const hasContent = el.textContent.trim().length > 0 || el.querySelector('img') !== null;
+      if (!hasContent) el.remove();
       else el.classList.remove('ksa-sticker-empty');
     });
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
@@ -2615,10 +2616,19 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const card = calItem.querySelector('.cal-card');
     if (!card) return;
     const existingSticker = card.querySelector('.cal-sticker');
-    const curVal = existingSticker ? existingSticker.textContent.trim() : '';
+    let curVal = '';
+    if (existingSticker) {
+      const img = existingSticker.querySelector('img');
+      if (img) {
+        curVal = existingSticker.getAttribute('data-img-src') || img.getAttribute('src') || '';
+      } else {
+        curVal = existingSticker.textContent.trim();
+      }
+    }
 
     const presets = [
       { emoji: '', label: 'Geen icoon' },
+      { emoji: 'img:assets/icons/ksa-logo-square.png', iconHtml: '<img src="assets/icons/ksa-logo-square.png" alt="KSA Logo" style="width:26px; height:26px; object-fit:contain; border-radius:4px; vertical-align:middle;">', label: 'KSA Logo' },
       { emoji: '🎅', label: 'Kerstman' },
       { emoji: '🎄', label: 'Kerstboom' },
       { emoji: '👑', label: 'Sinterklaas' },
@@ -2644,7 +2654,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       <div class="ksa-sticker-grid">
         ${presets.map(p => `
           <button type="button" class="ksa-sticker-choice" data-emoji="${p.emoji}">
-            <div>${p.emoji || '🚫'}</div>
+            <div style="display:flex; align-items:center; justify-content:center; min-height:28px;">${p.iconHtml || p.emoji || '🚫'}</div>
             <span>${p.label}</span>
           </button>
         `).join('')}
@@ -2664,7 +2674,15 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (clean) {
         const span = document.createElement('span');
         span.className = 'cal-sticker';
-        span.textContent = clean;
+        if (clean.startsWith('img:') || clean.includes('ksa-logo-square.png') || clean.includes('assets/icons/')) {
+          const imgSrc = clean.startsWith('img:') ? clean.substring(4) : (clean.startsWith('<img') ? (clean.match(/src="([^"]+)"/) || [])[1] : clean);
+          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Logo">`;
+          span.setAttribute('data-img-src', imgSrc || 'assets/icons/ksa-logo-square.png');
+        } else if (clean.startsWith('<img')) {
+          span.innerHTML = clean;
+        } else {
+          span.textContent = clean;
+        }
         span.title = '🎨 Klik om dit icoon te wijzigen of te verwijderen';
         span.onclick = (e) => {
           if (!isEditMode) return;
@@ -3106,7 +3124,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       sticker.className = 'cal-sticker ksa-sticker-empty';
       card.insertBefore(sticker, card.firstChild);
     }
-    const hasIcon = sticker.textContent.trim().length > 0;
+    const hasIcon = sticker.textContent.trim().length > 0 || sticker.querySelector('img') !== null;
     sticker.classList.toggle('ksa-sticker-empty', !hasIcon);
     sticker.removeAttribute('contenteditable');
     sticker.title = hasIcon
@@ -3365,7 +3383,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     document.querySelectorAll('.ksa-card-edit-tools').forEach(el => el.remove());
     document.querySelectorAll('.cal-sticker').forEach(el => {
-      if (!el.textContent.trim()) el.remove();
+      const hasContent = el.textContent.trim().length > 0 || el.querySelector('img') !== null;
+      if (!hasContent) el.remove();
       else el.classList.remove('ksa-sticker-empty');
     });
 

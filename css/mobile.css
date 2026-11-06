@@ -1914,3 +1914,12 @@ body.ksa-edit-mode-active .ksa-group-hidden {
   padding: 10px 14px !important;
   font-size: 0.82rem !important;
 }
+
+.cal-sticker img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 3px;
+  display: inline-block;
+}

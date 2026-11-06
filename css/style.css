@@ -1408,6 +1408,16 @@ body.ksa-edit-mode-active .ksa-topbar.ksa-section-hidden {
   transition: transform 0.2s ease;
 }
 
+.cal-sticker img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 4px;
+  display: inline-block;
+  pointer-events: none;
+}
+
 .cal-item:hover .cal-sticker {
   transform: scale(1.22) rotate(10deg);
 }
