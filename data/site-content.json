@@ -258,7 +258,7 @@
       },
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1)": {
         "href": "https://www.theem.be",
-        "text": "🌐 Surf naar www.theem.be →",
+        "text": "Surf naar www.theem.be →",
         "hidden": false
       }
     },
