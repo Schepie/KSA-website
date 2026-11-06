@@ -3190,6 +3190,33 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }, 50);
   }
 
+  function addDaysToKsaDate(dateStr, daysToAdd = 7) {
+    if (!dateStr) return '01 / 01';
+    const m = dateStr.match(/(\d{1,2})\s*[\/\-]\s*(\d{1,2})/);
+    if (!m) return dateStr;
+
+    const day = parseInt(m[1], 10);
+    const month = parseInt(m[2], 10);
+    if (isNaN(day) || isNaN(month) || month < 1 || month > 12 || day < 1 || day > 31) {
+      return dateStr;
+    }
+
+    const now = new Date();
+    const workYearStart = (now.getMonth() + 1 >= 9) ? now.getFullYear() : now.getFullYear() - 1;
+    const year = (month >= 9) ? workYearStart : workYearStart + 1;
+
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() + daysToAdd);
+
+    const newDay = d.getDate();
+    const newMonth = d.getMonth() + 1;
+
+    const formattedDay = (newDay < 10 && (m[1].length === 2 || m[1].startsWith('0'))) ? String(newDay).padStart(2, '0') : String(newDay);
+    const formattedMonth = String(newMonth).padStart(2, '0');
+
+    return `${formattedDay} / ${formattedMonth}`;
+  }
+
   function injectCardEditTools() {
     document.querySelectorAll('.cal-grid .cal-item').forEach(item => {
       ensureCalStickerSlot(item);
@@ -3201,7 +3228,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <button type="button" class="ksa-mini-btn" data-act="icon" title="Kies of verwijder icoon/sticker (bv. 🎅, 👑)">🎨 Icoon</button>
         <button type="button" class="ksa-mini-btn" data-act="past" title="Zet op Voorbij of Actief">🏁 Voorbij</button>
         <button type="button" class="ksa-mini-btn" data-act="now" title="Markeer als Binnenkort!">🔥 Nu</button>
-        <button type="button" class="ksa-mini-btn" data-act="add" title="Voeg extra datum hierna toe">➕</button>
+        <button type="button" class="ksa-mini-btn" data-act="add" title="Voeg extra datum hierna toe (telt automatisch 7 dagen op)">➕</button>
         <button type="button" class="ksa-mini-btn ksa-mini-btn-danger" data-act="del" title="Verwijder datum">🗑️</button>
       `;
       tools.querySelector('[data-act="icon"]').onclick = () => openCalendarStickerModal(item);
@@ -3217,6 +3244,27 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         const clone = item.cloneNode(true);
         clone.querySelector('.ksa-card-edit-tools')?.remove();
         clone.querySelectorAll('.cal-sticker').forEach(s => s.remove());
+        clone.classList.remove('is-current', 'is-past');
+        clone.querySelectorAll('.cal-pill-now, .cal-excl').forEach(el => el.remove());
+
+        // Automatisch 7 dagen optellen bij de datum
+        const origDateEl = item.querySelector('.cal-date');
+        const cloneDateEl = clone.querySelector('.cal-date');
+        if (cloneDateEl && origDateEl) {
+          const origText = (origDateEl.innerText || origDateEl.textContent || '').trim();
+          cloneDateEl.textContent = addDaysToKsaDate(origText, 7);
+        }
+
+        // Activiteitstekst opschonen indien het een speciaal feestje of 'geen ksa' was
+        const eventTextEl = clone.querySelector('.cal-event-text');
+        if (eventTextEl) {
+          eventTextEl.className = 'cal-event-text';
+          const curTxt = eventTextEl.textContent.trim().toLowerCase();
+          if (curTxt.includes('kerst') || curTxt.includes('hololool') || curTxt.includes('geen ksa')) {
+            eventTextEl.textContent = 'KSA';
+          }
+        }
+
         item.after(clone);
         enableEditMode();
       };
