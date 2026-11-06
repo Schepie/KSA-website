@@ -1,7 +1,13 @@
 {
   "_auth": {
     "pinHash": "56f53220e6bf0f85057d32c8498da4e9e5ab8b225f59e5bd8c977cd020aca195",
-    "updatedAt": "2026-11-06T07:35:26.275Z"
+    "updatedAt": "2026-11-06T07:55:26.282Z",
+    "vault": {
+      "salt": "9e21b3c0c0d3ed21042104cd4fcc3609",
+      "iv": "0c996d65f0ed0f40d763826c",
+      "data": "78c2f3bb1c80cf020b2debe90203eb9f11a030b06265e6fdc4c03b2fa9dad5bd4f7a2b86ec60b40a1c4c4ee5098768b8a1f10c2b02896a73ddcd0a747a191c8235c8a8c705ece66869ee8a5fcd426da7157b8a29922c554646b0768116fdfe68df90d332c094d835eaa2f1b187",
+      "updatedAt": "2026-11-06T07:55:26.044Z"
+    }
   },
   "groups": {
     "kabouters": {
@@ -269,7 +275,7 @@
     "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T07:48:03.692Z",
+  "updatedAt": "2026-11-06T07:55:26.282Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
