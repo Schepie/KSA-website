@@ -1819,6 +1819,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectCardEditTools();
     injectShortcutTools();
     injectTopbarEditTools();
+    updateTopbarButtonState();
     injectButtonGroupTools();
     injectShortcutTools();
     document.querySelectorAll('.ksa-link-hidden, .ksa-group-hidden').forEach(el => {
@@ -2207,6 +2208,27 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
   }
 
+  function updateTopbarButtonState() {
+    const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
+    const isHidden = topbar ? topbar.classList.contains('ksa-section-hidden') : false;
+    const btn = document.getElementById('ksaBtnEditTopbar');
+    if (btn) {
+      if (isHidden) {
+        btn.innerHTML = '📢 Topbalk: UIT (Verborgen)';
+        btn.title = 'De bovenste blauwe KSA-balk staat momenteel UIT. Klik om aan te passen of AAN te zetten.';
+        btn.style.background = '#fee2e2';
+        btn.style.color = '#991b1b';
+        btn.style.borderColor = '#fca5a5';
+      } else {
+        btn.innerHTML = '📢 Topbalk: AAN (Zichtbaar)';
+        btn.title = 'De bovenste blauwe KSA-balk staat momenteel AAN. Klik om aan te passen of UIT te zetten.';
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.borderColor = '#86efac';
+      }
+    }
+  }
+
   function setTopbarSectionHidden(hidden) {
     const topbar = document.getElementById('ksaTopbar') || document.querySelector('.ksa-topbar');
     if (topbar) {
@@ -2218,6 +2240,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       }
     }
     updateTopbarToggleBtnText();
+    updateTopbarButtonState();
   }
 
   function toggleTopbarVisibility() {
@@ -2269,6 +2292,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
 
     updateTopbarToggleBtnText();
+    updateTopbarButtonState();
   }
 
   function openTopbarModal() {
