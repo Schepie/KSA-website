@@ -3166,15 +3166,20 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   // 11. GITHUB REST API HULPFUNCTIE
   // --------------------------------------------------------------------------
   async function commitFileToGithub(token, owner, repo, branch, filePath, base64Content, commitMessage) {
+    const cleanToken = (token || '').replace(/^Bearer\s+/i, '').replace(/[\r\n\t ]+/g, '').trim();
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
     const headers = {
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${cleanToken}`,
       'Accept': 'application/vnd.github+json',
       'Content-Type': 'application/json'
     };
 
     let sha = undefined;
-    const getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, { headers });
+    let getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, { headers });
+    if (!getRes.ok && getRes.status === 401) {
+      headers['Authorization'] = `token ${cleanToken}`;
+      getRes = await fetch(`${apiUrl}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`, { headers });
+    }
     if (getRes.ok) {
       const existing = await getRes.json();
       sha = existing.sha;
@@ -3187,11 +3192,20 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
     if (sha) body.sha = sha;
 
-    const putRes = await fetch(apiUrl, {
+    let putRes = await fetch(apiUrl, {
       method: 'PUT',
       headers,
       body: JSON.stringify(body)
     });
+
+    if (!putRes.ok && putRes.status === 401 && headers['Authorization'].startsWith('Bearer ')) {
+      headers['Authorization'] = `token ${cleanToken}`;
+      putRes = await fetch(apiUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body)
+      });
+    }
 
     if (!putRes.ok) {
       const errText = await putRes.text();
