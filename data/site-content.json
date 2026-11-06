@@ -15,8 +15,8 @@
     "kabouters": {
       "name": "KABOUTERS",
       "image": "images/kabouters.jpg",
-      "ageRange": "6 - 8 jaar (1ste & 2de leerjaar)",
-      "tagline": "Spelen, ontdekken & oneindig veel fantasie!",
+      "ageRange": "6 - 9 jaar (1ste, 2de 3de leerjaar)",
+      "tagline": "SPELEN, ONTDEKKEN & ONEINDIG VEEL FANTASIE!",
       "desc": "Bij de kabouters stappen de allerjongste meisjes binnen in een magische wereld vol plezier. Van tikkertje in het gras en verkleedpartijtjes tot het bouwen van reusachtige zandkastelen.",
       "perks": [
         "Knutselen & dansen",
@@ -30,8 +30,8 @@
     "sloebers": {
       "name": "SLOEBERS",
       "image": "images/sloebers.jpg",
-      "ageRange": "8 - 10 jaar (3de & 4de leerjaar)",
-      "tagline": "Energie voor tien & spannende spelletjes!",
+      "ageRange": "9 - 11 jaar (3de & 4de leerjaar)",
+      "tagline": "ENERGIE VOOR TIEN & SPANNENDE SPELLETJES!",
       "desc": "De sloebers zitten boordevol energie! We ontdekken het bos, spelen actieve estafettes, leren geheime codes kraken en beleven samen de zotste avonturen.",
       "perks": [
         "Bosspelen & forten bouwen",
@@ -60,8 +60,8 @@
     "jim": {
       "name": "JIM",
       "image": "images/jim.jpg",
-      "ageRange": "12 - 14 jaar (1ste & 2de middelbaar)",
-      "tagline": "Grensverleggend avontuur & hechte vriendinnen!",
+      "ageRange": "11 - 13 jaar (6de leerjaar & 1ste middelbaar)",
+      "tagline": "GRENSVERLEGGEND AVONTUUR & HECHTE VRIENDINNEN!",
       "desc": "Op naar het middelbaar! De Jim-meisjes dagen zichzelf uit met spectaculaire dagtochten, droppingen, kookuitdagingen en knotsgekke activiteiten die je nergens anders beleeft.",
       "perks": [
         "Nachtspelen & dropping",
@@ -75,8 +75,8 @@
     "sim": {
       "name": "SIM",
       "image": "images/sim.jpg",
-      "ageRange": "14 - 16 jaar (3de & 4de middelbaar)",
-      "tagline": "Samen sterk, vrijheid en pure actie!",
+      "ageRange": "14 - 16 jaar (2de, 3de & 4de middelbaar)",
+      "tagline": "SAMEN STERK, VRIJHEID EN PURE ACTIE!",
       "desc": "Een super hechte bende die voor elkaar door het vuur gaat. Van overlevingstochten en themadagen tot spontane gezelligheid rond de vuurkorf.",
       "perks": [
         "Buitenlandse uitstapjes",
@@ -90,8 +90,8 @@
     "kim": {
       "name": "KIM (+16)",
       "image": "images/kim.jpg",
-      "ageRange": "16 - 17+ jaar (+16'ers / 5de & 6de middelbaar)",
-      "tagline": "Vriendschap voor het leven & de leiding van morgen!",
+      "ageRange": "16 - 17+ jaar ( 5de & 6de middelbaar)",
+      "tagline": "VRIENDSCHAP VOOR HET LEVEN & DE LEIDING VAN MORGEN!",
       "desc": "Zelf de touwtjes in handen nemen! Kim (+16) beleeft legendarische weekends, leefweek, triptrap en groeit door tot de toekomstige leidsters van KSA Zonhoven.",
       "perks": [
         "Leefweek & Triptrap",
@@ -278,7 +278,7 @@
     "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T19:52:55.060Z",
+  "updatedAt": "2026-11-06T19:54:09.632Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
