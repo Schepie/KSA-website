@@ -1391,7 +1391,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         <span class="ksa-dock-hint">Klik op eender welke <strong>tekst</strong> om te typen, op een <strong>foto</strong> om een nieuwe te kiezen, of op een <strong>knop</strong> om de link te wijzigen.</span>
       </div>
       <div class="ksa-dock-actions">
-        <button type="button" class="ksa-dock-btn ksa-dock-btn-push" id="ksaBtnSendPush" title="Stuur direct een pushbericht naar alle smartphones via OneSignal">📢 Pushbericht</button>
+        <!-- Pushbericht tijdelijk verborgen -->
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-push" id="ksaBtnSendPush" title="Stuur direct een pushbericht naar alle smartphones via OneSignal" style="display:none;">📢 Pushbericht</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnEditTopbar" title="Pas de bovenste blauwe KSA-balk aan">📢 Topbalk</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnToggleBanner" title="Toon of verberg de Event Aftelbanner">🎯 Banner Aan/Uit</button>
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaBtnChangePin" title="Wijzig het bewerkwachtwoord voor de hele leidingsploeg">🔑 Wachtwoord</button>
@@ -1409,7 +1410,8 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     modalBackdrop.innerHTML = `<div class="ksa-editor-modal" id="ksaEditorModalContent"></div>`;
     document.body.appendChild(modalBackdrop);
 
-    document.getElementById('ksaBtnSendPush').onclick = openPushNotificationModal;
+    const pushBtn = document.getElementById('ksaBtnSendPush');
+    if (pushBtn) pushBtn.onclick = openPushNotificationModal;
     document.getElementById('ksaBtnEditTopbar').onclick = openTopbarModal;
     document.getElementById('ksaBtnSaveEdits').onclick = saveAllEditsToGithub;
     document.getElementById('ksaBtnExitEdit').onclick = disableEditMode;
