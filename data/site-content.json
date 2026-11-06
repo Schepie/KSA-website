@@ -1,12 +1,12 @@
 {
   "_auth": {
-    "pinHash": "1b76a9af19078b491475a25e77a874cd60a79dd7f8ff4ec8c2bde91d7a542de7",
-    "updatedAt": "2026-11-06T15:01:55.779Z",
+    "pinHash": "56f53220e6bf0f85057d32c8498da4e9e5ab8b225f59e5bd8c977cd020aca195",
+    "updatedAt": "2026-11-06T15:04:35.344Z",
     "vault": {
-      "salt": "ada56362cb09e8049618d1d502eb9ee4",
-      "iv": "019ce9820917a4af3f7d22f2",
-      "data": "cd7f7bf9d855b4587cf3948c75df0fad5899ad885926ffc8621499a5d183645ccc1fdbeea3c14732341964874458ff1ae7b2be3676330c0cc5b5ef8f1fe6fde86687ef655e85789e0eeeee65b6e2ee0bb54625deda9829a2208ad2041f060595d38b0654b7020fcf9b765d8ee6",
-      "updatedAt": "2026-11-06T15:01:55.794Z"
+      "salt": "86d6a09c67f00e46dd253ef11a7bd8fb",
+      "iv": "f0d0aa835602cb81d462d1b4",
+      "data": "efe86f3cbb32564e79afafc9d0e40b5cd4b1f80f37b5258182b17e66305c68309dbd4f86175e7692faa30893d4c2f99cd73296d04aedc3fb6722b1807adf74c12f49865a6310e11fe9ae95cfe1a5f924f0ccfe4c78b5ab4c9ea7b892ad1e7713cad5acc07f8e6e9ed096c47083",
+      "updatedAt": "2026-11-06T15:04:35.365Z"
     }
   },
   "groups": {
@@ -276,7 +276,7 @@
     "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T15:01:55.779Z",
+  "updatedAt": "2026-11-06T15:04:35.344Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
