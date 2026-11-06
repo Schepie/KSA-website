@@ -1063,6 +1063,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         outline: 2px solid #0055a5;
         opacity: 1 !important;
       }
+      .cal-sticker img {
+        width: 22px !important;
+        height: 22px !important;
+        max-width: 22px !important;
+        max-height: 22px !important;
+        object-fit: contain !important;
+        border-radius: 3px !important;
+        display: block !important;
+        pointer-events: none !important;
+      }
       .ksa-sticker-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -2679,7 +2689,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         span.className = 'cal-sticker';
         if (clean.startsWith('img:') || clean.includes('ksa-logo-square.png') || clean.includes('assets/icons/')) {
           const imgSrc = clean.startsWith('img:') ? clean.substring(4) : (clean.startsWith('<img') ? (clean.match(/src="([^"]+)"/) || [])[1] : clean);
-          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Logo">`;
+          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Logo" width="22" height="22" style="width:22px !important; height:22px !important; max-width:22px !important; max-height:22px !important; object-fit:contain; border-radius:3px; display:block; pointer-events:none;">`;
           span.setAttribute('data-img-src', imgSrc || 'assets/icons/ksa-logo-square.png');
         } else if (clean.startsWith('<img')) {
           span.innerHTML = clean;

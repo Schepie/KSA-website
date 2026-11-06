@@ -1909,10 +1909,13 @@ body.ksa-edit-mode-active .ksa-group-hidden {
 }
 
 .cal-sticker img {
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  vertical-align: middle;
-  border-radius: 3px;
-  display: inline-block;
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  object-fit: contain !important;
+  vertical-align: middle !important;
+  border-radius: 3px !important;
+  display: block !important;
+  pointer-events: none !important;
 }
