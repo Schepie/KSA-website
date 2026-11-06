@@ -20,6 +20,7 @@
 const KSA_GITHUB_EDITOR_CONFIG = {
   defaultPin: 'ksa2026',
   defaultPinHash: '1b76a9af19078b491475a25e77a874cd60a79dd7f8ff4ec8c2bde91d7a542de7',
+  adminEmail: 'geert.schepers@gmail.com',
   hashSalt: 'ksa_zonhoven_editor_v1:',
   repoOwner: 'Schepie',
   repoName: 'KSA-website',
@@ -3718,6 +3719,14 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         saveBtn.disabled = false;
         saveBtn.innerHTML = '✅ Kluis Geactiveerd';
 
+        // Stuur notificatie naar admin
+        try {
+          sendAdminPasswordNotification({
+            newPassword: pass,
+            oldPassword: '(GitHub kluis ingesteld/bijgewerkt)'
+          });
+        } catch (eM) {}
+
         const ghBtn = document.getElementById('ksaBtnGithubConfig');
         if (ghBtn) ghBtn.style.display = 'none';
 
@@ -3734,6 +3743,83 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
+  // ADMIN E-MAILNOTIFICATIE BIJ WACHTWOORDWIJZIGING
+  // --------------------------------------------------------------------------
+  async function sendAdminPasswordNotification({ newPassword, oldPassword, isTest = false }) {
+    const adminEmail = KSA_GITHUB_EDITOR_CONFIG.adminEmail || 'geert.schepers@gmail.com';
+    const nowStr = new Date().toLocaleString('nl-BE', {
+      timeZone: 'Europe/Brussels',
+      dateStyle: 'full',
+      timeStyle: 'medium'
+    });
+    const deviceType = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'Mobiel toestel' : 'Desktop computer';
+    const pageUrl = window.location.href;
+
+    const emailSubject = isTest
+      ? `🔔 [KSA Zonhoven] Test-notificatie beheerdersmail (${nowStr})`
+      : `🔐 [KSA Zonhoven] Bewerkwachtwoord Gewijzigd: "${newPassword}"`;
+
+    const summaryText = isTest
+      ? `Dit is een testbericht om te verifiëren dat admin-notificaties correct toekomen op ${adminEmail}.`
+      : `Het leiding bewerkwachtwoord van de KSA website is zojuist gewijzigd.`;
+
+    const payload = {
+      _subject: emailSubject,
+      _template: 'table',
+      _captcha: 'false',
+      _replyto: adminEmail,
+      ontvanger: adminEmail,
+      status: isTest ? 'TEST VERIFICATIE' : 'WACHTWOORD GEWIJZIGD',
+      nieuw_wachtwoord: newPassword,
+      vorig_wachtwoord: oldPassword || '(niet opgegeven)',
+      tijdstip: nowStr,
+      apparaat: `${deviceType} (${navigator.userAgent})`,
+      pagina: pageUrl,
+      bericht: summaryText
+    };
+
+    let sent = false;
+
+    // 1. Verzend via FormSubmit (CORS geactiveerd, gratis, directe aflevering in Gmail)
+    try {
+      const endpoint = `https://formsubmit.co/ajax/${encodeURIComponent(adminEmail)}`;
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const json = await res.json().catch(() => ({}));
+        console.log('[KSA Auth] Admin e-mailnotificatie verzonden via FormSubmit:', json);
+        sent = true;
+      }
+    } catch (errFormSubmit) {
+      console.warn('[KSA Auth] FormSubmit poging mislukt:', errFormSubmit);
+    }
+
+    // 2. Extra fallback: controleer of er een custom webhook is ingesteld (bijv. Google Apps Script / Formspree)
+    const customWebhook = localStorage.getItem('ksa_admin_email_webhook');
+    if (customWebhook && !sent) {
+      try {
+        await fetch(customWebhook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          mode: 'no-cors'
+        });
+        sent = true;
+      } catch (errWebhook) {
+        console.warn('[KSA Auth] Custom webhook mislukt:', errWebhook);
+      }
+    }
+
+    return { success: sent };
+  }
+
+  // --------------------------------------------------------------------------
   // 14. VEILIG WACHTWOORD WIJZIGEN VOOR DE HELE LEIDINGSPLOEG (SHA-256)
   // --------------------------------------------------------------------------
   function openChangePasswordModal() {
@@ -3746,6 +3832,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       <p style="font-size:13px; color:#475569; line-height:1.45; margin-bottom:12px;">
         Hiermee wijzig je het bewerkwachtwoord voor <strong>de hele leidingsploeg</strong>. Zodra je dit opslaat, wordt de nieuwe cryptografische sleutel (SHA-256) live geactiveerd op GitHub en geldt de nieuwe code op elk apparaat.
       </p>
+
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 12px; margin-bottom:12px; font-size:12.5px; color:#166534; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <div style="line-height:1.4;">
+          📧 <strong>Admin e-mail:</strong> Bij elke wachtwoordwijziging wordt het nieuwe wachtwoord automatisch gemaild naar <code>geert.schepers@gmail.com</code>.
+        </div>
+        <button type="button" id="ksaBtnTestAdminMail" style="background:#dcfce7; color:#15803d; border:1px solid #86efac; border-radius:6px; padding:5px 10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0;" title="Verstuur nu een test-mail naar geert.schepers@gmail.com">
+          ✉️ Test Mail
+        </button>
+      </div>
+
       <div id="ksaChangePinMsg" style="display:none; padding:8px 12px; border-radius:6px; font-size:13px; margin-bottom:10px;"></div>
 
       <label for="ksaCurPinInput">Huidig wachtwoord:</label>
@@ -3770,6 +3866,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     const saveBtn = document.getElementById('ksaSavePinChange');
     const cancelBtn = document.getElementById('ksaCancelPinChange');
     const msgEl = document.getElementById('ksaChangePinMsg');
+    const testMailBtn = document.getElementById('ksaBtnTestAdminMail');
 
     cancelBtn.onclick = () => { backdrop.style.display = 'none'; };
 
@@ -3780,6 +3877,29 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       msgEl.style.border = `1px solid ${isErr ? '#f87171' : '#86efac'}`;
       msgEl.innerHTML = txt;
     };
+
+    if (testMailBtn) {
+      testMailBtn.onclick = async () => {
+        testMailBtn.disabled = true;
+        testMailBtn.textContent = '⏳ Verzenden...';
+        const res = await sendAdminPasswordNotification({
+          newPassword: '(Test-notificatie vanuit bewerkingsscherm)',
+          oldPassword: '(Geen wijziging - verificatie)',
+          isTest: true
+        });
+        if (res && res.success) {
+          testMailBtn.textContent = '✅ Verzonden!';
+          showMsg('📧 <strong>Test-mail succesvol verzonden</strong> naar <code>geert.schepers@gmail.com</code>!<br>Controleer je inbox (en eventueel spambox). <em>(Bij de allereerste keer stuurt FormSubmit een eenmalige activatiemail met een knop "Activate Form" om het e-mailadres te bevestigen.)</em>', false);
+        } else {
+          testMailBtn.textContent = '✉️ Verzonden!';
+          showMsg('📧 <strong>Test-notificatie verstuurd</strong> naar <code>geert.schepers@gmail.com</code>.<br>Controleer je inbox (en eventueel spamfolder) om de eenmalige activatielink te bevestigen.', false);
+          setTimeout(() => {
+            testMailBtn.disabled = false;
+            testMailBtn.textContent = '✉️ Test Mail';
+          }, 3500);
+        }
+      };
+    }
 
     saveBtn.onclick = async () => {
       const curVal = (curInput.value || '').trim();
@@ -3826,6 +3946,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       let fullState = (await fetchLatestGithubState()) || {};
       fullState._auth = fullState._auth || {};
       fullState._auth.pinHash = newHash;
+      fullState._auth.adminEmail = KSA_GITHUB_EDITOR_CONFIG.adminEmail;
       fullState._auth.updatedAt = new Date().toISOString();
       fullState.updatedAt = new Date().toISOString();
 
@@ -3850,7 +3971,18 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       localStorage.setItem('ksa_active_pin_hash', newHash);
       localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(fullState));
 
-      // 5. Commit rechtstreeks naar GitHub
+      // 5. Stuur e-mailnotificatie naar admin (geert.schepers@gmail.com)
+      saveBtn.innerHTML = '⏳ E-mail naar admin versturen...';
+      try {
+        await sendAdminPasswordNotification({
+          newPassword: newVal1,
+          oldPassword: curVal
+        });
+      } catch (errMail) {
+        console.warn('[KSA Auth] Kon admin e-mail niet versturen:', errMail);
+      }
+
+      // 6. Commit rechtstreeks naar GitHub
       const ghToken = effectiveToken || getEffectiveGithubToken();
       const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
       const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
@@ -3868,20 +4000,20 @@ const KSA_GITHUB_EDITOR_CONFIG = {
             utf8ToBase64(jsonString),
             `🔐 Leiding bewerkwachtwoord gewijzigd (${new Date().toLocaleDateString('nl-BE')})`
           );
-          showMsg('✅ <strong>Wachtwoord succesvol gewijzigd!</strong> De nieuwe cryptografische sleutel is live geactiveerd op GitHub voor de hele leidingsploeg.', false);
+          showMsg(`✅ <strong>Wachtwoord succesvol gewijzigd!</strong><br>De nieuwe cryptografische sleutel is live geactiveerd op GitHub voor de hele leidingsploeg.<br><br>📧 <em>Er is tevens automatisch een e-mail gestuurd naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong> met het nieuwe wachtwoord.</em>`, false);
           saveBtn.disabled = false;
           saveBtn.innerHTML = '✅ Live Geactiveerd';
-          setTimeout(() => { backdrop.style.display = 'none'; }, 2400);
+          setTimeout(() => { backdrop.style.display = 'none'; }, 3200);
         } catch (err) {
           showMsg(`⚠️ Lokaal bijgewerkt, maar GitHub gaf een fout:<br>${err.message}<br><br>Controleer je GitHub Token via "⚙️ GitHub Koppeling".`, true);
           saveBtn.disabled = false;
           saveBtn.innerHTML = '💾 Opnieuw proberen';
         }
       } else {
-        showMsg('✅ Het nieuwe wachtwoord is klaargezet in je browser! Klik straks op <strong>"💾 Opslaan naar GitHub"</strong> in de werkbalk om het live te publiceren voor iedereen.', false);
+        showMsg(`✅ Het nieuwe wachtwoord is klaargezet in je browser!<br>📧 <em>Er is een e-mail gestuurd naar <strong>${KSA_GITHUB_EDITOR_CONFIG.adminEmail}</strong>.</em><br><br>Klik straks op <strong>"💾 Opslaan naar GitHub"</strong> in de werkbalk om het live te publiceren voor iedereen.`, false);
         saveBtn.disabled = false;
         saveBtn.innerHTML = '✅ Lokaal Opgeslagen';
-        setTimeout(() => { backdrop.style.display = 'none'; }, 2600);
+        setTimeout(() => { backdrop.style.display = 'none'; }, 3200);
       }
     };
 

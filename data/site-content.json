@@ -1,5 +1,6 @@
 {
   "_auth": {
+    "adminEmail": "geert.schepers@gmail.com",
     "pinHash": "56f53220e6bf0f85057d32c8498da4e9e5ab8b225f59e5bd8c977cd020aca195",
     "updatedAt": "2026-11-06T07:55:26.282Z",
     "vault": {
