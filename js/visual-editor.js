@@ -71,6 +71,83 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     return KSA_GITHUB_EDITOR_CONFIG.defaultPinHash;
   }
 
+  // --------------------------------------------------------------------------
+  // AES-256-GCM WACHTWOORD-KLUIS VOOR GITHUB TOKEN (PBKDF2 + AES-GCM)
+  // --------------------------------------------------------------------------
+  const toHex = arr => Array.from(new Uint8Array(arr)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const fromHex = hex => new Uint8Array((hex || '').match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+  async function encryptToVault(plaintext, password) {
+    if (!window.crypto || !crypto.subtle) throw new Error('Web Crypto API niet beschikbaar');
+    const enc = new TextEncoder();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const baseKey = await crypto.subtle.importKey(
+      'raw',
+      enc.encode((password || '').trim().toLowerCase()),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    );
+    const aesKey = await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+      baseKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt']
+    );
+    const cipherBuffer = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      aesKey,
+      enc.encode(plaintext.trim())
+    );
+    return {
+      salt: toHex(salt),
+      iv: toHex(iv),
+      data: toHex(cipherBuffer),
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  async function decryptFromVault(vaultObj, password) {
+    if (!vaultObj || !vaultObj.salt || !vaultObj.iv || !vaultObj.data) return null;
+    if (!window.crypto || !crypto.subtle) return null;
+    try {
+      const enc = new TextEncoder();
+      const dec = new TextDecoder();
+      const salt = fromHex(vaultObj.salt);
+      const iv = fromHex(vaultObj.iv);
+      const cipher = fromHex(vaultObj.data);
+      const baseKey = await crypto.subtle.importKey(
+        'raw',
+        enc.encode((password || '').trim().toLowerCase()),
+        { name: 'PBKDF2' },
+        false,
+        ['deriveKey']
+      );
+      const aesKey = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        baseKey,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['decrypt']
+      );
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        aesKey,
+        cipher
+      );
+      return dec.decode(decrypted).trim();
+    } catch (e) {
+      console.warn('[KSA Vault] Ontsleutelen kluis mislukt met opgegeven wachtwoord');
+      return null;
+    }
+  }
+
+  function getEffectiveGithubToken() {
+    return (sessionStorage.getItem('ksa_github_token') || localStorage.getItem('ksa_github_token') || '').trim();
+  }
+
   // Bewaar bij het opstarten van de pagina op elke <img> de originele src (bv. "images/cara.jpg")
   // zodat we bij het vervangen van een foto ook dezelfde foto in het paspoort-overzicht en op mobiel kunnen vervangen!
   function tagOriginalImageSources() {
@@ -1493,6 +1570,22 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
       if (isMatch) {
         sessionStorage.setItem('ksa_edit_unlocked', '1');
+        sessionStorage.setItem('ksa_session_pass', val);
+
+        // Ontsleutel automatisch de GitHub token kluis indien aanwezig
+        try {
+          const s = await fetchLatestGithubState();
+          if (s && s._auth && s._auth.vault) {
+            const token = await decryptFromVault(s._auth.vault, val);
+            if (token) {
+              sessionStorage.setItem('ksa_github_token', token);
+              localStorage.setItem('ksa_github_token', token);
+            }
+          }
+        } catch (e) {
+          console.warn('[KSA Vault] Kon kluis bij inloggen niet openen:', e);
+        }
+
         backdrop.style.display = 'none';
         if (isMobilePage) {
           showMobileEditNoticeModal(() => enableEditMode());
@@ -3132,7 +3225,18 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     let fullState = (await fetchLatestGithubState()) || {};
     delete fullState.imageMap;
 
-    const ghToken = (localStorage.getItem('ksa_github_token') || '').trim();
+    let ghToken = getEffectiveGithubToken();
+    if (!ghToken && fullState._auth && fullState._auth.vault) {
+      const sessPass = sessionStorage.getItem('ksa_session_pass');
+      if (sessPass) {
+        ghToken = await decryptFromVault(fullState._auth.vault, sessPass);
+        if (ghToken) {
+          sessionStorage.setItem('ksa_github_token', ghToken);
+          localStorage.setItem('ksa_github_token', ghToken);
+        }
+      }
+    }
+
     const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
     const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
     const ghBranch = (localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch).trim();
@@ -3306,30 +3410,49 @@ const KSA_GITHUB_EDITOR_CONFIG = {
   }
 
   // --------------------------------------------------------------------------
-  // 13. GITHUB INSTELLINGEN MODAL
+  // 13. GITHUB INSTELLINGEN & AUTOMATISCHE KLUIS MODAL
   // --------------------------------------------------------------------------
-  function openGithubConfigModal(fromSave = false) {
-    const curToken = localStorage.getItem('ksa_github_token') || '';
+  async function openGithubConfigModal(fromSave = false) {
+    const curToken = getEffectiveGithubToken();
     const curOwner = localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner;
     const curRepo = localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName;
     const curBranch = localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch;
-    const curPin = localStorage.getItem('ksa_custom_pin') || KSA_GITHUB_EDITOR_CONFIG.defaultPin;
 
     const modal = document.getElementById('ksaEditorModalContent');
     const backdrop = document.getElementById('ksaEditorModalBackdrop');
 
+    let hasVault = false;
+    try {
+      const s = await fetchLatestGithubState();
+      hasVault = !!(s && s._auth && s._auth.vault);
+    } catch (e) {}
+
     modal.innerHTML = `
-      <h3>⚙️ Rechtstreekse GitHub Koppeling</h3>
-      ${fromSave ? `<p style="color:#166534; background:#dcfce7; padding:8px 10px; border-radius:8px; font-weight:600;">✅ Je wijzigingen zijn alvast in je browser bewaard! Vul hieronder eenmalig je GitHub Token in om ze live naar GitHub te pushen:</p>` : `<p>Hiermee schrijft de knop <strong>"💾 Opslaan naar GitHub"</strong> alle aanpassingen en geüploade foto's rechtstreeks naar jullie GitHub repository.</p>`}
-      <p style="font-size:0.78rem; background:#f1f5f9; padding:8px 10px; border-radius:8px;">
+      <h3>⚙️ Automatische GitHub Kluis &amp; Koppeling</h3>
+      ${hasVault ? `
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#166534; line-height:1.45;">
+          ✅ <strong>Automatische Kluis is Actief!</strong><br>
+          Jouw GitHub Token is veilig versleuteld (AES-256-GCM) gekoppeld aan het leiding-wachtwoord. <strong>Andere leiding hoeft nooit een token aan te maken of in te vullen</strong>; door simpelweg het leiding-wachtwoord in te typen kan iedereen direct opslaan en foto's uploaden!
+        </div>
+      ` : `
+        <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:13px; color:#1e3a8a; line-height:1.45;">
+          🔐 <strong>Eénmalige instelling voor de hele leidingsploeg:</strong><br>
+          Vul hieronder éénmalig jouw GitHub Token in. Het systeem versleutelt dit met het leidingwachtwoord en bewaart het in een beveiligde kluis op GitHub. Daarna kan <strong>elke leidster op elk toestel automatisch opslaan met enkel het wachtwoord!</strong>
+        </div>
+      `}
+      <div id="ksaGhModalMsg" style="display:none; padding:8px 12px; border-radius:6px; font-size:13px; margin-bottom:10px;"></div>
+
+      <p style="font-size:0.78rem; background:#f8fafc; border:1px solid #e2e8f0; padding:8px 10px; border-radius:8px; margin-bottom:10px;">
         <strong>Hoe maak je een gratis GitHub Token aan (slechts 1x nodig)?</strong><br>
         1. Ga op GitHub naar <em>Settings &rarr; Developer settings &rarr; Personal access tokens &rarr; Fine-grained tokens &rarr; Generate new token</em>.<br>
         2. Kies repository <strong>${curOwner}/${curRepo}</strong> en geef onder <em>Repository permissions</em> bij <strong>Contents</strong> de rechten <strong>Read and write</strong>.<br>
-        3. Plak de gegenereerde token (<code>github_pat_...</code> of <code>ghp_...</code>) hieronder:
+        3. Plak de token hieronder:
       </p>
-      <label>GitHub Personal Access Token:</label>
+
+      <label for="ksaGhTokenInput">GitHub Personal Access Token (beheerder):</label>
       <input type="password" id="ksaGhTokenInput" placeholder="github_pat_... of ghp_..." value="${curToken}">
-      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px;">
         <div>
           <label>Eigenaar:</label>
           <input type="text" id="ksaGhOwnerInput" value="${curOwner}">
@@ -3343,14 +3466,16 @@ const KSA_GITHUB_EDITOR_CONFIG = {
           <input type="text" id="ksaGhBranchInput" value="${curBranch}">
         </div>
       </div>
-      <div style="margin-top:14px; padding:12px 14px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px;">
-        <label style="margin-bottom:4px; display:block; font-weight:700; color:#0369a1;">🔐 Wachtwoord voor de hele leidingsploeg:</label>
-        <p style="font-size:12px; color:#475569; margin-bottom:8px;">Het bewerkwachtwoord wordt veilig cryptografisch versleuteld (SHA-256) opgeslagen op GitHub en is direct actief voor alle leiding op elk apparaat.</p>
-        <button type="button" class="btn btn-outline" id="ksaBtnOpenPinChangeFromGh" style="padding:7px 14px; font-size:13px; color:#0284c7; border:1px solid #0284c7; background:#fff; cursor:pointer; border-radius:6px; font-weight:700;">🔑 Wachtwoord Wijzigen &rarr;</button>
+
+      <div style="margin-top:14px; padding:12px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+        <label style="margin-bottom:4px; display:block; font-weight:700; color:#334155;">🔑 Leiding Bewerkwachtwoord:</label>
+        <p style="font-size:12px; color:#64748b; margin-bottom:8px;">Het wachtwoord om de kluis en bewerkmodus te ontgrendelen.</p>
+        <button type="button" class="btn btn-outline" id="ksaBtnOpenPinChangeFromGh" style="padding:6px 14px; font-size:13px; color:#0284c7; border:1px solid #0284c7; background:#fff; cursor:pointer; border-radius:6px; font-weight:700;">🔑 Wachtwoord Wijzigen &rarr;</button>
       </div>
+
       <div class="ksa-editor-modal-actions">
         <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaGhCancel">Sluiten</button>
-        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaGhSave">💾 Bewaar &amp; Koppel</button>
+        <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaGhSave">🔐 Versleutel &amp; Activeer Kluis</button>
       </div>
     `;
     backdrop.style.display = 'flex';
@@ -3361,14 +3486,82 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     }
 
     document.getElementById('ksaGhCancel').onclick = () => { backdrop.style.display = 'none'; };
-    document.getElementById('ksaGhSave').onclick = () => {
-      localStorage.setItem('ksa_github_token', document.getElementById('ksaGhTokenInput').value.trim());
-      localStorage.setItem('ksa_github_owner', document.getElementById('ksaGhOwnerInput').value.trim() || 'Schepie');
-      localStorage.setItem('ksa_github_repo', document.getElementById('ksaGhRepoInput').value.trim() || 'KSA-website');
-      localStorage.setItem('ksa_github_branch', document.getElementById('ksaGhBranchInput').value.trim() || 'main');
-      backdrop.style.display = 'none';
-      if (fromSave && document.getElementById('ksaGhTokenInput').value.trim()) {
-        saveAllEditsToGithub();
+    document.getElementById('ksaGhSave').onclick = async () => {
+      const tokenInput = document.getElementById('ksaGhTokenInput');
+      const tokenVal = (tokenInput.value || '').trim();
+      const ownerVal = (document.getElementById('ksaGhOwnerInput').value || '').trim() || 'Schepie';
+      const repoVal = (document.getElementById('ksaGhRepoInput').value || '').trim() || 'KSA-website';
+      const branchVal = (document.getElementById('ksaGhBranchInput').value || '').trim() || 'main';
+      const saveBtn = document.getElementById('ksaGhSave');
+      const msgEl = document.getElementById('ksaGhModalMsg');
+
+      const showMsg = (txt, isErr) => {
+        msgEl.style.display = 'block';
+        msgEl.style.background = isErr ? '#fee2e2' : '#dcfce7';
+        msgEl.style.color = isErr ? '#b91c1c' : '#166534';
+        msgEl.style.border = `1px solid ${isErr ? '#f87171' : '#86efac'}`;
+        msgEl.innerHTML = txt;
+      };
+
+      if (!tokenVal) {
+        return showMsg('❌ Vul een geldig GitHub Personal Access Token in.', true);
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '⏳ Bezig met versleutelen...';
+
+      localStorage.setItem('ksa_github_token', tokenVal);
+      sessionStorage.setItem('ksa_github_token', tokenVal);
+      localStorage.setItem('ksa_github_owner', ownerVal);
+      localStorage.setItem('ksa_github_repo', repoVal);
+      localStorage.setItem('ksa_github_branch', branchVal);
+
+      let pass = sessionStorage.getItem('ksa_session_pass');
+      if (!pass) {
+        pass = prompt('Voer het huidige leidingwachtwoord in om de kluis mee te versleutelen:', 'ksa2026');
+      }
+      if (!pass) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '🔐 Versleutel &amp; Activeer Kluis';
+        return showMsg('❌ Wachtwoord is vereist om de kluis veilig te versleutelen.', true);
+      }
+
+      try {
+        const vault = await encryptToVault(tokenVal, pass);
+        let fullState = (await fetchLatestGithubState()) || {};
+        fullState._auth = fullState._auth || {};
+        fullState._auth.vault = vault;
+        if (!fullState._auth.pinHash) {
+          fullState._auth.pinHash = await hashPin(pass);
+        }
+        fullState._auth.updatedAt = new Date().toISOString();
+        fullState.updatedAt = new Date().toISOString();
+
+        localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(fullState));
+
+        saveBtn.innerHTML = '⏳ Opslaan naar GitHub...';
+        const jsonString = JSON.stringify(fullState, null, 2);
+        await commitFileToGithub(
+          tokenVal,
+          ownerVal,
+          repoVal,
+          branchVal,
+          KSA_GITHUB_EDITOR_CONFIG.contentFilePath,
+          utf8ToBase64(jsonString),
+          `🔐 Automatische GitHub kluis geactiveerd voor leiding (${new Date().toLocaleDateString('nl-BE')})`
+        );
+
+        showMsg('✅ <strong>Kluis succesvol geactiveerd op GitHub!</strong><br>Vanaf nu kan elke leidster op elk toestel direct opslaan door enkel het leiding-wachtwoord in te typen.', false);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '✅ Kluis Geactiveerd';
+        setTimeout(() => {
+          backdrop.style.display = 'none';
+          if (fromSave) saveAllEditsToGithub();
+        }, 2200);
+      } catch (err) {
+        showMsg(`⚠️ Versleuteld, maar GitHub publicatie gaf een melding:<br>${err.message}<br><br>Controleer of het token 'Contents: Read and write' rechten heeft op de repo.`, true);
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 Opnieuw proberen';
       }
     };
   }
@@ -3469,12 +3662,29 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       fullState._auth.updatedAt = new Date().toISOString();
       fullState.updatedAt = new Date().toISOString();
 
-      // 3. Sla lokaal op
+      // 3. Als er een kluis is, her-versleutel het token met het NIEUWE wachtwoord!
+      let effectiveToken = getEffectiveGithubToken();
+      if (!effectiveToken && fullState._auth.vault) {
+        effectiveToken = await decryptFromVault(fullState._auth.vault, curVal);
+      }
+      if (effectiveToken) {
+        try {
+          const newVault = await encryptToVault(effectiveToken, newVal1);
+          fullState._auth.vault = newVault;
+          sessionStorage.setItem('ksa_github_token', effectiveToken);
+          localStorage.setItem('ksa_github_token', effectiveToken);
+          sessionStorage.setItem('ksa_session_pass', newVal1);
+        } catch (eVault) {
+          console.warn('[KSA Vault] Kon kluis niet herversleutelen:', eVault);
+        }
+      }
+
+      // 4. Sla lokaal op
       localStorage.setItem('ksa_active_pin_hash', newHash);
       localStorage.setItem(KSA_GITHUB_EDITOR_CONFIG.storageKey, JSON.stringify(fullState));
 
-      // 4. Commit rechtstreeks naar GitHub
-      const ghToken = (localStorage.getItem('ksa_github_token') || '').trim();
+      // 5. Commit rechtstreeks naar GitHub
+      const ghToken = effectiveToken || getEffectiveGithubToken();
       const ghOwner = (localStorage.getItem('ksa_github_owner') || KSA_GITHUB_EDITOR_CONFIG.repoOwner).trim();
       const ghRepo = (localStorage.getItem('ksa_github_repo') || KSA_GITHUB_EDITOR_CONFIG.repoName).trim();
       const ghBranch = (localStorage.getItem('ksa_github_branch') || KSA_GITHUB_EDITOR_CONFIG.defaultBranch).trim();
