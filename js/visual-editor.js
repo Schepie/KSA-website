@@ -1039,12 +1039,18 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.95);
         padding: 2px;
+        width: 26px !important;
+        height: 26px !important;
+        max-width: 26px !important;
+        max-height: 26px !important;
         min-width: 26px;
         min-height: 26px;
+        box-sizing: border-box !important;
         display: inline-flex !important;
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        overflow: hidden !important;
       }
       body.ksa-edit-mode-active .cal-sticker.ksa-sticker-empty::before,
       body.ksa-edit-mode-active .cal-sticker:empty::before {
@@ -1064,10 +1070,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         opacity: 1 !important;
       }
       .cal-sticker img {
-        width: 22px !important;
-        height: 22px !important;
-        max-width: 22px !important;
-        max-height: 22px !important;
+        width: 20px !important;
+        height: 20px !important;
+        max-width: 20px !important;
+        max-height: 20px !important;
         object-fit: contain !important;
         border-radius: 3px !important;
         display: block !important;
@@ -1421,14 +1427,10 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     const footerSupport = document.querySelector('.footer-support-tags');
     if (footerSupport) {
-      footerSupport.innerHTML = '';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'ksa-edit-trigger-btn';
-      btn.innerHTML = '✏️ Bewerk Website (Edit Mode)';
-      btn.onclick = promptAndEnableEditMode;
-      footerSupport.appendChild(btn);
+      footerSupport.style.display = 'none'; // Subtiel verborgen voor publiek; leiding opent via Long Press op copyright
     }
+
+    initLongPressEditTrigger();
 
     const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
     if (mobHeaderBtn) {
@@ -1577,6 +1579,97 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       notice.innerHTML = '<span style="font-size:1.3rem;">📅</span><div><strong>Centrale kalender:</strong> De kalender wordt beheerd op de desktop website en wordt hier automatisch actueel gehouden.</div>';
       board.parentElement.insertBefore(notice, board);
     }
+  }
+
+  function initLongPressEditTrigger() {
+    const targets = document.querySelectorAll('#footerCopyright, .footer-copyright, #mobileFooterCopyright, .mobile-footer-copyright');
+    if (!targets.length) return;
+
+    const HOLD_MS = 1200; // 1.2 seconden ingedrukt houden
+
+    targets.forEach(target => {
+      let timer = null;
+      let isHolding = false;
+
+      target.style.userSelect = 'none';
+      target.style.webkitUserSelect = 'none';
+      target.setAttribute('title', 'KSA Zonhoven Meisjes (Houd 1.2s ingedrukt voor Leiding bewerkmodus)');
+
+      const startHold = (e) => {
+        // Klikken op [Privacy & Cookies] mag niet als bewerk-trigger tellen
+        if (e.target && e.target.closest && e.target.closest('.footer-privacy-trigger')) {
+          return;
+        }
+
+        isHolding = true;
+        clearTimeout(timer);
+
+        target.style.transition = 'transform 1.2s ease, opacity 1.2s ease';
+        target.style.opacity = '0.65';
+        target.style.transform = 'scale(0.98)';
+
+        timer = setTimeout(() => {
+          endHold();
+          if (navigator.vibrate) {
+            try { navigator.vibrate(60); } catch (_) {}
+          }
+          if (isEditMode) {
+            disableEditMode();
+          } else {
+            promptAndEnableEditMode();
+          }
+        }, HOLD_MS);
+      };
+
+      const endHold = () => {
+        if (!isHolding) return;
+        isHolding = false;
+        clearTimeout(timer);
+        timer = null;
+        target.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+        target.style.opacity = '';
+        target.style.transform = '';
+      };
+
+      // Touch (Mobiel)
+      target.addEventListener('touchstart', startHold, { passive: true });
+      target.addEventListener('touchend', endHold);
+      target.addEventListener('touchcancel', endHold);
+
+      // Muis (Desktop)
+      target.addEventListener('mousedown', (e) => {
+        if (e.button === 0) startHold(e);
+      });
+      target.addEventListener('mouseup', endHold);
+      target.addEventListener('mouseleave', endHold);
+
+      // Desktop drievoudige klik als snelle extra manier
+      let clickCount = 0;
+      let clickResetTimer = null;
+      target.addEventListener('click', (e) => {
+        if (e.target && e.target.closest && e.target.closest('.footer-privacy-trigger')) {
+          return;
+        }
+        clickCount++;
+        clearTimeout(clickResetTimer);
+        if (clickCount >= 3) {
+          clickCount = 0;
+          if (isEditMode) disableEditMode();
+          else promptAndEnableEditMode();
+        } else {
+          clickResetTimer = setTimeout(() => { clickCount = 0; }, 400);
+        }
+      });
+    });
+
+    // Toetsenbord sneltoets: Ctrl + Shift + E
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'E' || e.key === 'e')) {
+        e.preventDefault();
+        if (isEditMode) disableEditMode();
+        else promptAndEnableEditMode();
+      }
+    });
   }
 
   function promptAndEnableEditMode() {
@@ -2690,7 +2783,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         span.className = 'cal-sticker';
         if (clean.startsWith('img:') || clean.includes('ksa-logo') || clean.includes('assets/icons/')) {
           const imgSrc = clean.startsWith('img:') ? clean.substring(4) : (clean.startsWith('<img') ? (clean.match(/src="([^"]+)"/) || [])[1] : clean);
-          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Sticker" width="22" height="22" style="width:22px !important; height:22px !important; max-width:22px !important; max-height:22px !important; object-fit:contain; border-radius:3px; display:block; pointer-events:none;">`;
+          span.innerHTML = `<img src="${imgSrc || 'assets/icons/ksa-logo-square.png'}" alt="KSA Sticker" width="20" height="20" style="width:20px !important; height:20px !important; max-width:20px !important; max-height:20px !important; object-fit:contain; border-radius:3px; display:block; pointer-events:none;">`;
           span.setAttribute('data-img-src', imgSrc || 'assets/icons/ksa-logo-square.png');
 
           // Slimme tekstkoppeling: als 'Geen KSA' gekozen wordt en de tekst is 'KSA', zet op 'GEEN KSA'

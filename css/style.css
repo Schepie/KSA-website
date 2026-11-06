@@ -203,6 +203,12 @@ body.ksa-edit-mode-active .ksa-topbar.ksa-section-hidden {
   opacity: 0.85;
 }
 
+#footerCopyright {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
 /* Privacy Modal */
 .ksa-privacy-modal-backdrop {
   position: fixed;
