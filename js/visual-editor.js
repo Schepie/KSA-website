@@ -491,19 +491,85 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       if (!g) return;
       const dBtn = document.querySelector(`.quiz-pill-btn[data-group="${grpKey}"]`);
       if (dBtn) {
-        if (g.buttonLabel) dBtn.textContent = g.buttonLabel;
-        else g.buttonLabel = dBtn.textContent.trim();
+        if (!g.buttonLabel) g.buttonLabel = (dBtn.querySelector('.quiz-pill-label')?.textContent || dBtn.textContent).trim();
+        updatePillButtonDOM(dBtn, g.buttonLabel, grpKey, false);
         dBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
         dBtn.style.display = (!isEditMode && g.hidden) ? 'none' : '';
       }
       const mBtn = document.querySelector(`.group-select-btn[data-group="${grpKey}"]`);
       if (mBtn) {
-        if (g.mobileButtonLabel) mBtn.textContent = g.mobileButtonLabel;
-        else if (g.buttonLabel) mBtn.textContent = g.buttonLabel;
+        if (!g.mobileButtonLabel) g.mobileButtonLabel = (g.buttonLabel || (mBtn.querySelector('.quiz-pill-label')?.textContent || mBtn.textContent).trim());
+        updatePillButtonDOM(mBtn, g.mobileButtonLabel, grpKey, true);
         mBtn.classList.toggle('ksa-group-hidden', !!g.hidden);
         mBtn.style.display = (!isEditMode && g.hidden) ? 'none' : '';
       }
     });
+  }
+
+  function updatePillButtonDOM(btn, label, grpKey, isMobile) {
+    if (!btn) return;
+    const cleanLabel = (label || '').trim() || (btn.querySelector('.quiz-pill-label')?.textContent || btn.textContent).trim();
+
+    if (isEditMode) {
+      btn.classList.add('ksa-editable-group-pill');
+      btn.title = 'Klik om groep te bekijken • Klik op ✏️ om knoptekst of zichtbaarheid aan te passen';
+
+      let labelSpan = btn.querySelector('.quiz-pill-label');
+      let pencil = btn.querySelector('.ksa-pill-edit-badge');
+
+      if (!labelSpan || !pencil) {
+        btn.innerHTML = `<span class="quiz-pill-label" contenteditable="true" spellcheck="false" title="✏️ Klik om tekst direct te typen">${cleanLabel}</span><span class="ksa-pill-edit-badge" title="⚙️ Groepsinstellingen &amp; knop aanpassen" role="button">✏️</span>`;
+        labelSpan = btn.querySelector('.quiz-pill-label');
+        pencil = btn.querySelector('.ksa-pill-edit-badge');
+      } else {
+        if (document.activeElement !== labelSpan) {
+          labelSpan.textContent = cleanLabel;
+        }
+      }
+
+      if (labelSpan && !labelSpan.dataset.ksaBound) {
+        labelSpan.dataset.ksaBound = '1';
+        labelSpan.addEventListener('click', (e) => {
+          e.stopPropagation(); // Voorkom dat de groepswissel getriggerd wordt tijdens tekstselectie/klik
+        });
+        labelSpan.addEventListener('input', () => {
+          const val = labelSpan.textContent.trim();
+          if (window.groupData && window.groupData[grpKey]) {
+            if (isMobile) window.groupData[grpKey].mobileButtonLabel = val;
+            else window.groupData[grpKey].buttonLabel = val;
+          }
+        });
+        labelSpan.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            labelSpan.blur();
+          }
+        });
+      }
+
+      if (pencil && !pencil.dataset.ksaBound) {
+        pencil.dataset.ksaBound = '1';
+        pencil.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          openSingleGroupPillModal(grpKey, btn);
+        });
+      }
+
+      if (!btn.dataset.ksaPillBound) {
+        btn.dataset.ksaPillBound = '1';
+        btn.addEventListener('dblclick', (e) => {
+          if (!isEditMode) return;
+          e.preventDefault();
+          e.stopPropagation();
+          openSingleGroupPillModal(grpKey, btn);
+        });
+      }
+    } else {
+      btn.classList.remove('ksa-editable-group-pill');
+      delete btn.dataset.ksaPillBound;
+      btn.textContent = cleanLabel;
+    }
   }
 
   function ensureJimSimCircles() {
@@ -1121,6 +1187,64 @@ const KSA_GITHUB_EDITOR_CONFIG = {
         text-decoration: line-through !important;
         outline: 2px dashed #e3001b !important;
         position: relative !important;
+      }
+      body.ksa-edit-mode-active .quiz-pill-btn,
+      body.ksa-edit-mode-active .group-select-btn {
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        position: relative !important;
+        transition: transform 0.15s, box-shadow 0.15s !important;
+      }
+      body.ksa-edit-mode-active .quiz-pill-btn:hover,
+      body.ksa-edit-mode-active .group-select-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+      body.ksa-edit-mode-active .quiz-pill-btn .quiz-pill-label,
+      body.ksa-edit-mode-active .group-select-btn .quiz-pill-label {
+        display: inline-block !important;
+        outline: 1.5px dashed rgba(0, 85, 165, 0.45) !important;
+        outline-offset: 2px !important;
+        cursor: text !important;
+        border-radius: 4px !important;
+        padding: 0 4px !important;
+        min-width: 40px !important;
+        user-select: text !important;
+        -webkit-user-select: text !important;
+      }
+      body.ksa-edit-mode-active .quiz-pill-btn .quiz-pill-label:focus,
+      body.ksa-edit-mode-active .group-select-btn .quiz-pill-label:focus {
+        outline: 2px solid #e3001b !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        color: #1a202c !important;
+      }
+      .ksa-pill-edit-badge {
+        display: none;
+      }
+      body.ksa-edit-mode-active .ksa-pill-edit-badge {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 11px !important;
+        line-height: 1 !important;
+        border-radius: 50% !important;
+        background: #ffffff !important;
+        color: #0055a5 !important;
+        border: 1.5px solid #cbd5e1 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+        flex-shrink: 0 !important;
+        transition: transform 0.15s, background 0.15s, color 0.15s !important;
+      }
+      body.ksa-edit-mode-active .ksa-pill-edit-badge:hover {
+        transform: scale(1.3) !important;
+        background: #e3001b !important;
+        color: #ffffff !important;
+        border-color: #e3001b !important;
       }
       .ksa-btn-add-pill {
         display: none;
@@ -1920,6 +2044,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     injectBannerControlBar();
     updateBannerButtonState();
     injectGroupPillsControlBar();
+    applyGroupButtonsState();
     injectCardEditTools();
     injectShortcutTools();
     injectTopbarEditTools();
@@ -2027,6 +2152,7 @@ const KSA_GITHUB_EDITOR_CONFIG = {
 
     document.querySelectorAll('.ksa-shortcut-tools, .shortcut-tile-add').forEach(el => el.remove());
     updateShortcutsVisibility();
+    applyGroupButtonsState();
 
     const mobHeaderBtn = document.getElementById('mobileEditTriggerBtn');
     if (mobHeaderBtn) {
@@ -2560,6 +2686,94 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     };
   }
 
+  function openSingleGroupPillModal(grpKey, btn) {
+    if (!window.groupData) return;
+    const g = window.groupData[grpKey] || {};
+    const isMob = window.location.pathname.includes('mobile.html');
+    const curLabel = isMob ? (g.mobileButtonLabel || g.name || grpKey) : (g.buttonLabel || g.name || grpKey);
+
+    const emojiPresets = ['✨', '🎈', '🏕️', '🧭', '⚡', '🔥', '⭐', '❤️', '🎉', '👑', '🍕', '🎯'];
+
+    const modal = document.getElementById('ksaEditorModalContent');
+    const backdrop = document.getElementById('ksaEditorModalBackdrop');
+
+    modal.innerHTML = `
+      <h3>🎒 Groepsknop Aanpassen (${(g.name || grpKey).toUpperCase()})</h3>
+      <p>Pas de tekst en emoji aan op deze groepsknop, of schakel de groep uit als deze dit jaar niet actief is:</p>
+      
+      <label style="display:block; font-weight:700; color:#1e293b; margin-top:8px;">Tekst op de knop:</label>
+      <input type="text" id="ksaSingleGroupPillInput" value="${curLabel.replace(/"/g, '&quot;')}" style="font-size:1.1rem; font-weight:700; text-transform:uppercase; margin-bottom:8px;">
+
+      <div style="font-size:0.8rem; color:#475569; background:#f8fafc; padding:7px 10px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0; line-height:1.4;">
+        💡 <strong>Tip:</strong> Open het Windows emoji-toetsenbord met de sneltoets: 👉 <strong>Windows-toets + . (punt)</strong> <em>(of Windows-toets + ;)</em>
+      </div>
+
+      <label style="display:block; font-size:0.85rem; font-weight:600; color:#475569; margin-bottom:4px;">Of voeg snel een emoji toe:</label>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;">
+        ${emojiPresets.map(em => `<button type="button" class="ksa-mini-btn ksa-emoji-quick-btn" style="font-size:1.1rem; padding:4px 8px;">${em}</button>`).join('')}
+      </div>
+
+      <div style="background:#f1f5f9; padding:10px 12px; border-radius:8px; margin-bottom:14px;">
+        <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-weight:700;">
+          <input type="checkbox" id="ksaSingleGroupPillAvail" ${!g.hidden ? 'checked' : ''}>
+          <span>Actieve groep dit werkjaar (toon knop op de website)</span>
+        </label>
+        <div style="font-size:0.78rem; color:#64748b; margin-top:3px; padding-left:24px;">
+          Als je dit uitvinkt, wordt de knop voor gewone bezoekers verborgen.
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:14px; border-top:1px solid #e2e8f0; flex-wrap:wrap; gap:8px;">
+        <button type="button" class="ksa-mini-btn" id="ksaOpenAllGroupsManagerBtn">📋 Alle groepen beheren...</button>
+        <div class="ksa-editor-modal-actions" style="margin:0;">
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-sec" id="ksaSingleGroupCancel">Annuleren</button>
+          <button type="button" class="ksa-dock-btn ksa-dock-btn-save" id="ksaSingleGroupSave">✔️ Toepassen</button>
+        </div>
+      </div>
+    `;
+
+    backdrop.style.display = 'flex';
+
+    const input = document.getElementById('ksaSingleGroupPillInput');
+    modal.querySelectorAll('.ksa-emoji-quick-btn').forEach(b => {
+      b.onclick = () => {
+        input.value = (input.value.trim() + ' ' + b.textContent.trim()).trim();
+        input.focus();
+      };
+    });
+
+    document.getElementById('ksaOpenAllGroupsManagerBtn').onclick = () => {
+      openGroupPillsModal(grpKey);
+    };
+
+    document.getElementById('ksaSingleGroupCancel').onclick = () => {
+      backdrop.style.display = 'none';
+    };
+
+    const saveChanges = () => {
+      const newLabel = input.value.trim();
+      const isAvail = document.getElementById('ksaSingleGroupPillAvail').checked;
+
+      if (newLabel) {
+        if (isMob) g.mobileButtonLabel = newLabel;
+        else g.buttonLabel = newLabel;
+      }
+      g.hidden = !isAvail;
+
+      applyGroupButtonsState();
+      backdrop.style.display = 'none';
+    };
+
+    document.getElementById('ksaSingleGroupSave').onclick = saveChanges;
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') saveChanges();
+    };
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
+  }
+
   function openGroupPillsModal(focusGroupKey) {
     if (!window.groupData) return;
     applyGroupButtonsState();
@@ -2573,6 +2787,9 @@ const KSA_GITHUB_EDITOR_CONFIG = {
     modal.innerHTML = `
       <h3>🎒 Leeftijdsgroepen Knoppen Beheren</h3>
       <p>Pas hieronder de tekst op de groepsknoppen aan, of vink een groep <strong>uit</strong> als deze leeftijdsgroep dit werkjaar niet beschikbaar is:</p>
+      <div style="font-size:0.8rem; color:#475569; background:#f8fafc; padding:7px 10px; border-radius:6px; margin-bottom:10px; border:1px solid #e2e8f0; line-height:1.4;">
+        💡 <strong>Tip:</strong> Open het Windows emoji-toetsenbord met de sneltoets: 👉 <strong>Windows-toets + . (punt)</strong> <em>(of Windows-toets + ;)</em>
+      </div>
       <div style="display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;">
         ${groupKeys.map(k => {
           const g = window.groupData[k] || {};
@@ -3669,6 +3886,19 @@ const KSA_GITHUB_EDITOR_CONFIG = {
       fullState.groups = {};
       ['kabouters', 'sloebers', 'roodkapjes', 'jim', 'sim', 'kim'].forEach(k => {
         if (window.groupData[k]) {
+          const dBtn = document.querySelector(`.quiz-pill-btn[data-group="${k}"]`);
+          if (dBtn) {
+            const lblSpan = dBtn.querySelector('.quiz-pill-label') || dBtn;
+            const currentDomText = (lblSpan.textContent || '').trim();
+            if (currentDomText) window.groupData[k].buttonLabel = currentDomText;
+          }
+          const mBtn = document.querySelector(`.group-select-btn[data-group="${k}"]`);
+          if (mBtn) {
+            const mLblSpan = mBtn.querySelector('.quiz-pill-label') || mBtn;
+            const currentMobText = (mLblSpan.textContent || '').trim();
+            if (currentMobText) window.groupData[k].mobileButtonLabel = currentMobText;
+          }
+
           fullState.groups[k] = {
             name: window.groupData[k].name,
             image: window.groupData[k].image,
