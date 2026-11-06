@@ -235,9 +235,7 @@
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(5) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793738334687_WhatsApp_Image_2026-11-03_at_17.46.16__1_.jpg",
       "#leiding > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(6) > div:nth-of-type(1) > img:nth-of-type(1)": "images/uploads/1793740682690_WhatsApp_Image_2026-11-03_at_17.46.16.jpg",
       "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(1) > a:nth-of-type(1) > img:nth-of-type(1)": "images/theem_logo_card.jpg",
-      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/theem.jpg",
-      "#ksaEditorModalContent > div:nth-of-type(1) > button:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-square.png",
-      "#ksaEditorModalContent > div:nth-of-type(1) > button:nth-of-type(3) > div:nth-of-type(1) > img:nth-of-type(1)": "assets/icons/ksa-logo-geen.png"
+      "#verhuring > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(2) > div:nth-of-type(1) > img:nth-of-type(1)": "images/theem.jpg"
     },
     "links": {
       "#mainContent > div:nth-of-type(1) > div:nth-of-type(1) > div:nth-of-type(3) > a:nth-of-type(1)": {
@@ -280,7 +278,7 @@
     "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T20:00:37.932Z",
+  "updatedAt": "2026-11-06T20:01:24.236Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
