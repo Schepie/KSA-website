@@ -2297,3 +2297,222 @@ a.contact-tile-card:hover .contact-tile-link-action {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   PWA Web App Installation Styles (Desktop & Website)
+   ========================================================================== */
+.pwa-desktop-install-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-full, 999px);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: #ffffff;
+  color: var(--ksa-blue, #0067b1);
+  border: 1.5px solid var(--ksa-blue, #0067b1);
+}
+
+.pwa-desktop-install-btn:hover {
+  background: var(--ksa-blue, #0067b1);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 103, 177, 0.25);
+}
+
+.pwa-footer-install-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--ksa-blue, #0067b1);
+  font-weight: 700;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pwa-footer-install-btn:hover {
+  background: #dbeafe;
+  color: #004b82;
+  transform: translateY(-1px);
+}
+
+/* Desktop PWA Floating Notification */
+.pwa-desktop-banner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 43, 127, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1.5px solid #dbeafe;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 9990;
+  animation: pwaSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pwaSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pwa-desktop-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pwa-desktop-banner-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-desktop-banner-text strong {
+  font-size: 0.9rem;
+  color: #002b7f;
+  font-weight: 800;
+}
+
+.pwa-desktop-banner-text span {
+  font-size: 0.78rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.pwa-desktop-banner-btn-install {
+  background: var(--ksa-blue, #0067b1);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.pwa-desktop-banner-btn-install:hover {
+  background: #004b82;
+  transform: scale(1.03);
+}
+
+.pwa-desktop-banner-btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.pwa-desktop-banner-btn-close:hover {
+  color: #334155;
+}
+
+/* PWA Desktop Modal */
+.pwa-desktop-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 16px;
+}
+
+.pwa-desktop-modal-card {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: pwaZoomIn 0.25s ease-out;
+}
+
+@keyframes pwaZoomIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.pwa-desktop-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pwa-modal-close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pwa-modal-close-btn:hover {
+  background: #e2e8f0;
+}
+
+.pwa-desktop-modal-body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pwa-step-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.pwa-step-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ksa-blue, #0067b1);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pwa-desktop-modal-footer {
+  padding: 14px 20px 18px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
