@@ -1,12 +1,12 @@
 {
   "_auth": {
-    "pinHash": "1b76a9af19078b491475a25e77a874cd60a79dd7f8ff4ec8c2bde91d7a542de7",
-    "updatedAt": "2026-11-06T15:51:45.460Z",
+    "pinHash": "56f53220e6bf0f85057d32c8498da4e9e5ab8b225f59e5bd8c977cd020aca195",
+    "updatedAt": "2026-11-06T15:52:18.314Z",
     "vault": {
-      "salt": "31af9e28cb008cd1747590dbf55f4ddc",
-      "iv": "51d7a4f681c3c205424e7e26",
-      "data": "4677195b69fcdacaccd75ae7bc889e7336854ad467e3d4d3dfc7baca1411f684b22c5def509f43a47ebf4c0a80e8352527d42b8af867db46bd93a8fa506031a8c6cc042500676cb8a86354fc8f1e460e8586b02a5bce22220b91903bf6cd6d4a2d2256e12b6b62797855e555ab",
-      "updatedAt": "2026-11-06T15:08:43.935Z"
+      "salt": "7119ade61b3ea3c7e808de023421c5d0",
+      "iv": "1e5f846e92d68023be182ec8",
+      "data": "936cb16a4263ca3a61840fb6c06001b100e8a662ff77117801b5a2d19f81a49ba5f1f7923f63635e9d66be7ff985132480c6c4fb53666b7dddab550d798da49006fcdafd810db3cbf041a4eed4e520ca48ce7d9f33ece9d23e84e1c2e238cedd6f56ac6542deac2123e8839c69",
+      "updatedAt": "2026-11-06T15:52:18.335Z"
     },
     "adminEmail": "geert.schepers@gmail.com",
     "emailNotificationKey": "45dff370-7e6d-41e2-bffd-b751ecf5acb1"
@@ -278,7 +278,7 @@
     "hidden": true,
     "targetIso": "2026-11-10T17:00:00.000Z"
   },
-  "updatedAt": "2026-11-06T15:51:45.460Z",
+  "updatedAt": "2026-11-06T15:52:18.314Z",
   "shortcutsHidden": false,
   "mobile": {
     "texts": {
