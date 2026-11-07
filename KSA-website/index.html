@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSA Zonhoven | Doorsturen...</title>
+  <link rel="canonical" href="https://ksazonhoven.be/">
+  <meta http-equiv="refresh" content="0; url=/">
+  <script>
+    (function() {
+      const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth <= 768;
+      const hash = window.location.hash || '';
+      if (isMobileUA || isSmallScreen) {
+        window.location.replace('/mobile.html' + hash);
+      } else {
+        window.location.replace('/' + hash);
+      }
+    })();
+  </script>
+</head>
+<body style="font-family:system-ui, -apple-system, sans-serif; text-align:center; padding:60px 20px; background:#0067b1; color:#fff; margin:0;">
+  <p>Je wordt doorgestuurd naar <a href="/" style="color:#ffe600; font-weight:bold;">ksazonhoven.be</a>...</p>
+</body>
+</html>

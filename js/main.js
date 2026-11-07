@@ -471,7 +471,7 @@ Met vriendelijke KSA-groeten,
 De Leiding van KSA Zonhoven
 📍 Dijkbeemdenweg 8, 3520 Zonhoven
 ✉️ hoofdleiding.ksazonhoven@gmail.com
-🌐 https://schepie.github.io/KSA-website/`;
+🌐 https://ksazonhoven.be/`;
 
     const endpoint = window.KSA_CONTACT_ENDPOINT || 'https://formsubmit.co/ajax/hoofdleiding.ksazonhoven@gmail.com';
 
